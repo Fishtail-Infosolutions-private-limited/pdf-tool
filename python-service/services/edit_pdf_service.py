@@ -1,0 +1,614 @@
+"""
+Edit PDF Service
+─────────────────
+1. extract_pdf_content  → parse text blocks + images with positions (returned as JSON)
+2. apply_pdf_edits      → receive edit instructions, whiteout originals, draw new content
+"""
+
+import io
+import os
+import re
+import json
+import base64
+import logging
+import fitz  # PyMuPDF
+from PIL import Image
+from fastapi import UploadFile
+
+logger = logging.getLogger(__name__)
+
+# ─── Font mapping (friendly name → fitz base-14 fontname) ────────────────────
+
+FONT_MAP = {
+    "Helvetica": "helv",
+    "Arial": "helv",
+    "Inter": "helv",
+    "Roboto": "helv",
+    "Open Sans": "helv",
+    "Lato": "helv",
+    "Montserrat": "helv",
+    "Poppins": "helv",
+    "Verdana": "helv",
+    "Impact": "helv",
+    "Times New Roman": "tiro",
+    "Georgia": "tiro",
+    "Courier": "cour",
+    "Courier New": "cour",
+}
+
+
+def _resolve_fitz_font(family: str, bold: bool, italic: bool) -> str:
+    base = FONT_MAP.get(family, "helv")
+    if base == "helv":
+        if bold and italic:
+            return "hebi"  # Helvetica-BoldOblique
+        elif bold:
+            return "hebo"  # Helvetica-Bold
+        elif italic:
+            return "heit"  # Helvetica-Oblique (was "heob" — invalid alias!)
+        return "helv"
+    elif base == "tiro":
+        if bold and italic:
+            return "tibi"
+        elif bold:
+            return "tibo"
+        elif italic:
+            return "tiit"
+        return "tiro"
+    elif base == "cour":
+        if bold and italic:
+            return "cobi"
+        elif bold:
+            return "cobo"
+        elif italic:
+            return "coit"
+        return "cour"
+    return base
+
+
+def _hex_to_rgb(hex_color: str) -> tuple:
+    try:
+        if not isinstance(hex_color, str) or not hex_color:
+            return 0.0, 0.0, 0.0
+        h = hex_color.lstrip("#")
+        if len(h) == 3:
+            h = "".join(c * 2 for c in h)
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+        return r / 255.0, g / 255.0, b / 255.0
+    except (ValueError, IndexError, TypeError):
+        return 0.0, 0.0, 0.0
+
+
+def _rgb_to_hex(r: float, g: float, b: float) -> str:
+    return "#{:02x}{:02x}{:02x}".format(
+        int(r * 255), int(g * 255), int(b * 255)
+    )
+
+
+# ─── EXTRACT ──────────────────────────────────────────────────────────────────
+
+async def extract_pdf_content(file: UploadFile) -> dict:
+    """
+    Extract all text blocks and images from a PDF.
+    Returns JSON with text_blocks and images arrays,
+    each with position info as percentages of page dimensions.
+    """
+    pdf_bytes = await file.read()
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+    result = {
+        "pages": [],
+        "total_pages": len(doc),
+    }
+
+    for page_idx in range(len(doc)):
+        page = doc[page_idx]
+        pw = page.rect.width
+        ph = page.rect.height
+
+        page_data = {
+            "page_number": page_idx + 1,
+            "width": pw,
+            "height": ph,
+            "text_blocks": [],
+            "images": [],
+        }
+
+        # ── Extract text lines ──────────────────────────────────────────
+        # Use get_text("dict") for detailed block/line/span info
+        text_dict = page.get_text("dict", flags=fitz.TEXT_PRESERVE_WHITESPACE)
+
+        for blk_idx, block in enumerate(text_dict.get("blocks", [])):
+            if block.get("type") != 0:  # type 0 = text block
+                continue
+
+            for line_idx, line in enumerate(block.get("lines", [])):
+                dominant_size = 12.0
+                dominant_color_hex = "#000000"
+                dominant_font = "Helvetica"
+                is_bold = False
+                is_italic = False
+                
+                line_parts = []
+                span_count = 0
+
+                for span in line.get("spans", []):
+                    span_text = span.get("text", "")
+                    # Don't skip completely empty spans if they are just spaces
+                    if not span_text:
+                        continue
+                        
+                    line_parts.append(span_text)
+                    span_count += 1
+
+                    # Track the most common style (use the first span's style)
+                    if span_count == 1:
+                        dominant_size = span.get("size", 12.0)
+                        # Color is an integer in fitz
+                        color_int = span.get("color", 0)
+                        r = ((color_int >> 16) & 0xFF) / 255.0
+                        g = ((color_int >> 8) & 0xFF) / 255.0
+                        b = (color_int & 0xFF) / 255.0
+                        dominant_color_hex = _rgb_to_hex(r, g, b)
+
+                        font_name = span.get("font", "")
+                        # Detect bold/italic from font name
+                        fn_lower = font_name.lower()
+                        is_bold = "bold" in fn_lower or "heavy" in fn_lower or "black" in fn_lower
+                        is_italic = "italic" in fn_lower or "oblique" in fn_lower
+
+                        # Map to a friendly font family
+                        if any(k in fn_lower for k in ["arial", "helvetica", "sans"]):
+                            dominant_font = "Helvetica"
+                        elif any(k in fn_lower for k in ["times", "serif", "roman"]):
+                            dominant_font = "Times New Roman"
+                        elif any(k in fn_lower for k in ["courier", "mono"]):
+                            dominant_font = "Courier New"
+                        else:
+                            dominant_font = "Helvetica"
+
+                full_text = "".join(line_parts)
+                if not full_text.strip():
+                    continue
+
+                # Line bounding box (much tighter and perfectly positioned than block bbox)
+                bbox = line.get("bbox", (0, 0, 0, 0))
+                x0, y0, x1, y1 = bbox
+
+                page_data["text_blocks"].append({
+                    "id": f"ext_t_{page_idx}_{blk_idx}_{line_idx}",
+                    "text": full_text,
+                    "x_pct": (x0 / pw) * 100,
+                    "y_pct": (y0 / ph) * 100,
+                    "w_pct": ((x1 - x0) / pw) * 100,
+                    "h_pct": ((y1 - y0) / ph) * 100,
+                    # Original coords for whiteout (in PDF points)
+                    "orig_x0": x0,
+                    "orig_y0": y0,
+                    "orig_x1": x1,
+                    "orig_y1": y1,
+                    # Style
+                    "fontSize": round(dominant_size, 1),
+                    "fontFamily": dominant_font,
+                    "color": dominant_color_hex,
+                    "bold": is_bold,
+                    "italic": is_italic,
+                })
+
+        # ── Extract images ───────────────────────────────────────────────
+        img_list = page.get_images(full=True)
+        for img_index, img_info in enumerate(img_list):
+            xref = img_info[0]
+            try:
+                # Get image bounding box by looking at how it's placed on the page
+                img_rects = page.get_image_rects(xref)
+                if not img_rects:
+                    continue
+
+                for rect_idx, img_rect in enumerate(img_rects):
+                    if img_rect.is_empty or img_rect.is_infinite:
+                        continue
+
+                    # Extract image bytes
+                    base_image = doc.extract_image(xref)
+                    if not base_image:
+                        continue
+
+                    img_bytes = base_image["image"]
+                    img_ext = base_image.get("ext", "png")
+
+                    # Apply SMask for transparency using Pillow
+                    if "smask" in base_image and base_image["smask"] > 0:
+                        try:
+                            mask_info = doc.extract_image(base_image["smask"])
+                            if mask_info:
+                                base_pil = Image.open(io.BytesIO(img_bytes)).convert("RGBA")
+                                mask_pil = Image.open(io.BytesIO(mask_info["image"])).convert("L")
+                                if base_pil.size == mask_pil.size:
+                                    base_pil.putalpha(mask_pil)
+                                    out_io = io.BytesIO()
+                                    base_pil.save(out_io, format="PNG")
+                                    img_bytes = out_io.getvalue()
+                                    img_ext = "png"
+                        except Exception as mask_e:
+                            logger.warning(f"Failed to apply SMask with PIL for xref={xref}: {mask_e}")
+
+                    mime = f"image/{img_ext}" if img_ext != "jpg" else "image/jpeg"
+
+                    # Convert to base64 data URL
+                    b64 = base64.b64encode(img_bytes).decode("utf-8")
+                    data_url = f"data:{mime};base64,{b64}"
+
+                    x0, y0, x1, y1 = img_rect.x0, img_rect.y0, img_rect.x1, img_rect.y1
+
+                    page_data["images"].append({
+                        "id": f"ext_i_{page_idx}_{img_index}_{rect_idx}",
+                        "page": page_idx + 1,
+                        "dataUrl": data_url,
+                        "x_pct": (x0 / pw) * 100,
+                        "y_pct": (y0 / ph) * 100,
+                        "w_pct": ((x1 - x0) / pw) * 100,
+                        "h_pct": ((y1 - y0) / ph) * 100,
+                        # Original coords for whiteout
+                        "orig_x0": x0,
+                        "orig_y0": y0,
+                        "orig_x1": x1,
+                        "orig_y1": y1,
+                    })
+            except Exception as e:
+                logger.warning(f"Could not extract image xref={xref}: {e}")
+                continue
+
+        result["pages"].append(page_data)
+
+    doc.close()
+    return result
+
+
+# ─── APPLY EDITS ──────────────────────────────────────────────────────────────
+
+async def apply_pdf_edits(file: UploadFile, edits_json: str) -> tuple[bytes, str]:
+    """
+    Apply edits to a PDF.
+
+    edits_json is a JSON string with:
+    {
+        "modified": [  // existing items that were changed (text edited, moved, resized)
+            {
+                "type": "text" | "image",
+                "page": 1,  // 1-indexed
+                // Original area to whiteout (PDF points)
+                "orig_x0": ..., "orig_y0": ..., "orig_x1": ..., "orig_y1": ...,
+                // New position (% of page)
+                "x_pct": ..., "y_pct": ..., "w_pct": ..., "h_pct": ...,
+                // For text:
+                "text": "...", "fontSize": 14, "fontFamily": "Helvetica",
+                "color": "#000000", "bold": false, "italic": false,
+                // For image:
+                "dataUrl": "data:image/..."
+            }
+        ],
+        "deleted": [  // existing items that were removed
+            {
+                "page": 1,
+                "orig_x0": ..., "orig_y0": ..., "orig_x1": ..., "orig_y1": ...
+            }
+        ],
+        "added": [  // brand new annotations
+            {
+                "type": "text" | "image",
+                "page": 1,
+                "x_pct": ..., "y_pct": ..., "w_pct": ..., "h_pct": ...,
+                "text": "...", "fontSize": 14, "fontFamily": "Helvetica",
+                "color": "#000000", "bold": false, "italic": false,
+                // or for image:
+                "dataUrl": "data:image/..."
+            }
+        ]
+    }
+
+    Returns (pdf_bytes, output_filename).
+    """
+    pdf_bytes = await file.read()
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+    edits = json.loads(edits_json)
+
+    modified = edits.get("modified", [])
+    deleted = edits.get("deleted", [])
+    added = edits.get("added", [])
+
+    # ── Process deletions: whiteout the original area ─────────────────────
+    for item in deleted:
+        page_idx = item["page"] - 1
+        if page_idx < 0 or page_idx >= len(doc):
+            continue
+        page = doc[page_idx]
+        # Expand the redaction rect by 1 point to account for float rounding
+        # This ensures the rectangle fully intersects the target image
+        rect = fitz.Rect(
+            item.get("orig_x0", 0) - 1, item.get("orig_y0", 0) - 1,
+            item.get("orig_x1", 0) + 1, item.get("orig_y1", 0) + 1
+        )
+        # Add redaction annotation (removes text/images without white fill)
+        page.add_redact_annot(rect)
+
+    # ── Process modifications: whiteout original, then draw new ──────────
+    for item in modified:
+        page_idx = item["page"] - 1
+        if page_idx < 0 or page_idx >= len(doc):
+            continue
+        page = doc[page_idx]
+
+        # Redact original position
+        rect = fitz.Rect(
+            item.get("orig_x0", 0) - 1, item.get("orig_y0", 0) - 1,
+            item.get("orig_x1", 0) + 1, item.get("orig_y1", 0) + 1
+        )
+        page.add_redact_annot(rect)
+
+    # Track which pages actually received redactions so we don't unnecessarily process untouched pages
+    pages_to_redact = set()
+    for item in deleted + modified:
+        page_idx = item["page"] - 1
+        if 0 <= page_idx < len(doc):
+            pages_to_redact.add(page_idx)
+
+    # Apply all redactions (deletions and modifications only)
+    for page_idx in pages_to_redact:
+        page = doc[page_idx]
+        # images=1 removes all overlapping images entirely, guaranteeing they don't linger
+        page.apply_redactions(images=1)
+
+    # ── Now draw modified items at their new positions ────────────────────
+    for item in modified:
+        page_idx = item["page"] - 1
+        if page_idx < 0 or page_idx >= len(doc):
+            continue
+        page = doc[page_idx]
+        pw = page.rect.width
+        ph = page.rect.height
+
+        item_type = item.get("type")
+        if item_type == "text":
+            _draw_text_block(page, item, pw, ph)
+        elif item_type == "image":
+            _draw_image_block(page, item, pw, ph)
+        elif item_type == "draw":
+            _draw_annotation_block(page, item, pw, ph)
+
+    # ── Draw newly added items ───────────────────────────────────────────
+    for item in added:
+        page_idx = item["page"] - 1
+        if page_idx < 0 or page_idx >= len(doc):
+            continue
+        page = doc[page_idx]
+        pw = page.rect.width
+        ph = page.rect.height
+
+        item_type = item.get("type")
+        if item_type == "text":
+            _draw_text_block(page, item, pw, ph)
+        elif item_type == "image":
+            _draw_image_block(page, item, pw, ph)
+        elif item_type == "draw":
+            _draw_annotation_block(page, item, pw, ph)
+
+    out_bytes = doc.tobytes(garbage=4, deflate=True)
+    doc.close()
+
+    base = (file.filename or "document").rsplit(".", 1)[0]
+    return out_bytes, f"{base}_edited.pdf"
+
+
+def _draw_text_block(page, item: dict, pw: float, ph: float):
+    """Draw a text block onto the page.
+    
+    PyMuPDF coordinate system: Y=0 at the TOP, increases downward.
+    Frontend coordinate system: percentages from top-left.
+    Direct mapping: x = (x_pct/100)*pw, y = (y_pct/100)*ph. No matrix needed.
+    """
+    text = item.get("text", "")
+    if not text.strip():
+        return
+
+    x = (float(item.get("x_pct") or 0) / 100) * pw
+    y = (float(item.get("y_pct") or 0) / 100) * ph
+    w = (float(item.get("w_pct") or 0) / 100) * pw
+    h = (float(item.get("h_pct") or 0) / 100) * ph
+
+    font_size = float(item.get("fontSize", 12))
+    font_family = item.get("fontFamily", "Helvetica")
+    color_hex = item.get("color", "#000000")
+    bold = item.get("bold", False)
+    italic = item.get("italic", False)
+    underline = item.get("underline", False)
+
+    fitz_font = _resolve_fitz_font(font_family, bold, italic)
+    color = _hex_to_rgb(color_hex)
+
+    # insert_text baseline is at y + font_size (top of glyph box to baseline)
+    baseline_y = y + font_size
+    insert_pt = fitz.Point(x, baseline_y)
+
+    try:
+        # Use insert_text — direct single-line placement, no clipping issues
+        lines = text.split("\n")
+        line_height = font_size * 1.2
+        curr_y = baseline_y
+        fitz_font_obj = fitz.Font(fitz_font)
+        for line_txt in lines:
+            page.insert_text(
+                fitz.Point(x, curr_y),
+                line_txt,
+                fontname=fitz_font,
+                fontsize=font_size,
+                color=color,
+            )
+            if underline:
+                lw = fitz_font_obj.text_length(line_txt, fontsize=font_size)
+                ul_y = curr_y + font_size * 0.15
+                page.draw_line(
+                    fitz.Point(x, ul_y),
+                    fitz.Point(x + lw, ul_y),
+                    color=color,
+                    width=max(0.5, font_size * 0.05)
+                )
+            curr_y += line_height
+    except Exception as e:
+        logger.error(f"Text insertion failed: {e}")
+
+
+def _draw_image_block(page, item: dict, pw: float, ph: float):
+    """Draw an image block onto the page."""
+    data_url = item.get("dataUrl", "")
+    if not data_url:
+        return
+
+    x = (float(item.get("x_pct") or 0) / 100) * pw
+    y = (float(item.get("y_pct") or 0) / 100) * ph
+    w = (float(item.get("w_pct") or 0) / 100) * pw
+    h = (float(item.get("h_pct") or 0) / 100) * ph
+
+    try:
+        if "," in data_url:
+            b64_data = data_url.split(",", 1)[1]
+        else:
+            b64_data = data_url
+
+        img_bytes = base64.b64decode(b64_data)
+
+        # Convert image to PNG using Pillow to support WebP and other formats not natively supported by PyMuPDF
+        import io
+        from PIL import Image
+        try:
+            pil_img = Image.open(io.BytesIO(img_bytes))
+            out_io = io.BytesIO()
+            pil_img.save(out_io, format="PNG")
+            img_bytes = out_io.getvalue()
+        except Exception as pil_err:
+            logger.warning(f"PIL conversion failed, attempting raw insertion: {pil_err}")
+
+        img_rect = fitz.Rect(x, y, x + w, y + h)
+        page.insert_image(img_rect, stream=img_bytes, keep_proportion=False)
+    except Exception as e:
+        logger.error(f"Image insertion failed: {e}")
+
+
+def _draw_annotation_block(page, item: dict, pw: float, ph: float):
+    """
+    Render a freehand draw / highlight / whiteout stroke onto the page.
+
+    The frontend stores paths as a list of lists of {x, y} points where
+    each coordinate is a fraction (0..1) of the bounding box, and the
+    bounding box itself is expressed as percentages of the page dimensions.
+
+    PDF coordinate space has Y=0 at the BOTTOM of the page, so we flip Y.
+    """
+    paths = item.get("paths", [])
+    if not paths:
+        return
+
+    color_hex = item.get("color", "#000000")
+    line_width = float(item.get("lineWidth", 2))
+    is_highlight = bool(item.get("isHighlight", False))
+    is_whiteout = (color_hex.lower().replace(" ", "") == "#ffffff")
+
+    # Bounding box in PDF points — direct percentage mapping, no matrix transforms
+    bx = (float(item.get("x_pct") or 0) / 100) * pw
+    by = (float(item.get("y_pct") or 0) / 100) * ph
+    bw = (float(item.get("w_pct") or 0) / 100) * pw
+    bh = (float(item.get("h_pct") or 0) / 100) * ph
+
+    stroke_color = _hex_to_rgb(color_hex)
+
+    for path in paths:
+        if len(path) < 2:
+            continue
+
+        # Convert relative [0..1] path points → absolute PDF coordinates.
+        # Frontend: Y=0 top, increases down. PyMuPDF: Y=0 top, increases down.
+        # Direct mapping is correct — no Y inversion needed.
+        points = [
+            fitz.Point(
+                bx + pt["x"] * bw,
+                by + pt["y"] * bh,
+            )
+            for pt in path
+        ]
+
+        try:
+            shape = page.new_shape()
+            shape.draw_polyline(points)
+
+            if is_whiteout:
+                # Solid white stroke to cover underlying content
+                shape.finish(
+                    color=(1.0, 1.0, 1.0),
+                    fill=None,
+                    width=line_width,
+                    closePath=False,
+                    stroke_opacity=1.0,
+                )
+            elif is_highlight:
+                # Semi-transparent coloured stroke
+                shape.finish(
+                    color=stroke_color,
+                    fill=None,
+                    width=line_width,
+                    closePath=False,
+                    stroke_opacity=0.35,
+                )
+            else:
+                # Normal pen stroke
+                shape.finish(
+                    color=stroke_color,
+                    fill=None,
+                    width=line_width,
+                    closePath=False,
+                    stroke_opacity=1.0,
+                )
+
+            shape.commit()
+        except Exception as e:
+            logger.warning(f"Draw stroke rendering failed: {e}")
+
+async def render_clean_page(file: UploadFile, page_number: int, redactions_json: str, dpi: int = 150) -> str:
+    """
+    Renders a specific page to a base64 Data URL, first applying any redactions.
+    redactions_json is a list of bounding boxes (PDF coordinates):
+    [ { "orig_x0": ..., "orig_y0": ..., "orig_x1": ..., "orig_y1": ... }, ... ]
+    """
+    pdf_bytes = await file.read()
+    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+
+    page_idx = page_number - 1
+    if page_idx < 0 or page_idx >= len(doc):
+        raise ValueError("Invalid page number")
+        
+    page = doc[page_idx]
+
+    try:
+        redactions = json.loads(redactions_json)
+    except Exception:
+        redactions = []
+
+    for item in redactions:
+        x0, y0 = item.get("orig_x0", 0), item.get("orig_y0", 0)
+        x1, y1 = item.get("orig_x1", 0), item.get("orig_y1", 0)
+        rect = fitz.Rect(x0, y0, x1, y1)
+        # We redact without fill so it acts as an eraser for text/images but leaves background
+        page.add_redact_annot(rect)
+
+    page.apply_redactions()
+
+    # Render out exactly as the initial load does
+    scale = dpi / 72.0
+    matrix = fitz.Matrix(scale, scale)
+    pix = page.get_pixmap(matrix=matrix)
+    
+    # We want PNG for lossless, matching initial render format
+    png_bytes = pix.tobytes("png")
+    b64 = base64.b64encode(png_bytes).decode("utf-8")
+    doc.close()
+    
+    return f"data:image/png;base64,{b64}"
