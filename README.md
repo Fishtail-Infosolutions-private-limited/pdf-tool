@@ -4,7 +4,7 @@ PDF Maya is a comprehensive, full-stack PDF management and editing toolkit. It p
 
 Built with a high-performance Next.js frontend and a powerful Python-based backend service, PDF Maya is designed to handle complex document workflows efficiently and securely.
 
-## 🌟 Key Features
+## 🌟  Key Features
 
 ### Edit & Organize
 - **PDF Editor:** Add text, images, drawings, and highlights to existing PDFs.
@@ -104,3 +104,4 @@ PDF Maya is containerized and optimized for modern deployment platforms (like Co
 ## 📄 License & Legal
 All rights reserved. 
 *(Ensure your `.env` files are added to `.gitignore` and never committed to public repositories).*
+
