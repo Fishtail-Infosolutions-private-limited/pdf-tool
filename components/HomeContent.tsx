@@ -29,7 +29,7 @@ const CAPABILITIES = [
         title: "PDF Converter",
         description:
             "Convert documents between PDF and popular file formats with a fast, browser-based pdf converter. Turn PDFs into editable documents or convert Word, Excel, PowerPoint, and images into PDF files.",
-        popularNote: "Popular tools: PDF to Word, Word to PDF, PDF to JPG, JPG to PDF, and PPT to PDF.",
+        note: "Popular tools: PDF to Word, Word to PDF, PDF to JPG, JPG to PDF, and PPT to PDF.",
         icon: IconArrowsRightLeft,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -45,7 +45,7 @@ const CAPABILITIES = [
         title: "PDF Editor",
         description:
             "Make changes to your documents directly in your browser with a simple pdf editor. Add text, images, shapes, annotations, page numbers, and other elements without rebuilding the original document.",
-        subNote: "Use it when you need to make quick corrections or prepare a PDF for sharing.",
+        note: "Use it when you need to make quick corrections or prepare a PDF for sharing.",
         icon: IconPencil,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -60,10 +60,10 @@ const CAPABILITIES = [
         title: "PDF Tools for Every Document Task",
         description:
             "Find the right pdf tool for everyday document work. Merge files, split documents, extract pages, compress PDFs, repair damaged files, run OCR, and organize pages from one online workspace.",
-        subNote: "Choose a tool, upload your document, and download the finished file when processing is complete.",
+        note: "Choose a tool, upload your document, and download the finished file when processing is complete.",
         icon: IconStack,
-        accent: "#8C886B",
-        bg: "#f0ede4",
+        accent: "#047C58",
+        bg: "#e6f4ef",
         tools: [
             { label: "Merge PDF", href: "/merge-pdf" },
             { label: "Split PDF", href: "/split-pdf" },
@@ -75,7 +75,7 @@ const CAPABILITIES = [
         title: "Convert Files to PDF",
         description:
             "Turn everyday documents and images into PDF files while keeping your workflow simple. Convert Word documents, spreadsheets, presentations, and images into a format that is easy to share, store, and submit.",
-        subNote: "Use convert word to pdf, Excel to PDF, PowerPoint to PDF, or image to PDF when you need a reliable final document.",
+        note: "Use convert word to pdf, Excel to PDF, PowerPoint to PDF, or image to PDF when you need a reliable final document.",
         icon: IconFileArrowRight,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -90,10 +90,10 @@ const CAPABILITIES = [
         title: "Convert PDF to Other Formats",
         description:
             "Need information from a PDF in another format? Convert your document into editable or shareable files depending on what you need to do next.",
-        subNote: "Use pdf to word for editable documents, pdf to jpg or pdf to png for images, and PDF to other supported formats without installing additional software.",
+        note: "Use pdf to word for editable documents, pdf to jpg or pdf to png for images, and PDF to other supported formats without installing additional software.",
         icon: IconFileWord,
-        accent: "#8C886B",
-        bg: "#f0ede4",
+        accent: "#047C58",
+        bg: "#e6f4ef",
         tools: [
             { label: "PDF to Word", href: "/pdf-to-word" },
             { label: "PDF to JPG", href: "/pdf-to-jpg" },
@@ -105,15 +105,13 @@ const CAPABILITIES = [
         title: "Compress and Organise PDFs",
         description:
             "Keep large documents easier to share and manage. Compress PDF files to reduce unnecessary file size, or organise pages by merging, splitting, extracting, removing, rotating, and rearranging them.",
-        subNote: "For larger documents, use a pdf splitter when you need to separate specific pages into individual files.",
+        note: "For larger documents, use a pdf splitter when you need to separate specific pages into individual files.",
         icon: IconLayersSubtract,
         accent: "#047C58",
         bg: "#e6f4ef",
         tools: [
             { label: "Compress PDF", href: "/compress-pdf" },
             { label: "Split PDF", href: "/split-pdf" },
-            { label: "Organise Pages", href: "/organise-pdf" },
-            { label: "Remove Pages", href: "/remove-pages" },
         ],
     },
 ];
@@ -153,7 +151,7 @@ const USE_CASES = [
         points: [
             "Edit a resume without having to have the original design file!",
             "Use a password to protect tax documents or personal records",
-            "SIGN RENTAL AGREEMENTS OR FREELANCE CONTRACTS FROM YOUR PHONES!",
+            "Sign Rental Agreement or Freelance Contracts From Your Phones!",
             "Reduce large PDFs to fit in an E-mail attachment.",
         ],
     },
@@ -284,9 +282,9 @@ export default function HomeContent() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.45 }}
-                        className="text-center mb-14 max-w-3xl mx-auto"
+                        className="text-center mb-14 md:mb-16 max-w-3xl mx-auto"
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold text-brand-dark leading-tight">
+                        <h2 className="text-3xl md:text-4xl font-bold text-brand-dark leading-tight tracking-tight">
                             What Can You Do with a Free Online PDF Tool?
                         </h2>
                         <p className="mt-4 text-neutral-600 text-base sm:text-lg leading-relaxed">
@@ -294,8 +292,8 @@ export default function HomeContent() {
                         </p>
                     </motion.div>
 
-                    {/* 6 Capabilities Cards Grid (Clean & Minimal) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* 6 Capabilities Cards Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {CAPABILITIES.map((cap, i) => {
                             const Icon = cap.icon;
                             return (
@@ -305,13 +303,12 @@ export default function HomeContent() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.4, delay: i * 0.05 }}
-                                    className="flex flex-col justify-between p-7 rounded-2xl border border-[#E0DED9] bg-[#FAFAF9] hover:bg-white hover:border-brand-teal hover:shadow-sm transition-all duration-200"
+                                    className="flex flex-col justify-between p-7 md:p-8 rounded-2xl border border-[#E0DED9] bg-[#FAFAF9] hover:bg-white hover:border-brand-teal/60 hover:shadow-md transition-all duration-200"
                                 >
-                                    <div className="flex flex-col gap-3.5">
+                                    <div className="flex flex-col gap-4">
                                         <div className="flex items-center gap-3">
                                             <span
-                                                className="flex items-center justify-center w-10 h-10 rounded-xl"
-                                                style={{ background: cap.bg, color: cap.accent }}
+                                                className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#e6f4ef] text-brand-teal"
                                             >
                                                 <Icon size={20} stroke={2} />
                                             </span>
@@ -324,29 +321,24 @@ export default function HomeContent() {
                                             {cap.description}
                                         </p>
 
-                                        {cap.popularNote && (
-                                            <p className="text-xs font-semibold text-brand-teal mt-0.5">
-                                                {cap.popularNote}
-                                            </p>
-                                        )}
-                                        {cap.subNote && (
-                                            <p className="text-xs text-neutral-500 italic mt-0.5">
-                                                {cap.subNote}
+                                        {cap.note && (
+                                            <p className="text-xs text-neutral-500 font-medium leading-relaxed bg-white p-3 rounded-xl border border-[#E0DED9]/80">
+                                                {cap.note}
                                             </p>
                                         )}
                                     </div>
 
-                                    {/* Tool Quick Links */}
+                                    {/* Tool Links */}
                                     <div className="mt-6 pt-4 border-t border-[#E0DED9]">
-                                        <div className="flex flex-wrap gap-1.5">
+                                        <div className="flex flex-wrap gap-2">
                                             {cap.tools.map((tool) => (
                                                 <Link
                                                     key={tool.label}
                                                     href={tool.href}
-                                                    className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-md bg-white border border-[#E0DED9] text-brand-dark hover:border-brand-teal hover:text-brand-teal transition-colors shadow-2xs"
+                                                    className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-white border border-[#E0DED9] text-brand-dark hover:border-brand-teal hover:text-brand-teal hover:shadow-2xs transition-all"
                                                 >
                                                     {tool.label}
-                                                    <IconArrowRight size={11} className="opacity-50" />
+                                                    <IconArrowRight size={11} className="opacity-40" />
                                                 </Link>
                                             ))}
                                         </div>
@@ -370,6 +362,9 @@ export default function HomeContent() {
                         transition={{ duration: 0.45 }}
                         className="text-center mb-14"
                     >
+                        <p className="text-xs font-semibold uppercase tracking-widest text-brand-teal mb-3">
+                            Workflow
+                        </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
                             How It Works
                         </h2>
@@ -481,6 +476,9 @@ export default function HomeContent() {
                         <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
                             Frequently Asked Questions(FAQs)
                         </h2>
+                        <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                            Straight answers, no marketing fluff.
+                        </p>
                     </motion.div>
 
                     <div className="flex flex-col gap-3">
