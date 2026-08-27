@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import {
@@ -204,32 +204,44 @@ const HOW_IT_WORKS = [
 
 const FAQS = [
     {
-        q: "Is PDF Maya really free?",
-        a: "Yes. The majority of our tools - including editing, merging, splitting, compressing, and converting - are free to use without creating an account. We don't add watermarks to output files on our free tools.",
+        q: "What can I do with PDF Maya?",
+        a: "PDF Maya brings together a wide range of online PDF utilities for different document workflows. You can use the platform for tasks such as changing document formats, managing pages, preparing files for sharing, and handling other common PDF requirements.",
     },
     {
-        q: "Can I edit text in a scanned PDF?",
-        a: "Yes. First run the file through our OCR PDF tool. Once OCR is applied, the text in the scanned document becomes selectable and searchable. You can then open it in the Edit PDF tool to make changes.",
+        q: "Do Pdf Maya add watermarks to my files?",
+        a: "That's correct, PDF Maya doesn't put any watermarks on your output documents and they remain clean and professional.",
     },
     {
-        q: "How much can I compress a PDF?",
-        a: "It varies depending on how image-heavy the file is. Our compressor optimises embedded images and removes redundant data. Files with lots of high-resolution scans typically see the biggest size reduction.",
+        q: "Do I need to install software to use PDF Maya?",
+        a: "No. PDF Maya is designed to work directly in your web browser, so you can access its online tools without installing a separate desktop application.",
     },
     {
-        q: "Is it safe to upload sensitive documents?",
-        a: "All file transfers use SSL encryption. Files are processed on our secure backend and deleted after your session. We do not read, index, or store the contents of your documents.",
+        q: "Can I use PDF Maya on a mobile phone?",
+        a: "Yes. PDF Maya can be accessed through a modern mobile web browser, allowing you to work with documents when you are away from your computer.",
     },
     {
-        q: "Can I sign a PDF from my phone?",
-        a: "Yes. PDF Maya is fully responsive and works in any modern mobile browser. You can draw a signature with your finger, type one, or upload an existing signature image.",
+        q: "Does PDF Maya support image files?",
+        a: "Yes. Several PDF workflows can involve image files, making it possible to work between PDFs and common image formats when preparing documents for different purposes.",
     },
     {
-        q: "Does converting from PDF preserve formatting?",
-        a: "Our conversion engine makes a strong effort to preserve tables, headings, fonts, and images. Very complex layouts may need minor touch-ups, but the result is far faster to work with than starting from scratch.",
+        q: "Can PDF Maya help with large PDF files?",
+        a: "Yes. PDF Maya includes tools designed for working with documents of different sizes and for handling common file-management requirements. The available options depend on the particular task and file.",
     },
     {
-        q: "Do I need to sign up?",
-        a: "No account is required for most tools. You can get started immediately. Creating a free account unlocks saved preferences and slightly higher usage limits on compute-intensive tasks like OCR and conversion.",
+        q: "Is PDF Maya free?",
+        a: "Yes, most of our tools are totally free and have no limits, the PDF Editor has a limit of 3 edits per hour not logged in and 10 edits per hour logged in, but with .edu email, students and educators can unlock editor access.",
+    },
+    {
+        q: "Do I need to create an account?",
+        a: "NO - Most of our tools do not require you to register, only to increase your editor limits.",
+    },
+    {
+        q: "Do my files get lost or are they compromised?",
+        a: "Yes, all your files are treated securely, automatically deleted as soon as you finish your task, and we don't read, store, or share any of your files.",
+    },
+    {
+        q: "Is PDF Maya compatible with mobile?",
+        a: "Yes. PDF Maya is browser based and available on any device – Mac, Windows, Linux, iPhone, and Android.",
     },
 ];
 
@@ -539,15 +551,11 @@ export default function HomeContent() {
                         transition={{ duration: 0.5 }}
                         className="text-center mb-12"
                     >
-                        <p className="text-xs font-semibold uppercase tracking-widest text-brand-teal mb-3">
-                            FAQ
-                        </p>
+
                         <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
-                            Common questions
+                            Frequently Asked Questions
                         </h2>
-                        <p className="mt-3 text-brand-sage text-lg">
-                            Straight answers, no marketing fluff.
-                        </p>
+
                     </motion.div>
 
                     <div className="flex flex-col gap-3">
