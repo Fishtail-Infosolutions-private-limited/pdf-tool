@@ -9,21 +9,21 @@ import Footer from "@/components/Footer";
 import { getFAQSchema } from "@/lib/schema";
 
 export const metadata: Metadata = {
-  title: "PDF Maya | 100% Free | All-in-One Online PDF Editor & Converter",
-  description: "The world's best free PDF editor. Merge, split, compress, convert, sign and secure PDFs in seconds. No installation required, 100% secure and easy to use.",
-  keywords: "free pdf editor, convert pdf to word, merge pdf online, compress pdf, sign pdf, pdf maya, secure pdf tools",
+  title: "Free Online PDF Converter, Editor & PDF Tools | PDF Maya",
+  description: "Work with your documents faster using PDF Maya, an all-in-one pdf converter, pdf editor, and online pdf tool suite. Convert, edit, merge, split, compress, organize, sign, and secure PDF files directly in your browser.",
+  keywords: "free online pdf converter, pdf editor, pdf tools, merge pdf, split pdf, compress pdf, convert pdf to word, word to pdf, sign pdf, pdf maya, free pdf tool",
   openGraph: {
-    title: "PDF Maya | 100% Free | All-in-One Online PDF Editor & Converter",
-    description: "Edit and convert PDFs for free with PDF Maya. Fast, secure, and works in your browser.",
+    title: "Free Online PDF Converter, Editor & PDF Tools | PDF Maya",
+    description: "Work with your documents faster using PDF Maya, an all-in-one pdf converter, pdf editor, and online pdf tool suite. Convert, edit, merge, split, compress, organize, sign, and secure PDF files directly in your browser.",
     images: ["/og-image.png"],
   },
   twitter: {
-    title: "PDF Maya | 100% Free | All-in-One Online PDF Editor & Converter",
-    description: "The ultimate collection of PDF tools. Edit, convert, merge and more for free.",
+    title: "Free Online PDF Converter, Editor & PDF Tools | PDF Maya",
+    description: "Work with your documents faster using PDF Maya, an all-in-one pdf converter, pdf editor, and online pdf tool suite. Convert, edit, merge, split, compress, organize, sign, and secure PDF files directly in your browser.",
     images: ["/og-image.png"],
   },
   other: {
-    "title": "PDF Maya | 100% Free | All-in-One Online PDF Editor & Converter",
+    "title": "Free Online PDF Converter, Editor & PDF Tools | PDF Maya",
   }
 };
 
@@ -83,8 +83,8 @@ export default function Home() {
       <main className="flex-1">
         <Hero />
         <ServicesGrid />
-        <UsagePlans />
         <Features />
+        <UsagePlans />
         <HomeContent />
       </main>
       <Footer />

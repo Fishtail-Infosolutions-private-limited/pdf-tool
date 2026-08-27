@@ -1,198 +1,194 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
+import Link from "next/link";
 import {
-    IconInfoCircle,
     IconSchool,
     IconCheck,
     IconPencil,
     IconInfinity,
     IconAlertTriangle,
+    IconArrowRight,
 } from "@tabler/icons-react";
 
 export default function UsagePlans() {
     return (
-        <section id="usage-plans" className="py-24 px-5 md:px-8" style={{ background: "#F7F6F3" }}>
-            <div className="max-w-5xl mx-auto">
-
+        <section id="usage-plans" className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 16 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5 }}
+                    transition={{ duration: 0.45 }}
                     className="max-w-2xl mb-14 mx-auto text-center"
                 >
-                    <p className="text-xs font-semibold uppercase tracking-widest text-brand-teal mb-3">
-                        How It Works
-                    </p>
                     <h2 className="text-3xl md:text-4xl font-bold text-brand-dark leading-tight">
                         Almost everything is free.
                     </h2>
-                    <p className="mt-4 text-brand-sage text-lg leading-relaxed">
-                        The vast majority of our tools are completely unlimited. We only cap the
-                        <strong className="text-brand-dark"> Edit PDF</strong> tool to keep processing fast for everyone.
+                    <p className="mt-4 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                        The vast majority of our tools are completely unlimited. We only cap the{" "}
+                        <strong className="text-brand-dark font-semibold">Edit PDF</strong> tool to keep processing fast for everyone.
                     </p>
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-
-                    {/* Unlimited Tools Card */}
+                    {/* 1. Unlimited Tools Card */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.45, delay: 0.05 }}
-                        className="flex flex-col p-7 rounded-2xl bg-white border border-[#E0DED9] shadow-sm relative overflow-hidden"
+                        transition={{ duration: 0.4, delay: 0.05 }}
+                        className="flex flex-col justify-between p-7 rounded-2xl bg-white border border-[#E0DED9] shadow-2xs"
                     >
-                        <div className="flex items-center gap-3 mb-5">
-                            <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#e6f4ef] text-[#047C58]">
-                                <IconInfinity size={20} stroke={1.8} />
-                            </span>
-                            <div>
-                                <h3 className="font-bold text-brand-dark text-base">All Other Tools</h3>
-                                <p className="text-xs text-brand-sage">No limits, ever.</p>
+                        <div>
+                            <div className="flex items-center gap-3 mb-5">
+                                <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
+                                    <IconInfinity size={22} stroke={2} />
+                                </span>
+                                <div>
+                                    <h3 className="font-bold text-brand-dark text-lg">All Other Tools</h3>
+                                    <p className="text-xs text-neutral-500">No limits, ever.</p>
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="bg-[#e6f4ef] rounded-xl p-4 flex items-center gap-3 mb-5 border border-[#a3d9c5]">
-                            <span className="text-2xl font-black text-[#047C58] leading-none">∞</span>
-                            <p className="text-sm font-semibold text-[#047C58]">Unlimited usage for everyone</p>
-                        </div>
+                            <div className="bg-[#e6f4ef] rounded-xl p-4 flex items-center gap-3 mb-5 border border-[#bce0d5]">
+                                <span className="text-2xl font-black text-brand-teal leading-none">∞</span>
+                                <p className="text-sm font-semibold text-brand-teal">Unlimited usage for everyone</p>
+                            </div>
 
-                        <div className="flex flex-col flex-1 gap-4">
-                            <p className="text-sm leading-relaxed text-brand-sage">
+                            <p className="text-sm text-neutral-600 leading-relaxed mb-4">
                                 <strong className="text-brand-dark font-semibold">Every single tool</strong> in our suite, except for the main PDF Editor, is completely unrestricted.
                             </p>
-                            <ul className="flex flex-col gap-3 w-full mt-1">
-                                <li className="flex items-start gap-2 text-sm text-brand-sage">
-                                    <IconCheck size={14} className="text-[#047C58] shrink-0 mt-0.5" />
-                                    <span>No file size or page count restrictions.</span>
+
+                            <ul className="flex flex-col gap-2.5">
+                                <li className="flex items-start gap-2 text-sm text-neutral-600">
+                                    <IconCheck size={16} className="text-brand-teal shrink-0 mt-0.5" />
+                                    <span>No file size or page count restrictions</span>
                                 </li>
-                                <li className="flex items-start gap-2 text-sm text-brand-sage">
-                                    <IconCheck size={14} className="text-[#047C58] shrink-0 mt-0.5" />
-                                    <span>No daily or hourly usage limits.</span>
+                                <li className="flex items-start gap-2 text-sm text-neutral-600">
+                                    <IconCheck size={16} className="text-brand-teal shrink-0 mt-0.5" />
+                                    <span>No daily or hourly usage limits</span>
                                 </li>
-                                <li className="flex items-start gap-2 text-sm text-brand-sage">
-                                    <IconCheck size={14} className="text-[#047C58] shrink-0 mt-0.5" />
-                                    <span>No sign-up or credit card required.</span>
+                                <li className="flex items-start gap-2 text-sm text-neutral-600">
+                                    <IconCheck size={16} className="text-brand-teal shrink-0 mt-0.5" />
+                                    <span>No sign-up or credit card required</span>
                                 </li>
                             </ul>
                         </div>
-                    </motion.div>
 
-                    {/* Edit PDF Limit Card */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.45, delay: 0.15 }}
-                        className="flex flex-col p-7 rounded-2xl bg-white border-2 border-[#047C58]/30 shadow-sm relative overflow-hidden"
-                    >
-                        {/* Badge */}
-                        <div className="absolute top-4 right-4">
-                            <span className="text-[10px] font-bold uppercase tracking-widest text-[#047C58] bg-[#e6f4ef] px-2 py-0.5 rounded-full border border-[#a3d9c5]">
-                                Edit PDF only
-                            </span>
-                        </div>
-
-                        <div className="flex items-center gap-3 mb-5">
-                            <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#fff3cd] text-[#b45309]">
-                                <IconPencil size={20} stroke={1.8} />
-                            </span>
-                            <div>
-                                <h3 className="font-bold text-brand-dark text-base">Edit PDF Limit</h3>
-                                <p className="text-xs text-brand-sage">Applies to the editor only.</p>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 mb-5">
-                            <div className="bg-[#faf9f7] rounded-xl p-3.5 flex flex-col border border-[#E0DED9]">
-                                <p className="text-[10px] font-bold text-brand-sage uppercase tracking-wider mb-1">No Login</p>
-                                <p className="text-2xl font-black text-brand-dark leading-none">3 <span className="text-xs font-medium text-brand-sage">/ hr</span></p>
-                            </div>
-                            <div className="bg-[#e6f4ef] rounded-xl p-3.5 flex flex-col border border-[#a3d9c5]">
-                                <p className="text-[10px] font-bold text-brand-teal uppercase tracking-wider mb-1">Logged In</p>
-                                <p className="text-2xl font-black text-[#047C58] leading-none">10 <span className="text-xs font-medium">/ hr</span></p>
-                            </div>
-                        </div>
-
-                        <ul className="flex flex-col gap-2.5 flex-1">
-                            <li className="flex items-start gap-2 text-sm text-brand-sage leading-relaxed">
-                                <IconAlertTriangle size={14} className="text-[#b45309] shrink-0 mt-0.5" />
-                                <span>Limit resets <strong className="text-brand-dark">1 hour</strong> after your last edit.</span>
-                            </li>
-                            <li className="flex items-start gap-2 text-sm text-brand-sage leading-relaxed">
-                                <IconCheck size={14} className="text-[#047C58] shrink-0 mt-0.5" />
-                                <span>Login to triple your hourly allowance.</span>
-                            </li>
-                        </ul>
-
-                        <div className="pt-5 mt-5 border-t border-[#E0DED9]">
+                        <div className="pt-6 mt-6 border-t border-[#E0DED9]">
                             <a
-                                href="/login"
-                                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-[#047C58] text-[#047C58] font-bold text-sm hover:bg-[#e6f4ef] transition-colors active:scale-[0.98]"
+                                href="#services"
+                                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#FAFAF9] border border-[#E0DED9] text-brand-dark font-semibold text-sm hover:border-brand-teal hover:text-brand-teal transition-colors"
                             >
-                                Login to Free Account
+                                Explore All Tools
                             </a>
                         </div>
                     </motion.div>
 
-                    {/* Edu Accounts Card */}
+                    {/* 2. Edit PDF Limit Card */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 16 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.45, delay: 0.25 }}
-                        className="flex flex-col p-7 rounded-2xl bg-brand-dark shadow-xl relative overflow-hidden"
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                        className="flex flex-col justify-between p-7 rounded-2xl bg-white border border-[#E0DED9] shadow-2xs"
                     >
-                        {/* decorative graphic */}
-                        <div
-                            aria-hidden
-                            className="pointer-events-none absolute -top-16 -right-16 w-64 h-64 rounded-full"
-                            style={{ background: "radial-gradient(circle, rgba(4,124,88,0.25) 0%, transparent 60%)" }}
-                        />
-
-                        <div className="relative z-10 flex flex-col h-full">
+                        <div>
                             <div className="flex items-center gap-3 mb-5">
-                                <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-brand-teal text-white">
-                                    <IconSchool size={20} stroke={1.8} />
+                                <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#f0ede4] text-brand-dark">
+                                    <IconPencil size={20} stroke={2} />
                                 </span>
                                 <div>
-                                    <h3 className="font-bold text-white text-base">Education is Free</h3>
-                                    <p className="text-xs text-[#a09888]">For students and educators</p>
+                                    <h3 className="font-bold text-brand-dark text-lg">Edit PDF Limit</h3>
+                                    <p className="text-xs text-neutral-500">Applies to the editor only.</p>
                                 </div>
                             </div>
 
-                            <p className="text-[#C9C4B5] text-[14px] leading-relaxed mb-5 font-medium">
+                            <div className="grid grid-cols-2 gap-3 mb-5">
+                                <div className="bg-[#FAFAF9] rounded-xl p-3.5 flex flex-col border border-[#E0DED9]">
+                                    <p className="text-[10px] font-bold text-neutral-500 uppercase tracking-wider mb-1">No Login</p>
+                                    <p className="text-2xl font-black text-brand-dark leading-none">3 <span className="text-xs font-normal text-neutral-500">/ hr</span></p>
+                                </div>
+                                <div className="bg-[#e6f4ef] rounded-xl p-3.5 flex flex-col border border-[#bce0d5]">
+                                    <p className="text-[10px] font-bold text-brand-teal uppercase tracking-wider mb-1">Logged In</p>
+                                    <p className="text-2xl font-black text-brand-teal leading-none">10 <span className="text-xs font-normal text-brand-teal/80">/ hr</span></p>
+                                </div>
+                            </div>
+
+                            <ul className="flex flex-col gap-2.5">
+                                <li className="flex items-start gap-2 text-sm text-neutral-600 leading-relaxed">
+                                    <IconAlertTriangle size={16} className="text-amber-600 shrink-0 mt-0.5" />
+                                    <span>Limit resets 1 hour after your last edit.</span>
+                                </li>
+                                <li className="flex items-start gap-2 text-sm text-neutral-600 leading-relaxed">
+                                    <IconCheck size={16} className="text-brand-teal shrink-0 mt-0.5" />
+                                    <span>Login to increase your hourly allowance to 10 edits.</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div className="pt-6 mt-6 border-t border-[#E0DED9]">
+                            <Link
+                                href="/login"
+                                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-brand-teal text-brand-teal font-semibold text-sm hover:bg-[#e6f4ef] transition-colors"
+                            >
+                                Login to Free Account
+                            </Link>
+                        </div>
+                    </motion.div>
+
+                    {/* 3. Education / Students Card (Aligned with App Theme) */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 16 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.4, delay: 0.15 }}
+                        className="flex flex-col justify-between p-7 rounded-2xl bg-white border-2 border-brand-teal shadow-sm"
+                    >
+                        <div>
+                            <div className="flex items-center gap-3 mb-5">
+                                <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-brand-teal text-white">
+                                    <IconSchool size={22} stroke={2} />
+                                </span>
+                                <div>
+                                    <h3 className="font-bold text-brand-dark text-lg">Education is Free</h3>
+                                    <p className="text-xs text-brand-teal font-semibold">For students &amp; educators</p>
+                                </div>
+                            </div>
+
+                            <p className="text-sm text-neutral-600 leading-relaxed mb-5">
                                 We believe students and teachers shouldn&apos;t pay to get basic academic tasks done.
                             </p>
 
-                            <div className="bg-[#2a1a05] border border-[#4a3010] rounded-xl p-4 mb-auto">
-                                <p className="text-white text-sm font-semibold mb-2">Unlock unlimited Edit PDF:</p>
+                            <div className="bg-[#FAFAF9] border border-[#E0DED9] rounded-xl p-4 mb-4">
+                                <p className="text-xs font-bold uppercase tracking-wider text-brand-dark mb-2">
+                                    Unlock unlimited Edit PDF:
+                                </p>
                                 <ul className="flex flex-col gap-2">
-                                    <li className="flex items-start gap-2 text-sm text-[#A09888]">
+                                    <li className="flex items-start gap-2 text-xs text-neutral-600">
                                         <span className="w-1.5 h-1.5 rounded-full bg-brand-teal shrink-0 mt-1.5" />
-                                        <span>Register with an <strong>.edu</strong> email, or verify via a school ID/document.</span>
+                                        <span>Register with an <strong className="text-brand-dark">.edu</strong> email, or verify via school ID.</span>
                                     </li>
-                                    <li className="flex items-start gap-2 text-sm text-[#A09888]">
+                                    <li className="flex items-start gap-2 text-xs text-neutral-600">
                                         <span className="w-1.5 h-1.5 rounded-full bg-brand-teal shrink-0 mt-1.5" />
                                         <span>Your account will immediately be completely unlimited.</span>
                                     </li>
                                 </ul>
                             </div>
+                        </div>
 
-                            <div className="pt-5 mt-5 border-t border-[#4a3010]">
-                                <a
-                                    href="/login"
-                                    className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-brand-teal text-white font-bold text-sm hover:bg-[#036649] transition-colors shadow-lg active:scale-[0.98]"
-                                >
-                                    Login with .edu Email
-                                </a>
-                            </div>
+                        <div className="pt-6 mt-6 border-t border-[#E0DED9]">
+                            <Link
+                                href="/login"
+                                className="w-full flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-brand-teal text-white font-semibold text-sm hover:bg-[#036649] transition-all shadow-xs active:scale-[0.98]"
+                            >
+                                Login with .edu Email
+                                <IconArrowRight size={16} />
+                            </Link>
                         </div>
                     </motion.div>
-
                 </div>
             </div>
         </section>
