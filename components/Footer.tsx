@@ -91,21 +91,6 @@ export default function Footer() {
                             A fast, private, and straightforward online tool suite for editing, converting, and managing PDF files directly in your browser.
                         </p>
 
-                        {/* Trust highlights */}
-                        <div className="flex flex-col gap-2 mt-2 pt-2 text-xs text-neutral-600 font-medium">
-                            <div className="flex items-center gap-2">
-                                <IconShieldCheck size={16} className="text-brand-teal shrink-0" />
-                                <span>100% Free &amp; Private file processing</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <IconLock size={16} className="text-brand-teal shrink-0" />
-                                <span>SSL 256-bit encrypted file transfers</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <IconBolt size={16} className="text-brand-teal shrink-0" />
-                                <span>Fast browser-based conversion engine</span>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Link columns */}
