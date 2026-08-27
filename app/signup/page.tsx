@@ -197,12 +197,13 @@ export default function SignupPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@university.edu"
+                  placeholder="you@gmail.com"
                   required
                   className="w-full px-4 py-3 bg-[#FAFAF9] border border-[#E0DED9] rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-teal/20 focus:border-brand-teal transition-all text-brand-dark placeholder:text-neutral-400 text-sm"
                 />
-                <p className="text-[11px] font-semibold text-brand-teal ml-1 mt-1.5 flex items-center gap-1.5">
-                  <span>🎓</span> Student? Use your .edu email for unlimited access.
+                <p className="text-[11px] text-neutral-500 mt-1.5 ml-1 flex items-center gap-1.5">
+                  <span className="text-[9px] font-bold uppercase tracking-wider bg-brand-teal/10 text-brand-teal px-1.5 py-0.5 rounded">Student</span>
+                  <span>Use your <span className="text-brand-teal font-semibold">.edu</span> email for unlimited access</span>
                 </p>
               </div>
 
