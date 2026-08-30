@@ -1,945 +1,470 @@
-"use client";
-import React, { useState, useRef, useCallback, useEffect } from "react";
-import ToolLayout from "@/components/ToolLayout";
+import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import HtmlToPdfClient from "./HtmlToPdfClient";
+import Link from "next/link";
 import {
-    IconWorld,
-    IconLoader2,
-    IconCheck,
-    IconCode,
-    IconFileCode,
-    IconLink,
     IconUpload,
-    IconEye,
+    IconSettings,
     IconDownload,
-    IconX,
-    IconRefresh,
-    IconAlertCircle,
-    IconChevronRight,
-    IconChevronDown,
+    IconWorld,
+    IconShieldLock,
+    IconDeviceLaptop,
+    IconSparkles,
+    IconCode,
+    IconDeviceMobile,
+    IconReceipt,
+    IconFileDescription,
+    IconArrowUpRight,
+    IconPlus,
+    IconFileWord,
+    IconTable,
+    IconPhoto,
+    IconArrowsJoin2,
+    IconLayersSubtract,
+    IconPencil,
     IconFileTypePdf,
-    IconArrowLeft,
+    IconArrowRight,
 } from "@tabler/icons-react";
-import { urlToPdf, downloadBlob } from "@/lib/pdf-utils";
-import { FileUpload } from "@/components/ui/file-upload";
-import { motion, AnimatePresence } from "motion/react";
-// ─── Types ───────────────────────────────────────────────────────────────────
-type Tab = "url" | "file" | "code";
-type Stage = "input" | "preview" | "success";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
-const SCREEN_SIZES = [
-    { label: "Your screen", value: "your-screen" },
-    { label: "Desktop HD (1920px)", value: "1920" },
-    { label: "Desktop (1440px)", value: "1440" },
-    { label: "Laptop (1280px)", value: "1280" },
-    { label: "Tablet (768px)", value: "768" },
-    { label: "iPhone/Mobile (430px)", value: "430" },
+export const metadata: Metadata = {
+    title: "Convert HTML to PDF Online Free – Webpage to PDF | PDF Maya",
+    description:
+        "Convert live webpage URLs, HTML files, or raw HTML code into high-fidelity PDF documents online for free. Full CSS rendering, customizable viewport sizes, and 100% privacy.",
+    keywords: [
+        "html to pdf",
+        "convert html to pdf",
+        "webpage to pdf",
+        "url to pdf converter",
+        "save webpage as pdf",
+        "html code to pdf",
+        "free online html to pdf",
+    ],
+    alternates: {
+        canonical: "/html-to-pdf",
+    },
+    openGraph: {
+        title: "Convert HTML to PDF Online Free – Webpage to PDF | PDF Maya",
+        description:
+            "Convert live webpage URLs, HTML files, or raw HTML code into high-fidelity PDF documents online for free. Full CSS rendering with 100% privacy.",
+        url: "/html-to-pdf",
+        siteName: "PDF Maya",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Convert HTML to PDF Online Free | PDF Maya",
+        description:
+            "Convert live web URLs, HTML code, or files into printable, formatted PDF files instantly.",
+    },
+};
+
+const HOW_TO_STEPS = [
+    {
+        step: "01",
+        icon: IconWorld,
+        title: "Enter URL, File, or Code",
+        body: "Type a live website URL, upload an .html file, or paste your raw HTML/CSS snippet into the converter above.",
+    },
+    {
+        step: "02",
+        icon: IconSettings,
+        title: "Browser Engine Rendering",
+        body: "Click 'Preview PDF'. Our engine renders the webpage with active CSS styles, images, and fonts into an interactive preview.",
+    },
+    {
+        step: "03",
+        icon: IconDownload,
+        title: "Download Print-Ready PDF",
+        body: "Your PDF document is compiled instantly. Download for offline archiving, printing, or client reporting.",
+    },
 ];
 
-const PAGE_SIZES = [
-    { label: "Fit to content", value: "fit" },
-    { label: "A4 (8.27 × 11.69 in)", value: "a4" },
-    { label: "A5 (5.83 × 8.27 in)", value: "a5" },
-    { label: "A3 (11.69 × 16.54 in)", value: "a3" },
-    { label: "Letter (8.5 × 11 in)", value: "letter" },
-    { label: "Legal (8.5 × 14 in)", value: "legal" },
-    { label: "Ledger (11 × 17 in)", value: "ledger" },
+const FEATURES = [
+    {
+        icon: IconWorld,
+        title: "High-Fidelity Browser Rendering",
+        body: "Executes modern CSS, responsive layouts, web fonts, and JavaScript elements with pinpoint visual accuracy.",
+    },
+    {
+        icon: IconDeviceMobile,
+        title: "Custom Device Viewports",
+        body: "Render pages as Desktop HD (1920px), Laptop (1280px), Tablet (768px), or Mobile iPhone (430px) formats.",
+    },
+    {
+        icon: IconCode,
+        title: "URL, File & Raw Code Modes",
+        body: "Seamlessly convert from live public URLs, local .html files, or raw HTML templates.",
+    },
+    {
+        icon: IconSparkles,
+        title: "100% Free with No Watermarks",
+        body: "Capture web pages and convert HTML without paying subscription fees or getting branded watermarks.",
+    },
+    {
+        icon: IconShieldLock,
+        title: "Encrypted & Auto-Deleted",
+        body: "All transmissions are encrypted via SSL/TLS. Files and temporary renders are deleted immediately after your session.",
+    },
+    {
+        icon: IconDeviceLaptop,
+        title: "Cross-Platform Access",
+        body: "Convert web content directly in your web browser on macOS, Windows, Linux, iOS, and Android.",
+    },
 ];
 
-const MARGIN_OPTIONS = [
-    { label: "None", value: "none", sub: "0\"" },
-    { label: "Small", value: "small", sub: "0.5\"" },
-    { label: "Large", value: "large", sub: "1\"" },
+const USE_CASES = [
+    {
+        icon: IconReceipt,
+        title: "Online Invoices & Receipts",
+        body: "Capture online payment receipts, booking confirmations, and digital invoices into permanent archival PDFs.",
+    },
+    {
+        icon: IconWorld,
+        title: "Web Articles & Blog Posts",
+        body: "Save long-form news stories, scientific blog posts, and documentation articles for offline reading and research.",
+    },
+    {
+        icon: IconCode,
+        title: "HTML Templates & Reports",
+        body: "Convert automated HTML invoice templates, receipts, and dynamic dashboard reports into downloadable PDF files.",
+    },
+    {
+        icon: IconFileDescription,
+        title: "Webpage Legal Disclosures",
+        body: "Archive terms of service updates, policy statements, and website snapshots for compliance records.",
+    },
 ];
 
-// ─── Custom Select ────────────────────────────────────────────────────────────
-function CustomSelect<T extends string>({
-    options,
-    value,
-    onChange,
-    label,
-}: {
-    options: { label: string; value: T }[];
-    value: T;
-    onChange: (v: T) => void;
-    label: string;
-}) {
-    const [open, setOpen] = useState(false);
-    const ref = useRef<HTMLDivElement>(null);
-    const current = options.find((o) => o.value === value);
+const FAQS = [
+    {
+        q: "How do I convert a website URL to a PDF for free?",
+        a: "Enter the webpage URL into the tool above and click 'Preview PDF'. Once rendered, click 'Download PDF' to save the complete webpage as a document.",
+    },
+    {
+        q: "Will CSS stylesheets and images be preserved?",
+        a: "Yes. Our engine uses a full headless browser that loads external CSS, web fonts, responsive images, and layouts accurately.",
+    },
+    {
+        q: "Can I convert raw HTML code without hosting it online?",
+        a: "Yes! Switch to the 'Paste Code' tab to enter any raw HTML and CSS markup directly, or upload an .html file via the 'Upload HTML' tab.",
+    },
+    {
+        q: "Can I capture a single continuous long page instead of multi-page breaks?",
+        a: "Yes! Check the 'Single continuous long page' option in the sidebar to generate an unbroken snapshot of the entire webpage.",
+    },
+    {
+        q: "Are my uploaded HTML documents and URLs secure?",
+        a: "Yes. All file uploads and URL rendering are protected with HTTPS encryption. Rendered files are deleted immediately after download.",
+    },
+    {
+        q: "Are there any watermarks on the converted PDF?",
+        a: "No. PDF Maya never inserts watermarks, branding stamps, or limitations on your output PDF documents.",
+    },
+];
 
-    useEffect(() => {
-        const handler = (e: MouseEvent) => {
-            if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-        };
-        document.addEventListener("mousedown", handler);
-        return () => document.removeEventListener("mousedown", handler);
-    }, []);
+const RELATED_TOOLS = [
+    { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
+    { label: "PDF to JPG", href: "/pdf-to-jpg", desc: "Convert PDF pages into high-resolution images.", icon: IconPhoto },
+    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
+    { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
+    { label: "PDF to Text", href: "/pdf-to-txt", desc: "Extract raw plain text from PDF documents.", icon: IconFileDescription },
+    { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
+];
 
-    return (
-        <div ref={ref} className={`relative w-full ${open ? "z-50" : "z-10"}`}>
-            <label className="block text-xs font-bold text-brand-sage uppercase tracking-widest mb-1.5">{label}</label>
-            <button
-                onClick={() => setOpen((o) => !o)}
-                className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-sm font-medium text-brand-dark hover:border-[#F97316] transition-colors shadow-sm cursor-pointer"
-            >
-                <span className="truncate">{current?.label}</span>
-                <IconChevronDown size={14} className={`shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
-            </button>
-            <AnimatePresence>
-                {open && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -4, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -4, scale: 0.97 }}
-                        transition={{ duration: 0.14 }}
-                        className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden"
-                    >
-                        {options.map((opt) => (
-                            <button
-                                key={opt.value}
-                                onClick={() => { onChange(opt.value); setOpen(false); }}
-                                className={`w-full text-left px-3 py-2.5 text-sm transition-colors ${value === opt.value ? "bg-[#F97316]/10 text-[#c2410c] font-semibold" : "text-brand-dark hover:bg-gray-50"}`}
-                            >
-                                {opt.label}
-                            </button>
-                        ))}
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
-    );
-}
-
-// ─── Tab Button ───────────────────────────────────────────────────────────────
-function TabBtn({
-    active,
-    onClick,
-    icon,
-    label,
-}: {
-    active: boolean;
-    onClick: () => void;
-    icon: React.ReactNode;
-    label: string;
-}) {
-    return (
-        <button
-            onClick={onClick}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 cursor-pointer ${active
-                ? "bg-[#F97316] text-white shadow-md shadow-orange-200"
-                : "text-brand-sage hover:text-brand-dark hover:bg-gray-100"
-                }`}
-        >
-            {icon}
-            {label}
-        </button>
-    );
-}
-
-// ─── PDF Preview Panel ────────────────────────────────────────────────────────
-function PdfPreview({ pdfUrl }: { pdfUrl: string }) {
-    return (
-        <div className="flex flex-col gap-3 flex-1 min-h-[500px]">
-            <iframe
-                src={pdfUrl}
-                title="PDF Preview"
-                className="w-full flex-1 border-none rounded-xl bg-gray-100 min-h-[500px]"
-            />
-            <p className="text-xs text-brand-sage text-center bg-gray-50 py-1.5 rounded-lg border border-border">
-                This is the exact PDF that will be downloaded.
-            </p>
-        </div>
-    );
-}
-
-// ─── Generating Placeholder ───────────────────────────────────────────────────
-function GeneratingPlaceholder() {
-    return (
-        <div className="flex flex-col items-center justify-center flex-1 min-h-[500px] bg-gray-50 rounded-xl border border-dashed border-border gap-4">
-            <IconLoader2 size={36} className="animate-spin text-[#F97316]" />
-            <p className="text-sm font-semibold text-brand-sage">Generating preview PDF…</p>
-            <p className="text-xs text-brand-sage opacity-70">This may take a few moments</p>
-        </div>
-    );
-}
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
 export default function HtmlToPdfPage() {
-    const [activeTab, setActiveTab] = useState<Tab>("url");
-    const [stage, setStage] = useState<Stage>("input");
-
-    // URL tab state
-    const [urlInput, setUrlInput] = useState("");
-    const [isFetchingUrl, setIsFetchingUrl] = useState(false);
-
-    // File tab state
-    const [htmlFiles, setHtmlFiles] = useState<File[]>([]);
-
-    // Code tab state
-    const [codeInput, setCodeInput] = useState("");
-
-    // Shared preview / process state
-    const [previewHtml, setPreviewHtml] = useState("");
-    const [previewTitle, setPreviewTitle] = useState("");
-    const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
-    const [isGeneratingPreview, setIsGeneratingPreview] = useState(false);
-    const [isConverting, setIsConverting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    // Options Sidebar state
-    const [screenSize, setScreenSize] = useState<string>("your-screen");
-    const [actualScreenWidth, setActualScreenWidth] = useState<number>(1280);
-    const [pageSize, setPageSize] = useState<string>("a4");
-    const [oneLongPage, setOneLongPage] = useState(false);
-    const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
-    const [margin, setMargin] = useState<string>("none");
-    const [hideCookie, setHideCookie] = useState(true);
-
-    // Tracking if options changed
-    const [settingsChanged, setSettingsChanged] = useState(false);
-
-    // Detect real screen width for 'your-screen' option
-    useEffect(() => {
-        setActualScreenWidth(window.innerWidth);
-    }, []);
-
-    // Compute the actual viewport width to send to Playwright
-    const resolvedViewportWidth = screenSize === "your-screen"
-        ? actualScreenWidth
-        : parseInt(screenSize) || 1280;
-
-    // Build dynamic 'Your screen' label
-    const dynamicScreenSizes = SCREEN_SIZES.map(s =>
-        s.value === "your-screen"
-            ? { ...s, label: `Your screen (${actualScreenWidth}px)` }
-            : s
-    );
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
-    // Prevent accidental page reloads/navigation
-    useEffect(() => {
-        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (stage !== "input") {
-                e.preventDefault();
-                e.returnValue = "";
-            }
-        };
-        window.addEventListener("beforeunload", handleBeforeUnload);
-        return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-    }, [stage]);
-
-    const resetAll = () => {
-        if (stage !== "input") {
-            const confirmed = window.confirm("Are you sure you want to go back? Any unsaved changes will be lost.");
-            if (!confirmed) return;
-        }
-        setStage("input");
-        setPreviewHtml("");
-        setPreviewTitle("");
-        if (previewPdfUrl) URL.revokeObjectURL(previewPdfUrl);
-        setPreviewPdfUrl(null);
-        setError(null);
-        setUrlInput("");
-        setHtmlFiles([]);
-        setCodeInput("");
-        setSettingsChanged(false);
+    const jsonLdSoftware = {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "HTML to PDF Converter - PDF Maya",
+        url: "https://pdfmaya.com/html-to-pdf",
+        description: "Convert live webpage URLs, HTML files, or raw HTML code into high-fidelity PDF documents online for free.",
+        applicationCategory: "UtilityApplication",
+        operatingSystem: "All",
+        offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+        },
     };
 
-    // ── URL: Fetch → Generate preview PDF ─────────────────────────────────────
-    const handleFetchUrl = async () => {
-        if (!urlInput.trim()) return;
-        setIsFetchingUrl(true);
-        setIsGeneratingPreview(true);
-        setError(null);
-        if (previewPdfUrl) URL.revokeObjectURL(previewPdfUrl);
-        setPreviewPdfUrl(null);
-        try {
-            const pdfBlob = await urlToPdf({
-                url: urlInput.trim(),
-                pageSize,
-                orientation,
-                margin,
-                oneLongPage,
-                hideCookie,
-                viewportWidth: resolvedViewportWidth,
-            });
-            const blobUrl = URL.createObjectURL(pdfBlob);
-            setPreviewPdfUrl(blobUrl);
-            setPreviewTitle(urlInput.trim().replace(/^https?:\/\//, "").split("/")[0]);
-            setStage("preview");
-            setSettingsChanged(false);
-        } catch (err: any) {
-            setError(err.message || "Failed to fetch and convert URL.");
-        } finally {
-            setIsFetchingUrl(false);
-            setIsGeneratingPreview(false);
-        }
+    const jsonLdHowTo = {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: "How to Convert HTML to PDF Online",
+        description: "Step-by-step guide to converting web pages, HTML files, or code into a PDF with PDF Maya.",
+        step: HOW_TO_STEPS.map((s, index) => ({
+            "@type": "HowToStep",
+            position: index + 1,
+            name: s.title,
+            text: s.body,
+        })),
     };
 
-    // ── File: Read → Generate preview PDF ─────────────────────────────────────
-    const handleFileRead = useCallback((file: File) => {
-        if (!file.name.endsWith(".html") && !file.name.endsWith(".htm")) {
-            setError("Please upload an HTML file (.html or .htm).");
-            return;
-        }
-        setError(null);
-        const reader = new FileReader();
-        reader.onload = async (e) => {
-            const text = e.target?.result as string;
-            setPreviewHtml(text);
-            setPreviewTitle(file.name.replace(/\.(html|htm)$/i, ""));
-            setPreviewPdfUrl(null);
-            try {
-                const pdfBlob = await urlToPdf({
-                    html: text,
-                    pageSize,
-                    orientation,
-                    margin,
-                    oneLongPage,
-                    hideCookie,
-                    viewportWidth: resolvedViewportWidth,
-                });
-                setPreviewPdfUrl(URL.createObjectURL(pdfBlob));
-            } catch {
-                // preview generation failed - no-preview fallback
-            } finally {
-                setIsGeneratingPreview(false);
-            }
-            setStage("preview");
-            setSettingsChanged(false);
-        };
-        setIsGeneratingPreview(true);
-        reader.readAsText(file);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageSize, orientation, margin, oneLongPage, hideCookie, resolvedViewportWidth]);
-
-    // ── Code: Generate preview PDF ────────────────────────────────────────────
-    const handleCodePreview = async () => {
-        if (!codeInput.trim()) return;
-        setError(null);
-        setPreviewHtml(codeInput);
-        setPreviewTitle("custom-html");
-        setIsGeneratingPreview(true);
-        setPreviewPdfUrl(null);
-        try {
-            const pdfBlob = await urlToPdf({
-                html: codeInput,
-                pageSize,
-                orientation,
-                margin,
-                oneLongPage,
-                hideCookie,
-                viewportWidth: resolvedViewportWidth,
-            });
-            setPreviewPdfUrl(URL.createObjectURL(pdfBlob));
-        } catch {
-            // preview failed
-        } finally {
-            setIsGeneratingPreview(false);
-        }
-        setStage("preview");
-        setSettingsChanged(false);
+    const jsonLdFaq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FAQS.map((faq) => ({
+            "@type": "Question",
+            name: faq.q,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.a,
+            },
+        })),
     };
-
-    // ── Download (already-generated PDF blob) ─────────────────────────────────
-    const handleConvert = async () => {
-        if (!previewHtml.trim() && !urlInput.trim()) return;
-        setIsConverting(true);
-        setError(null);
-
-        try {
-            let pdfBlob: Blob;
-
-            // Logic: if preview already exists AND settings haven't changed since preview was made,
-            // then we can instantly download the existing preview blob.
-            if (previewPdfUrl && !settingsChanged) {
-                const response = await fetch(previewPdfUrl);
-                pdfBlob = await response.blob();
-            } else {
-                // Settings HAVE changed or preview doesn't exist, must generate fresh PDF
-                pdfBlob = await urlToPdf({
-                    url: activeTab === "url" ? urlInput.trim() : undefined,
-                    html: activeTab !== "url" ? previewHtml : undefined,
-                    pageSize,
-                    orientation,
-                    margin,
-                    oneLongPage,
-                    hideCookie,
-                    viewportWidth: resolvedViewportWidth,
-                });
-
-                // Update preview as well while we are at it
-                if (previewPdfUrl) URL.revokeObjectURL(previewPdfUrl);
-                setPreviewPdfUrl(URL.createObjectURL(pdfBlob));
-            }
-
-            downloadBlob(pdfBlob, `${previewTitle || "document"}.pdf`);
-            setStage("success");
-            setSettingsChanged(false);
-        } catch (err: any) {
-            setError(err.message || "Failed to download PDF.");
-        } finally {
-            setIsConverting(false);
-        }
-    };
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Render: Preview and Success
-    // ─────────────────────────────────────────────────────────────────────────
-    if (stage === "preview" || stage === "success") {
-        return (
-            <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
-                <Navbar />
-
-                <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-
-                    {/* ── SUCCESS STATE ── */}
-                    {stage === "success" && (
-                        <div className="bg-white rounded-2xl shadow-sm border border-border p-8 flex flex-col items-center justify-center text-center max-w-2xl mx-auto mt-12 animate-in fade-in zoom-in duration-300">
-                            <span className="flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-600 mb-4">
-                                <IconCheck size={32} stroke={2} />
-                            </span>
-                            <h2 className="text-xl font-bold text-brand-dark">PDF Downloaded!</h2>
-                            <p className="text-brand-sage mt-2 text-sm">Your PDF has been saved to your device.</p>
-                            <div className="flex gap-3 mt-6 flex-wrap justify-center">
-                                <button
-                                    onClick={() => setStage("preview")}
-                                    className="px-6 py-3 rounded-xl bg-gray-100 text-brand-dark font-semibold hover:bg-gray-200 transition-all cursor-pointer text-sm"
-                                >
-                                    Back to Preview
-                                </button>
-                                <button
-                                    onClick={resetAll}
-                                    className="px-6 py-3 rounded-xl bg-[#F97316] text-white font-semibold hover:bg-[#c2410c] transition-all cursor-pointer shadow-md text-sm"
-                                >
-                                    Convert Another
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ── PREVIEW STATE ── */}
-                    {stage === "preview" && (
-                        <div className="flex flex-col lg:flex-row gap-6">
-
-                            {/* Left: PDF Preview */}
-                            <div className="flex-1 min-w-0 bg-white rounded-2xl shadow-sm border border-border p-5 flex flex-col gap-4">
-                                {/* Header */}
-                                <div className="flex items-center justify-between gap-3">
-                                    <div className="flex items-center gap-2">
-                                        <span className="w-2 h-2 rounded-full bg-[#F97316]" />
-                                        <span className="text-sm font-semibold text-brand-dark truncate max-w-[200px] md:max-w-xs">
-                                            {previewTitle}
-                                        </span>
-                                    </div>
-                                    <button
-                                        onClick={resetAll}
-                                        className="flex items-center gap-1.5 text-xs text-brand-sage hover:text-red-500 transition-colors cursor-pointer px-2"
-                                    >
-                                        <IconArrowLeft size={14} />
-                                        Go Back
-                                    </button>
-                                </div>
-
-                                {/* PDF Preview Area */}
-                                {isGeneratingPreview ? (
-                                    <GeneratingPlaceholder />
-                                ) : previewPdfUrl ? (
-                                    <PdfPreview pdfUrl={previewPdfUrl} />
-                                ) : (
-                                    <div className="flex flex-col items-center justify-center flex-1 min-h-[500px] bg-gray-50 rounded-xl border border-dashed border-border gap-3">
-                                        <IconAlertCircle size={28} className="text-brand-sage" />
-                                        <p className="text-sm text-brand-sage">Preview unavailable. Click "Download PDF" to generate.</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Right: Options Sidebar */}
-                            <div className="w-full lg:w-72 xl:w-80 shrink-0">
-                                <div className="bg-white rounded-2xl border border-border shadow-sm p-5 flex flex-col gap-5 sticky top-24">
-                                    <h2 className="text-sm font-bold text-brand-dark flex items-center gap-2">
-                                        <IconFileTypePdf size={18} className="text-[#F97316]" />
-                                        Convert Options
-                                    </h2>
-
-                                    {/* URL input (URL tab only) */}
-                                    {activeTab === "url" && (
-                                        <div className="flex flex-col gap-2">
-                                            <label className="text-xs font-bold text-brand-sage uppercase tracking-widest mb-0.5">Website URL</label>
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="url"
-                                                    value={urlInput}
-                                                    onChange={(e) => { setUrlInput(e.target.value); setSettingsChanged(true); }}
-                                                    onKeyDown={(e) => e.key === "Enter" && handleFetchUrl()}
-                                                    className="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316]"
-                                                />
-                                                <button
-                                                    onClick={handleFetchUrl}
-                                                    disabled={isFetchingUrl || isGeneratingPreview || !urlInput.trim()}
-                                                    className="px-3 py-2 bg-[#F97316] text-white rounded-xl hover:bg-[#c2410c] transition-colors flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-50"
-                                                    title="Re-generate PDF"
-                                                >
-                                                    <IconRefresh size={16} className={isFetchingUrl || isGeneratingPreview ? "animate-spin" : ""} />
-                                                </button>
-                                            </div>
-                                            {(isFetchingUrl || isGeneratingPreview) && (
-                                                <div className="flex items-center gap-2 p-2 rounded-lg bg-blue-50 border border-blue-100 text-[10px] text-blue-700 animate-pulse mt-1">
-                                                    <IconLoader2 size={10} className="animate-spin shrink-0" />
-                                                    <span>Regenerating, this may take a few moments.</span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
-
-                                    {/* Screen Size */}
-                                    <CustomSelect
-                                        label="Screen Size"
-                                        options={dynamicScreenSizes}
-                                        value={screenSize}
-                                        onChange={(v) => { setScreenSize(v); setSettingsChanged(true); }}
-                                    />
-
-                                    <div className="h-px w-full bg-slate-100" />
-
-                                    {/* Page Size */}
-                                    <div className="flex flex-col gap-3">
-                                        <CustomSelect
-                                            label="Page Size"
-                                            options={PAGE_SIZES}
-                                            value={pageSize}
-                                            onChange={(v) => { setPageSize(v); setSettingsChanged(true); }}
-                                        />
-                                        <label className="flex items-center gap-2 mt-1 cursor-pointer">
-                                            <div
-                                                className={`w-5 h-5 rounded flex items-center justify-center border transition-colors ${oneLongPage ? "bg-green-500 border-green-500" : "bg-white border-slate-300"}`}
-                                                onClick={() => { setOneLongPage(!oneLongPage); setSettingsChanged(true); }}
-                                            >
-                                                {oneLongPage && <IconCheck size={14} className="text-white" stroke={3} />}
-                                            </div>
-                                            <span className="text-sm font-medium text-brand-dark select-none min-w-0" onClick={() => { setOneLongPage(!oneLongPage); setSettingsChanged(true); }}>
-                                                One long page
-                                            </span>
-                                        </label>
-                                    </div>
-
-                                    {/* Orientation */}
-                                    <div className={`transition-opacity ${oneLongPage ? "opacity-40 pointer-events-none" : ""}`}>
-                                        <p className="text-xs font-bold text-brand-sage uppercase tracking-widest mb-2">Orientation</p>
-                                        <div className="grid grid-cols-2 gap-2">
-                                            {(["portrait", "landscape"] as const).map((o) => (
-                                                <button
-                                                    key={o}
-                                                    onClick={() => { setOrientation(o); setSettingsChanged(true); }}
-                                                    className={`flex flex-col items-center gap-2 py-3 px-2 rounded-xl border-2 text-xs font-semibold transition-all cursor-pointer ${orientation === o
-                                                        ? "border-[#F97316] bg-[#F97316]/10 text-[#c2410c]"
-                                                        : "border-slate-200 text-brand-sage hover:border-slate-300"
-                                                        }`}
-                                                >
-                                                    <span className={`border-2 rounded-sm ${o === "portrait" ? "w-6 h-8" : "w-8 h-6"} ${orientation === o ? "border-[#F97316]" : "border-slate-300"}`} />
-                                                    {o.charAt(0).toUpperCase() + o.slice(1)}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Margin */}
-                                    <div className={`transition-opacity ${oneLongPage ? "opacity-40 pointer-events-none" : ""}`}>
-                                        <p className="text-xs font-bold text-brand-sage uppercase tracking-widest mb-2">Margin</p>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {MARGIN_OPTIONS.map((m) => (
-                                                <button
-                                                    key={m.value}
-                                                    onClick={() => { setMargin(m.value); setSettingsChanged(true); }}
-                                                    className={`flex flex-col items-center gap-1 py-2.5 px-1 rounded-xl border-2 text-xs font-semibold transition-all cursor-pointer ${margin === m.value
-                                                        ? "border-[#F97316] bg-[#F97316]/10 text-[#c2410c]"
-                                                        : "border-slate-200 text-brand-sage hover:border-slate-300"
-                                                        }`}
-                                                >
-                                                    <span
-                                                        className={`w-8 h-6 border-2 rounded-sm flex items-center justify-center ${margin === m.value ? "border-[#F97316]" : "border-slate-300"}`}
-                                                        style={{ padding: m.value === "none" ? "0" : m.value === "small" ? "2px" : "4px" }}
-                                                    >
-                                                        <span className={`flex-1 rounded-[2px] w-full ${margin === m.value ? "bg-[#F97316]/30" : "bg-slate-200"}`} style={{ minHeight: "100%" }} />
-                                                    </span>
-                                                    <span>{m.label}</span>
-                                                    <span className="text-[9px] opacity-60">{m.sub}</span>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    <div className="h-px w-full bg-slate-100" />
-
-                                    {/* Extra toggles */}
-                                    <div className="flex flex-col gap-3">
-                                        <label className="flex flex-row items-center gap-3 cursor-pointer">
-                                            <div
-                                                className={`relative rounded-full transition-colors duration-200 border-2 mt-0.5 ${hideCookie ? "bg-[#F97316] border-[#F97316]" : "bg-slate-200 border-slate-200"}`}
-                                                onClick={() => { setHideCookie(!hideCookie); setSettingsChanged(true); }}
-                                                style={{ height: "22px", width: "40px", flexShrink: 0 }}
-                                            >
-                                                <span className={`absolute top-px w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${hideCookie ? "translate-x-4" : "translate-x-0.5"}`} />
-                                            </div>
-                                            <span className="text-sm font-semibold text-brand-dark">Hide cookie dialog</span>
-                                        </label>
-                                    </div>
-
-                                    {/* Error */}
-                                    {error && (
-                                        <div className="flex items-start gap-2 p-3 bg-red-50 text-red-600 text-xs rounded-xl border border-red-100">
-                                            <span className="w-1.5 h-1.5 mt-1 rounded-full bg-red-500 shrink-0" />
-                                            {error}
-                                        </div>
-                                    )}
-
-                                    {/* Download PDF Button */}
-                                    <button
-                                        onClick={handleConvert}
-                                        disabled={isConverting || isGeneratingPreview}
-                                        className={`w-full mt-2 py-3.5 rounded-xl font-semibold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-md text-sm cursor-pointer ${isConverting || isGeneratingPreview
-                                            ? "bg-[#F97316] opacity-60 cursor-wait shadow-none"
-                                            : "bg-[#F97316] hover:bg-[#c2410c]"
-                                            }`}
-                                    >
-                                        {isConverting ? (
-                                            <span className="flex flex-col items-center">
-                                                <span className="flex items-center gap-2">
-                                                    <IconLoader2 size={18} className="animate-spin" />
-                                                    {settingsChanged ? "Regenerating & Downloading..." : "Downloading..."}
-                                                </span>
-                                                <span className="text-[10px] font-normal opacity-70">This may take a few moments</span>
-                                            </span>
-                                        ) : (
-                                            <>
-                                                <IconDownload size={18} />
-                                                {settingsChanged ? "Download without Preview" : "Download PDF"}
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-                    )}
-                </main>
-
-                {/* Floating "Regenerate Preview" button when settings changed */}
-                <AnimatePresence>
-                    {stage === "preview" && settingsChanged && (
-                        <motion.button
-                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 50, scale: 0.9 }}
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => {
-                                if (activeTab === "url" && urlInput.trim()) {
-                                    handleFetchUrl();
-                                } else if (activeTab === "code" && codeInput.trim()) {
-                                    handleCodePreview();
-                                } else {
-                                    setSettingsChanged(false);
-                                }
-                            }}
-                            className="fixed bottom-8 right-8 z-50 flex items-center gap-2 px-6 py-4 bg-[#1E1E1E] hover:bg-black text-white rounded-full font-bold shadow-2xl shadow-black/40 transition-colors cursor-pointer"
-                        >
-                            {isFetchingUrl || isGeneratingPreview ? (
-                                <>
-                                    <IconLoader2 size={20} className="animate-spin" />
-                                    <span className="flex flex-col items-start">
-                                        <span>Generating…</span>
-                                        <span className="text-xs font-normal opacity-70">Don&apos;t close this tab</span>
-                                    </span>
-                                </>
-                            ) : (
-                                <>
-                                    <IconRefresh size={20} />
-                                    Regenerate Preview
-                                </>
-                            )}
-                        </motion.button>
-                    )}
-                </AnimatePresence>
-            </div>
-        );
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Render: Input
-    // ─────────────────────────────────────────────────────────────────────────
-    const descriptionContent = (
-        <div className="flex flex-col gap-5 mt-4">
-            <p className="text-brand-sage leading-relaxed">
-                Save web content for offline use with PDF Maya’s HTML to PDF tool. Convert URLs or HTML code into clean, printable PDF documents.
-            </p>
-            <h2 className="text-xl font-bold text-brand-dark mt-2">Key Features & Benefits</h2>
-            <ul className="flex flex-col gap-2.5">
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span><strong>Web Archiving:</strong> Save articles, reports, or invoices from websites.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span><strong>Print Optimization:</strong> Remove ads and sidebars for a clean reading experience.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span><strong>Code Conversion:</strong> Paste raw HTML code to generate a PDF.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span><strong>Offline Access:</strong> View web content without an internet connection.</span>
-                </li>
-            </ul>
-            <h2 className="text-xl font-bold text-brand-dark mt-2">When to Use This Tool</h2>
-            <ul className="flex flex-col gap-2.5">
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span>Research: Save online articles for reference.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span>Invoicing: Convert web-generated invoices to PDF for records.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#F97316]" />
-                    <span>Documentation: Archive web pages for compliance or proof.</span>
-                </li>
-            </ul>
-            <p className="text-sm font-medium text-brand-dark mt-2">
-                Capture the web with our HTML to PDF converter.
-            </p>
-        </div>
-    );
 
     return (
-        <ToolLayout
-            title="HTML to PDF - Convert Web Pages to Downloadable Documents"
-            description={descriptionContent}
-            icon={<IconWorld size={28} stroke={1.5} />}
-            accentColor="#F97316"
-        >
-            <div className="flex flex-col gap-4">
+        <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdHowTo) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+            />
 
-                {/* ── INPUT STATE ── */}
-                {stage === "input" && (
-                    <div className="bg-white rounded-2xl shadow-sm border border-border overflow-hidden">
-                        {/* Tab bar */}
-                        <div className="flex items-center gap-2 p-3 border-b border-border bg-gray-50/60">
-                            <TabBtn
-                                active={activeTab === "url"}
-                                onClick={() => { setActiveTab("url"); setError(null); }}
-                                icon={<IconLink size={15} />}
-                                label="From URL"
-                            />
-                            <TabBtn
-                                active={activeTab === "file"}
-                                onClick={() => { setActiveTab("file"); setError(null); }}
-                                icon={<IconFileCode size={15} />}
-                                label="Upload HTML"
-                            />
-                            <TabBtn
-                                active={activeTab === "code"}
-                                onClick={() => { setActiveTab("code"); setError(null); }}
-                                icon={<IconCode size={15} />}
-                                label="Paste Code"
-                            />
+            <Navbar />
+
+            {/* ═══════════════════════════════════════════════
+                HERO AREA: Header & Full-Width Upload Section
+            ═══════════════════════════════════════════════ */}
+            <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
+                <div className="max-w-7xl mx-auto text-center">
+                    {/* Format Badge */}
+                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-brand-teal">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e6f4ef]">
+                                <IconWorld size={13} stroke={2.5} />
+                            </span>
+                            <span>HTML / Webpage</span>
                         </div>
-
-                        <div className="p-5 md:p-6">
-                            {/* ── URL TAB ── */}
-                            {activeTab === "url" && (
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1.5">
-                                        <label htmlFor="url-input" className="text-sm font-semibold text-brand-dark">
-                                            Enter a webpage URL
-                                        </label>
-                                        <p className="text-xs text-brand-sage">
-                                            We'll render the page in a real browser and convert it to a PDF.
-                                        </p>
-                                    </div>
-
-                                    <div className="flex gap-2">
-                                        <div className="flex-1 relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-brand-sage">
-                                                <IconLink size={16} />
-                                            </span>
-                                            <input
-                                                id="url-input"
-                                                type="url"
-                                                placeholder="https://example.com"
-                                                value={urlInput}
-                                                onChange={(e) => { setUrlInput(e.target.value); setError(null); }}
-                                                onKeyDown={(e) => e.key === "Enter" && handleFetchUrl()}
-                                                className="w-full pl-9 pr-4 py-3 border border-border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316] bg-gray-50 transition-all"
-                                            />
-                                        </div>
-                                        <button
-                                            onClick={handleFetchUrl}
-                                            disabled={!urlInput.trim() || isFetchingUrl}
-                                            className={`flex items-center gap-2 px-4 py-3 rounded-xl font-semibold text-white text-sm transition-all shadow-sm whitespace-nowrap ${!urlInput.trim()
-                                                ? "bg-[#F97316]/30 cursor-not-allowed"
-                                                : isFetchingUrl
-                                                    ? "bg-[#F97316] opacity-60 cursor-wait"
-                                                    : "bg-[#F97316] hover:bg-[#c2410c] cursor-pointer"
-                                                }`}
-                                        >
-                                            {isFetchingUrl ? (
-                                                <IconLoader2 size={16} className="animate-spin" />
-                                            ) : (
-                                                <IconEye size={16} />
-                                            )}
-                                            {isFetchingUrl ? "Fetching…" : "Preview"}
-                                        </button>
-                                    </div>
-
-                                    {/* Loading hint */}
-                                    {(isFetchingUrl || isGeneratingPreview) && (
-                                        <div className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 animate-pulse">
-                                            <IconLoader2 size={13} className="animate-spin shrink-0" />
-                                            <span>Generating your PDF preview, this may take a few moments. Don&apos;t close this tab.</span>
-                                        </div>
-                                    )}
-
-                                    <div className="flex items-start gap-3 p-3 rounded-xl bg-orange-50 border border-orange-100 text-xs text-orange-700">
-                                        <IconAlertCircle size={15} className="shrink-0 mt-0.5" />
-                                        <span>
-                                            Some websites block external requests. If a page fails to load, try
-                                            downloading the page and uploading the HTML file instead.
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* ── FILE TAB ── */}
-                            {activeTab === "file" && (
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1.5">
-                                        <label className="text-sm font-semibold text-brand-dark">
-                                            Upload an HTML file
-                                        </label>
-                                        <p className="text-xs text-brand-sage">
-                                            Accepts .html and .htm files.
-                                        </p>
-                                    </div>
-
-                                    <FileUpload
-                                        accept={{ "text/html": [".html", ".htm"] }}
-                                        multiple={false}
-                                        files={htmlFiles}
-                                        setFiles={setHtmlFiles}
-                                    />
-
-                                    {htmlFiles.length > 0 && (
-                                        <button
-                                            onClick={() => handleFileRead(htmlFiles[0])}
-                                            disabled={isGeneratingPreview}
-                                            className={`flex items-center gap-2 w-full justify-center py-3 rounded-xl bg-[#F97316] text-white font-semibold text-sm hover:bg-[#c2410c] transition-all cursor-pointer shadow-md ${isGeneratingPreview ? "opacity-60 cursor-wait" : ""}`}
-                                        >
-                                            {isGeneratingPreview ? (
-                                                <IconLoader2 size={16} className="animate-spin" />
-                                            ) : (
-                                                <IconEye size={16} />
-                                            )}
-                                            {isGeneratingPreview ? "Processing..." : "Preview HTML"}
-                                            {!isGeneratingPreview && <IconChevronRight size={15} />}
-                                        </button>
-                                    )}
-
-                                    {/* Loading hint */}
-                                    {isGeneratingPreview && (
-                                        <div className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 animate-pulse">
-                                            <IconLoader2 size={13} className="animate-spin shrink-0" />
-                                            <span>Generating your PDF preview, this may take a few moments. Don&apos;t close this tab.</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* ── CODE TAB ── */}
-                            {activeTab === "code" && (
-                                <div className="flex flex-col gap-4">
-                                    <div className="flex flex-col gap-1.5">
-                                        <label htmlFor="html-code-input" className="text-sm font-semibold text-brand-dark">
-                                            Paste your HTML code
-                                        </label>
-                                        <p className="text-xs text-brand-sage">
-                                            Paste any valid HTML snippet or a full document.
-                                        </p>
-                                    </div>
-
-                                    <div className="relative">
-                                        <div className="flex items-center gap-2 px-3 py-2 bg-[#1E1702] rounded-t-xl border border-border border-b-0">
-                                            <div className="flex gap-1.5">
-                                                <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
-                                                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400" />
-                                                <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-                                            </div>
-                                            <span className="text-[11px] text-white/40 font-mono ml-1">HTML</span>
-                                            {codeInput.trim() && (
-                                                <button
-                                                    onClick={() => setCodeInput("")}
-                                                    className="ml-auto text-white/40 hover:text-white/70 transition-colors cursor-pointer"
-                                                >
-                                                    <IconX size={13} />
-                                                </button>
-                                            )}
-                                        </div>
-                                        <textarea
-                                            id="html-code-input"
-                                            value={codeInput}
-                                            onChange={(e) => { setCodeInput(e.target.value); setError(null); }}
-                                            placeholder={"<html>\n  <body>\n    <h1>Hello, World!</h1>\n    <p>This will become a PDF!</p>\n  </body>\n</html>"}
-                                            className="w-full h-56 p-4 border border-border rounded-b-xl bg-[#1a1a1a] text-green-400 font-mono text-sm resize-y focus:outline-none focus:ring-2 focus:ring-[#F97316]/40 focus:border-[#F97316] placeholder:text-white/20"
-                                            spellCheck={false}
-                                        />
-                                    </div>
-
-                                    <button
-                                        onClick={handleCodePreview}
-                                        disabled={!codeInput.trim() || isGeneratingPreview}
-                                        className={`flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-white text-sm transition-all shadow-md ${!codeInput.trim()
-                                            ? "bg-[#F97316]/30 cursor-not-allowed"
-                                            : isGeneratingPreview
-                                                ? "bg-[#F97316] opacity-60 cursor-wait"
-                                                : "bg-[#F97316] hover:bg-[#c2410c] cursor-pointer"
-                                            }`}
-                                    >
-                                        {isGeneratingPreview ? (
-                                            <IconLoader2 size={16} className="animate-spin" />
-                                        ) : (
-                                            <IconEye size={16} />
-                                        )}
-                                        {isGeneratingPreview ? "Processing..." : "Preview HTML"}
-                                        {!isGeneratingPreview && <IconChevronRight size={15} />}
-                                    </button>
-
-                                    {/* Loading hint */}
-                                    {isGeneratingPreview && (
-                                        <div className="flex items-center gap-2 p-3 rounded-xl bg-blue-50 border border-blue-100 text-xs text-blue-700 animate-pulse">
-                                            <IconLoader2 size={13} className="animate-spin shrink-0" />
-                                            <span>Generating your PDF preview, this may take a few moments. Don&apos;t close this tab.</span>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* ── Shared Error ── */}
-                            {error && (
-                                <div className="flex items-center gap-2 mt-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl border border-red-100">
-                                    <IconAlertCircle size={16} className="shrink-0" />
-                                    {error}
-                                </div>
-                            )}
+                        <IconArrowRight size={13} className="text-neutral-400" />
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#dc2626]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#fee2e2]">
+                                <IconFileTypePdf size={13} stroke={2.5} />
+                            </span>
+                            <span>PDF</span>
                         </div>
                     </div>
-                )}
 
-            </div>
-        </ToolLayout>
+                    {/* H1 Heading */}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
+                        Convert HTML to PDF
+                    </h1>
+
+                    {/* Subtitle */}
+                    <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                        Transform live website URLs, HTML files, or raw code into clean, print-ready PDF documents.
+                    </p>
+
+                    {/* Full-Width File Upload Card */}
+                    <div className="mt-10">
+                        <HtmlToPdfClient />
+                    </div>
+                </div>
+            </header>
+
+            {/* ═══════════════════════════════════════════════
+                WRITTEN CONTENT BELOW HERO UPLOADER
+            ═══════════════════════════════════════════════ */}
+            <main className="flex-1">
+                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                How to Convert HTML to PDF Online
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Three simple steps to render any webpage or HTML code into a clean PDF.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {HOW_TO_STEPS.map((s) => {
+                                const StepIcon = s.icon;
+                                return (
+                                    <div
+                                        key={s.step}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="relative">
+                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
+                                                <StepIcon size={26} stroke={1.8} />
+                                            </span>
+                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
+                                                {s.step}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {s.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {s.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Key Features & Benefits ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Why Convert HTML to PDF with PDF Maya?
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Pixel-accurate browser rendering with full CSS, web fonts, and responsive layout control.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {FEATURES.map((f) => {
+                                const FeatureIcon = f.icon;
+                                return (
+                                    <div
+                                        key={f.title}
+                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
+                                            <FeatureIcon size={22} stroke={1.8} />
+                                        </span>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {f.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {f.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 3: Common Use Cases ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                When to Use the HTML to PDF Converter
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Save online receipts, archive blog articles, convert invoice templates, and record compliance disclosures.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {USE_CASES.map((uc) => {
+                                const UcIcon = uc.icon;
+                                return (
+                                    <div
+                                        key={uc.title}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
+                                    >
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
+                                            <UcIcon size={20} stroke={2} />
+                                        </span>
+                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
+                                            {uc.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {uc.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Frequently Asked Questions
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to know about converting webpages and HTML to PDF.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-3.5">
+                            {FAQS.map((faq) => (
+                                <details
+                                    key={faq.q}
+                                    className="group border border-[#E0DED9] rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
+                                >
+                                    <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none font-bold text-brand-dark text-sm sm:text-base hover:bg-[#FAF9F7] transition-colors select-none">
+                                        <span className="pr-4 leading-snug">{faq.q}</span>
+                                        <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#f0ede4] text-brand-dark group-open:rotate-45 transition-transform duration-200">
+                                            <IconPlus size={14} stroke={2.5} />
+                                        </span>
+                                    </summary>
+                                    <div className="px-6 pb-5 pt-3 text-sm text-neutral-600 leading-relaxed border-t border-[#E0DED9] bg-[#FAF9F7]">
+                                        {faq.a}
+                                    </div>
+                                </details>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Explore More PDF Tools
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to convert, organize, and edit documents in one place.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {RELATED_TOOLS.map((tool) => {
+                                const ToolIcon = tool.icon;
+                                return (
+                                    <Link
+                                        key={tool.label}
+                                        href={tool.href}
+                                        className="group relative flex items-start gap-4 p-5 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] hover:bg-white hover:border-brand-teal hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]/60 group-hover:scale-105 transition-transform duration-200">
+                                            <ToolIcon size={22} stroke={1.8} />
+                                        </div>
+                                        <div className="flex-1 min-w-0 pr-3">
+                                            <h3 className="font-bold text-base text-brand-dark group-hover:text-brand-teal transition-colors truncate">
+                                                {tool.label}
+                                            </h3>
+                                            <p className="text-xs text-neutral-500 mt-1 leading-relaxed line-clamp-2">
+                                                {tool.desc}
+                                            </p>
+                                        </div>
+                                        <span className="shrink-0 text-neutral-300 group-hover:text-brand-teal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 mt-0.5">
+                                            <IconArrowUpRight size={17} />
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <Footer />
+        </div>
     );
 }
-

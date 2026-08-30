@@ -24,6 +24,9 @@ import {
     IconArrowsJoin2,
     IconLayersSubtract,
     IconPencil,
+    IconFileTypePdf,
+    IconFileWord,
+    IconArrowRight,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -268,6 +271,23 @@ export default function PdfToWordPage() {
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
+                    {/* Format Badge with Word Logo */}
+                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#dc2626]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#fee2e2]">
+                                <IconFileTypePdf size={13} stroke={2.5} />
+                            </span>
+                            <span>PDF</span>
+                        </div>
+                        <IconArrowRight size={13} className="text-neutral-400" />
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#185ABD]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e0ecfc]">
+                                <IconFileWord size={13} stroke={2.5} />
+                            </span>
+                            <span>Word (.docx)</span>
+                        </div>
+                    </div>
+
                     {/* H1 Heading */}
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
                         Convert PDF to Word

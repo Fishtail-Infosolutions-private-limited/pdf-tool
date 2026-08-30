@@ -1,1151 +1,462 @@
-"use client";
-import React, {
-    useState,
-    useRef,
-    useCallback,
-    useEffect,
-} from "react";
+import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
-import ToolLayout from "@/components/ToolLayout";
-import { motion, AnimatePresence } from "motion/react";
-
+import Footer from "@/components/Footer";
+import ComparePdfClient from "./ComparePdfClient";
+import Link from "next/link";
 import {
     IconUpload,
-    IconLoader2,
-    IconX,
-    IconChevronLeft,
-    IconChevronRight,
-    IconArrowLeft,
-    IconArrowRight,
-    IconEye,
-    IconEyeOff,
-    IconAlertCircle,
-    IconCheck,
-    IconFiles,
-    IconFileText,
-    IconMinus,
-    IconPlus,
+    IconSettings,
+    IconDownload,
     IconArrowsLeftRight,
-    IconListDetails,
+    IconShieldLock,
+    IconDeviceLaptop,
+    IconSparkles,
+    IconEye,
+    IconFileDescription,
+    IconLayersIntersect,
+    IconArrowUpRight,
+    IconPlus,
+    IconFileWord,
+    IconTable,
+    IconPhoto,
+    IconArrowsJoin2,
+    IconLayersSubtract,
+    IconPencil,
+    IconFileTypePdf,
+    IconArrowRight,
 } from "@tabler/icons-react";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+export const metadata: Metadata = {
+    title: "Compare PDF Online Free – Side-by-Side Visual Diff Tool | PDF Maya",
+    description:
+        "Compare two PDF documents side-by-side online for free. Spot text additions, deletions, modifications, and visual layout differences with 100% privacy.",
+    keywords: [
+        "compare pdf",
+        "pdf diff tool",
+        "compare two pdf files",
+        "find differences in pdf",
+        "side by side pdf compare",
+        "pdf comparison online free",
+        "free online compare pdf",
+    ],
+    alternates: {
+        canonical: "/compare-pdf",
+    },
+    openGraph: {
+        title: "Compare PDF Online Free – Side-by-Side Visual Diff Tool | PDF Maya",
+        description:
+            "Compare two PDF documents side-by-side online for free. Spot text additions, deletions, and modifications with 100% privacy.",
+        url: "/compare-pdf",
+        siteName: "PDF Maya",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Compare PDF Online Free | PDF Maya",
+        description:
+            "Spot changes, additions, and deletions between two PDF versions instantly with side-by-side visual diffing.",
+    },
+};
 
-interface BBox {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-    text: string;
-}
+const HOW_TO_STEPS = [
+    {
+        step: "01",
+        icon: IconUpload,
+        title: "Upload Both PDF Versions",
+        body: "Drop your original version (A) and revised version (B) into the comparison boxes above.",
+    },
+    {
+        step: "02",
+        icon: IconArrowsLeftRight,
+        title: "Deep Text & Layout Diffing",
+        body: "Click 'Compare Documents'. Our engine scans word-for-word and highlights deleted text in red and new text in green.",
+    },
+    {
+        step: "03",
+        icon: IconEye,
+        title: "Inspect Synchronized Pages",
+        body: "Scroll through synchronized pages with color-coded highlights and inspect the exact change logs.",
+    },
+];
 
-interface PageDiff {
-    page_num: number;
-    page_a_exists: boolean;
-    page_b_exists: boolean;
-    has_changes: boolean;
-    deletions: BBox[];
-    additions: BBox[];
-}
+const FEATURES = [
+    {
+        icon: IconArrowsLeftRight,
+        title: "Side-by-Side Synchronized Scrolling",
+        body: "Scroll both versions together in lockstep to immediately identify paragraph shifts and layout revisions.",
+    },
+    {
+        icon: IconEye,
+        title: "Color-Coded Visual Highlighting",
+        body: "Highlights deleted text in red-tinted bounding boxes and newly added words in green highlights.",
+    },
+    {
+        icon: IconFileDescription,
+        title: "Detailed Change Counter",
+        body: "Get instant metrics on total added words, deleted phrases, and modified page numbers.",
+    },
+    {
+        icon: IconSparkles,
+        title: "100% Free with No Accounts",
+        body: "Compare unlimited document revisions with zero monthly subscriptions or paywalls.",
+    },
+    {
+        icon: IconShieldLock,
+        title: "Private & Auto-Deleted",
+        body: "All transmissions are encrypted via SSL/TLS. Files are processed securely and deleted immediately after your session.",
+    },
+    {
+        icon: IconDeviceLaptop,
+        title: "Cross-Platform Diffing",
+        body: "Compare PDF documents smoothly in any modern web browser on Mac, Windows, Linux, and iPad.",
+    },
+];
 
-interface DiffSummary {
-    total_added_words: number;
-    total_deleted_words: number;
-    changed_pages: number[];
-    total_pages: number;
-}
+const USE_CASES = [
+    {
+        icon: IconFileDescription,
+        title: "Contract Revisions & Redlines",
+        body: "Verify that counter-party attorneys didn't sneak in unauthorized clauses or alter payment schedules in legal agreements.",
+    },
+    {
+        icon: IconLayersIntersect,
+        title: "Book Manuscripts & Editorial Proofs",
+        body: "Check author draft submissions against final typeset proof copies to ensure copyediting fidelity.",
+    },
+    {
+        icon: IconArrowsLeftRight,
+        title: "Financial Audits & 10-K Filings",
+        body: "Compare quarterly balance sheets and SEC filings to verify disclosures and numbers between quarters.",
+    },
+    {
+        icon: IconDeviceLaptop,
+        title: "Engineering Specs & Blueprints",
+        body: "Track architectural changes and revision history across blueprint iterations and hardware specs.",
+    },
+];
 
-interface DiffResult {
-    total_pages_a: number;
-    total_pages_b: number;
-    pages: PageDiff[];
-    summary: DiffSummary;
-}
+const FAQS = [
+    {
+        q: "How do I compare two PDF files for free?",
+        a: "Upload your original PDF into box A and your revised PDF into box B in the tool above, then click 'Compare Documents' to view live side-by-side color-coded differences.",
+    },
+    {
+        q: "What do the different highlight colors mean?",
+        a: "Red highlights indicate words or paragraphs deleted from Version A. Green highlights indicate new words or sentences added in Version B.",
+    },
+    {
+        q: "Do the pages scroll together?",
+        a: "Yes! Both document viewports are synchronized, so scrolling on either side moves both pages simultaneously for effortless comparison.",
+    },
+    {
+        q: "Are my sensitive business contracts private?",
+        a: "Yes. All file uploads are protected with HTTPS encryption. Documents are processed in isolated sandbox environments and deleted immediately after processing.",
+    },
+    {
+        q: "Can I toggle the highlight overlays off to read normally?",
+        a: "Yes! Use the 'Highlights' toggle in the top toolbar at any time to hide or reveal the colored bounding boxes.",
+    },
+    {
+        q: "Is there any software installation required?",
+        a: "No. PDF Maya's compare tool runs completely inside your web browser without installing Adobe Acrobat or third-party diff plugins.",
+    },
+];
 
-interface PageImage {
-    pageNum: number;
-    dataUrl: string;
-}
-
-// ─── Accent colour ────────────────────────────────────────────────────────────
-
-const ACCENT = "#7C3AED"; // violet — distinct from the default teal
-
-// ─── Drop-zone component ──────────────────────────────────────────────────────
-
-function DropZone({
-    id,
-    label,
-    sublabel,
-    file,
-    onFile,
-    color,
-}: {
-    id: string;
-    label: string;
-    sublabel: string;
-    file: File | null;
-    onFile: (f: File) => void;
-    color: string;
-}) {
-    const inputRef = useRef<HTMLInputElement>(null);
-    const [dragging, setDragging] = useState(false);
-
-    const handleDrop = (e: React.DragEvent) => {
-        e.preventDefault();
-        setDragging(false);
-        const f = e.dataTransfer.files[0];
-        if (f && f.type === "application/pdf") onFile(f);
-    };
-
-    return (
-        <div
-            id={id}
-            onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={handleDrop}
-            onClick={() => !file && inputRef.current?.click()}
-            className="relative rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer select-none overflow-hidden"
-            style={{
-                borderColor: dragging ? color : file ? color : "#E0DED9",
-                background: dragging ? `${color}08` : file ? `${color}06` : "#FAFAF9",
-            }}
-        >
-            <input
-                ref={inputRef}
-                type="file"
-                accept=".pdf,application/pdf"
-                className="hidden"
-                onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) onFile(f);
-                }}
-            />
-
-            <div className="flex flex-col items-center justify-center gap-3 p-8 min-h-[180px]">
-                {file ? (
-                    <>
-                        <span
-                            className="flex items-center justify-center w-12 h-12 rounded-2xl"
-                            style={{ background: `${color}15`, color }}
-                        >
-                            <IconFileText size={24} stroke={1.8} />
-                        </span>
-                        <div className="text-center">
-                            <p
-                                className="font-semibold text-sm truncate max-w-[200px]"
-                                style={{ color }}
-                            >
-                                {file.name}
-                            </p>
-                            <p className="text-xs text-brand-sage mt-0.5">
-                                {(file.size / 1024).toFixed(1)} KB · PDF
-                            </p>
-                        </div>
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                inputRef.current?.click();
-                            }}
-                            className="text-xs font-medium px-3 py-1 rounded-full border transition-colors"
-                            style={{ borderColor: color, color }}
-                        >
-                            Change file
-                        </button>
-                    </>
-                ) : (
-                    <>
-                        <span
-                            className="flex items-center justify-center w-12 h-12 rounded-2xl"
-                            style={{ background: `${color}10`, color }}
-                        >
-                            <IconUpload size={22} stroke={1.8} />
-                        </span>
-                        <div className="text-center">
-                            <p className="font-bold text-sm text-brand-dark">{label}</p>
-                            <p className="text-xs text-brand-sage mt-0.5">{sublabel}</p>
-                        </div>
-                    </>
-                )}
-            </div>
-        </div>
-    );
-}
-
-// ─── Page viewer with highlight overlays ─────────────────────────────────────
-
-function PageViewer({
-    pages,
-    currentPage,
-    diffPages,
-    highlightType,
-    showHighlights,
-    scrollRef,
-    onScroll,
-    label,
-    labelColor,
-}: {
-    pages: PageImage[];
-    currentPage: number;
-    diffPages: PageDiff[];
-    highlightType: "deletions" | "additions";
-    showHighlights: boolean;
-    scrollRef: React.RefObject<HTMLDivElement | null>;
-    onScroll: () => void;
-    label: string;
-    labelColor: string;
-}) {
-    const pageData = pages.find((p) => p.pageNum === currentPage);
-    const diffData = diffPages.find((p) => p.page_num === currentPage);
-    const boxes: BBox[] = showHighlights && diffData ? diffData[highlightType] : [];
-
-    const highlightColor =
-        highlightType === "deletions"
-            ? "rgba(239, 68, 68, 0.35)"   // red-500 translucent
-            : "rgba(34, 197, 94, 0.35)";  // green-500 translucent
-    const highlightBorder =
-        highlightType === "deletions"
-            ? "rgba(239, 68, 68, 0.7)"
-            : "rgba(34, 197, 94, 0.7)";
-
-    return (
-        <div className="flex flex-col flex-1 min-w-0 min-h-0 bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-            {/* Header */}
-            <div
-                className="flex items-center gap-2 px-4 py-3 border-b border-slate-100 shrink-0"
-                style={{ background: `${labelColor}08` }}
-            >
-                <span
-                    className="flex items-center justify-center w-6 h-6 rounded-md text-white text-xs font-bold shrink-0"
-                    style={{ background: labelColor }}
-                >
-                    {label === "Original" ? "A" : "B"}
-                </span>
-                <span className="text-sm font-semibold" style={{ color: labelColor }}>
-                    {label}
-                </span>
-                <span className="ml-auto text-xs text-brand-sage font-medium">
-                    Page {currentPage}
-                </span>
-                {diffData?.has_changes && (
-                    <span
-                        className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white"
-                        style={{ background: labelColor }}
-                    >
-                        Changed
-                    </span>
-                )}
-            </div>
-
-            {/* Scrollable content */}
-            <div
-                ref={scrollRef}
-                onScroll={onScroll}
-                className="flex-1 overflow-auto custom-scrollbar"
-            >
-                <div className="flex justify-center p-4">
-                    {pageData ? (
-                        <div className="relative inline-block shadow-lg rounded overflow-hidden">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src={pageData.dataUrl}
-                                alt={`Page ${currentPage}`}
-                                className="block max-w-full"
-                                style={{ display: "block" }}
-                                draggable={false}
-                            />
-                            {/* Highlight overlays */}
-                            {boxes.map((box, i) => (
-                                <div
-                                    key={i}
-                                    className="absolute pointer-events-none"
-                                    style={{
-                                        left: `${box.x * 100}%`,
-                                        top: `${box.y * 100}%`,
-                                        width: `${box.w * 100}%`,
-                                        height: `${box.h * 100}%`,
-                                        background: highlightColor,
-                                        border: `1px solid ${highlightBorder}`,
-                                        borderRadius: 2,
-                                    }}
-                                    title={box.text}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center gap-3 py-20 text-brand-sage">
-                            <IconFiles size={32} stroke={1.5} />
-                            <p className="text-sm font-medium">No page available</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
-
-// ─── Main page ────────────────────────────────────────────────────────────────
+const RELATED_TOOLS = [
+    { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
+    { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
+    { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
+    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
+    { label: "Sign PDF", href: "/sign-pdf", desc: "Add digital signatures and initials to PDFs.", icon: IconPencil },
+    { label: "Protect PDF", href: "/protect-pdf", desc: "Encrypt PDF files with strong password protection.", icon: IconShieldLock },
+];
 
 export default function ComparePdfPage() {
-    const [fileA, setFileA] = useState<File | null>(null);
-    const [fileB, setFileB] = useState<File | null>(null);
-
-    const [step, setStep] = useState<"upload" | "processing" | "results">("upload");
-    const [processingMsg, setProcessingMsg] = useState("Analysing documents…");
-    const [error, setError] = useState<string | null>(null);
-
-    const [diffResult, setDiffResult] = useState<DiffResult | null>(null);
-    const [pagesA, setPagesA] = useState<PageImage[]>([]);
-    const [pagesB, setPagesB] = useState<PageImage[]>([]);
-
-    const [currentPage, setCurrentPage] = useState(1);
-    const [showHighlights, setShowHighlights] = useState(true);
-
-    const scrollARef = useRef<HTMLDivElement>(null);
-    const scrollBRef = useRef<HTMLDivElement>(null);
-    const isSyncing = useRef(false);
-
-    // Mobile specific states
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerTab, setDrawerTab] = useState<"navigation" | "details">("navigation");
-    const [mobileView, setMobileView] = useState<"original" | "modified">("original");
-
-    // Details expansion limits
-    const [delLimit, setDelLimit] = useState(20);
-    const [addLimit, setAddLimit] = useState(20);
-
-    // ── Sync scroll ──────────────────────────────────────────────────────────
-
-    const syncScroll = useCallback((source: "a" | "b") => {
-        if (isSyncing.current) return;
-        isSyncing.current = true;
-        const src = source === "a" ? scrollARef.current : scrollBRef.current;
-        const dst = source === "a" ? scrollBRef.current : scrollARef.current;
-        if (src && dst) {
-            dst.scrollTop = src.scrollTop;
-            dst.scrollLeft = src.scrollLeft;
-        }
-        requestAnimationFrame(() => { isSyncing.current = false; });
-    }, []);
-
-    // ── Render pages from a File via PDF.js ──────────────────────────────────
-
-    const renderPages = useCallback(async (file: File): Promise<PageImage[]> => {
-        const pdfjsLib = await import("pdfjs-dist");
-        pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-            "pdfjs-dist/build/pdf.worker.min.mjs",
-            import.meta.url
-        ).toString();
-
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-        const results: PageImage[] = [];
-
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.8 });
-            const canvas = document.createElement("canvas");
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            const ctx = canvas.getContext("2d")!;
-            await page.render({ canvasContext: ctx, viewport } as any).promise;
-            results.push({
-                pageNum: i,
-                dataUrl: canvas.toDataURL("image/jpeg", 0.9),
-            });
-        }
-        return results;
-    }, []);
-
-    // ── Run comparison ───────────────────────────────────────────────────────
-
-    const runCompare = useCallback(async () => {
-        if (!fileA || !fileB) return;
-
-        (async () => {
-            setStep("processing");
-            setError(null);
-
-            try {
-                // Step 1: Fetch diff data from backend
-                setProcessingMsg("Extracting & comparing text…");
-                const form = new FormData();
-                form.append("file_a", fileA, fileA.name);
-                form.append("file_b", fileB, fileB.name);
-
-                const diffRes = await fetch("/api/compare-pdf", {
-                    method: "POST",
-                    body: form,
-                });
-
-                if (!diffRes.ok) {
-                    const body = await diffRes.json().catch(() => ({}));
-                    throw new Error(body.error || `Server error ${diffRes.status}`);
-                }
-
-                const diff: DiffResult = await diffRes.json();
-                setDiffResult(diff);
-
-                // Step 2: Render both PDFs as images client-side
-                setProcessingMsg("Rendering " + fileA.name + "…");
-                const imgA = await renderPages(fileA);
-                setPagesA(imgA);
-
-                setProcessingMsg("Rendering " + fileB.name + "…");
-                const imgB = await renderPages(fileB);
-                setPagesB(imgB);
-
-                setCurrentPage(1);
-                setStep("results");
-            } catch (err: any) {
-                setError(err?.message || "An unexpected error occurred.");
-                setStep("upload");
-            }
-        })();
-    }, [fileA, fileB, renderPages]);
-
-    // ── Derived page list ────────────────────────────────────────────────────
-
-    const pageList = diffResult ? diffResult.pages : [];
-
-    const totalPages = pageList.length;
-    const pageIndex = pageList.findIndex((p) => p.page_num === currentPage);
-
-    const goToPage = (num: number) => {
-        setCurrentPage(num);
-        setDelLimit(20);
-        setAddLimit(20);
-        // Scroll both viewers back to top on page change
-        scrollARef.current && (scrollARef.current.scrollTop = 0);
-        scrollBRef.current && (scrollBRef.current.scrollTop = 0);
+    const jsonLdSoftware = {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Compare PDF Tool - PDF Maya",
+        url: "https://pdfmaya.com/compare-pdf",
+        description: "Compare two PDF documents side-by-side online for free with visual diffing.",
+        applicationCategory: "UtilityApplication",
+        operatingSystem: "All",
+        offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+        },
     };
 
-    const prevPage = () => {
-        if (pageIndex > 0) goToPage(pageList[pageIndex - 1].page_num);
-    };
-    const nextPage = () => {
-        if (pageIndex < totalPages - 1) goToPage(pageList[pageIndex + 1].page_num);
-    };
-
-    const changedPageList = diffResult?.summary.changed_pages ?? [];
-
-    // ── Reset ────────────────────────────────────────────────────────────────
-
-    const reset = () => {
-        setFileA(null);
-        setFileB(null);
-        setDiffResult(null);
-        setPagesA([]);
-        setPagesB([]);
-        setStep("upload");
-        setError(null);
-        setShowHighlights(true);
+    const jsonLdHowTo = {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: "How to Compare Two PDF Files Online",
+        description: "Step-by-step guide to finding differences between two PDF versions with PDF Maya.",
+        step: HOW_TO_STEPS.map((s, index) => ({
+            "@type": "HowToStep",
+            position: index + 1,
+            name: s.title,
+            text: s.body,
+        })),
     };
 
-    // ════════════════════════════════════════════════════════════════════════
-    // RENDER : UPLOAD STEP
-    // ════════════════════════════════════════════════════════════════════════
-    if (step === "upload") {
-        const descriptionContent = (
-            <div className="flex flex-col gap-5 mt-4">
-                <p className="text-brand-sage leading-relaxed">
-                    Spot changes instantly with PDF Maya’s Compare PDF tool. Compare two PDF files side-by-side to highlight additions, deletions, and modifications.
-                </p>
-                <h2 className="text-xl font-bold text-brand-dark mt-2">Key Features & Benefits</h2>
-                <ul className="flex flex-col gap-2.5">
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span><strong>Visual Highlights:</strong> Color-coded changes show exactly what’s different.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span><strong>Side-by-Side View:</strong> See original and revised versions simultaneously.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span><strong>Detailed Report:</strong> Generate a summary of all changes made.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span><strong>Version Control:</strong> Essential for tracking contract revisions.</span>
-                    </li>
-                </ul>
-                <h2 className="text-xl font-bold text-brand-dark mt-2">When to Use This Tool</h2>
-                <ul className="flex flex-col gap-2.5">
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span>Contract Review: Verify changes made by legal teams.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span>Editing Proofing: Check drafts against final versions.</span>
-                    </li>
-                    <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#7C3AED]" />
-                        <span>Audit Trails: Track modifications in financial reports.</span>
-                    </li>
-                </ul>
-                <p className="text-sm font-medium text-brand-dark mt-2">
-                    Never miss a change with our PDF comparison tool.
-                </p>
-            </div>
-        );
-
-        return (
-            <ToolLayout
-                title="Compare PDF - Find Differences Between Two Documents"
-                description={descriptionContent}
-                icon={<IconArrowsLeftRight size={28} stroke={1.5} />}
-                accentColor={ACCENT}
-            >
-                <div className="bg-white rounded-2xl border border-border shadow-sm p-6 flex flex-col gap-5">
-                    <h2 className="text-sm font-bold text-brand-dark text-center">Upload Two PDFs to Compare</h2>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <DropZone
-                            id="drop-zone-a"
-                            label="Original PDF"
-                            sublabel="Drag & drop or click"
-                            file={fileA}
-                            onFile={setFileA}
-                            color="#ef4444"
-                        />
-                        <DropZone
-                            id="drop-zone-b"
-                            label="Modified PDF"
-                            sublabel="Drag & drop or click"
-                            file={fileB}
-                            onFile={setFileB}
-                            color="#22c55e"
-                        />
-                    </div>
-
-                    {/* Legend */}
-                    <div className="flex items-center justify-center gap-6 text-xs text-brand-sage">
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(239,68,68,0.4)" }} />
-                            Removed text (A only)
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                            <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(34,197,94,0.4)" }} />
-                            Added text (B only)
-                        </span>
-                    </div>
-
-                    {error && (
-                        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
-                            <IconAlertCircle size={16} className="shrink-0 mt-0.5" />
-                            {error}
-                        </div>
-                    )}
-
-                    <button
-                        id="compare-pdf-btn"
-                        onClick={runCompare}
-                        disabled={!fileA || !fileB}
-                        className="w-full py-4 rounded-xl font-bold text-white text-[15px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-lg active:scale-[0.98]"
-                        style={{
-                            background: fileA && fileB
-                                ? `linear-gradient(135deg, ${ACCENT}, #6d28d9)`
-                                : "#D1D5DB",
-                            cursor: fileA && fileB ? "pointer" : "not-allowed",
-                            boxShadow: fileA && fileB ? `0 8px 24px ${ACCENT}30` : "none",
-                        }}
-                    >
-                        <IconArrowsLeftRight size={20} />
-                        Compare PDFs
-                        <IconArrowRight size={16} />
-                    </button>
-                </div>
-            </ToolLayout>
-        );
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    // RENDER : PROCESSING STEP
-    // ════════════════════════════════════════════════════════════════════════
-    if (step === "processing") {
-        return (
-            <div
-                className="min-h-screen flex flex-col pt-16"
-                style={{ background: "var(--brand-white)" }}
-            >
-                <Navbar />
-                <main className="flex-1 flex items-center justify-center">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.92 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="flex flex-col items-center gap-6 text-center px-6"
-                    >
-                        {/* Animated rings */}
-                        <div className="relative flex items-center justify-center w-24 h-24">
-                            <div
-                                className="absolute inset-0 rounded-full animate-ping opacity-20"
-                                style={{ background: ACCENT }}
-                            />
-                            <div
-                                className="absolute inset-2 rounded-full animate-ping opacity-15"
-                                style={{ background: ACCENT, animationDelay: "0.3s" }}
-                            />
-                            <span
-                                className="relative flex items-center justify-center w-16 h-16 rounded-full text-white"
-                                style={{ background: ACCENT }}
-                            >
-                                <IconLoader2 size={32} className="animate-spin" />
-                            </span>
-                        </div>
-
-                        <div>
-                            <h2 className="text-2xl font-bold text-brand-dark">Comparing Documents</h2>
-                            <p className="text-brand-sage text-sm mt-1">{processingMsg}</p>
-                        </div>
-
-                        <div className="flex items-center gap-3 text-sm text-brand-sage">
-                            <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border shadow-sm">
-                                <IconFileText size={14} style={{ color: "#ef4444" }} />
-                                {fileA?.name}
-                            </span>
-                            <IconArrowsLeftRight size={16} />
-                            <span className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-border shadow-sm">
-                                <IconFileText size={14} style={{ color: "#22c55e" }} />
-                                {fileB?.name}
-                            </span>
-                        </div>
-                    </motion.div>
-                </main>
-            </div>
-        );
-    }
-
-    // ════════════════════════════════════════════════════════════════════════
-    // RENDER : RESULTS STEP
-    // ════════════════════════════════════════════════════════════════════════
-    const summary = diffResult!.summary;
-    const currentDiffPage = diffResult!.pages.find((p) => p.page_num === currentPage);
-    const hasNoChanges = summary.changed_pages.length === 0;
+    const jsonLdFaq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FAQS.map((faq) => ({
+            "@type": "Question",
+            name: faq.q,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.a,
+            },
+        })),
+    };
 
     return (
-        <div
-            className="h-screen flex flex-col overflow-hidden pt-16"
-            style={{ background: "var(--brand-white)" }}
-        >
+        <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdHowTo) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+            />
+
             <Navbar />
 
-            {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
-            <div className="shrink-0 flex items-center gap-3 px-4 py-2.5 bg-white border-b border-slate-100 z-20 flex-wrap">
-
-                {/* Back */}
-                <button
-                    id="compare-back-btn"
-                    onClick={reset}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer px-2 py-1.5 rounded-lg hover:bg-slate-100"
-                >
-                    <IconArrowLeft size={15} />
-                    New Comparison
-                </button>
-
-                <div className="w-px h-5 bg-slate-200" />
-
-                {/* Summary chips */}
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
-                        <IconMinus size={12} />
-                        {summary.total_deleted_words} removed
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                        <IconPlus size={12} />
-                        {summary.total_added_words} added
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-brand-sage">
-                        <IconArrowsLeftRight size={12} />
-                        {summary.changed_pages.length} pages changed
-                    </span>
-                </div>
-
-                <div className="flex-1" />
-
-                {/* Highlight toggle */}
-                <button
-                    id="toggle-highlights"
-                    onClick={() => setShowHighlights((v) => !v)}
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer"
-                    style={showHighlights
-                        ? { background: ACCENT, borderColor: ACCENT, color: "white" }
-                        : { background: "white", borderColor: "#E0DED9", color: "#8C886B" }
-                    }
-                >
-                    {showHighlights ? <IconEye size={13} /> : <IconEyeOff size={13} />}
-                    <span className="hidden sm:inline">Highlights</span>
-                </button>
-
-                {/* Mobile Drawer Toggle */}
-                <button
-                    onClick={() => setDrawerOpen(true)}
-                    className="xl:hidden flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border border-border text-brand-dark hover:bg-slate-100 transition-colors"
-                >
-                    <IconListDetails size={14} />
-                    Details
-                </button>
-
-                <div className="w-px h-5 bg-slate-200 hidden sm:block" />
-
-                {/* Page navigation */}
-                <div className="flex items-center gap-1.5">
-                    <button
-                        id="compare-prev-page"
-                        onClick={prevPage}
-                        disabled={pageIndex <= 0}
-                        className="flex items-center justify-center w-7 h-7 rounded-lg border border-border text-brand-sage hover:text-brand-dark hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                        <IconChevronLeft size={14} />
-                    </button>
-                    <span className="text-xs font-semibold text-brand-dark min-w-[80px] text-center">
-                        Page {currentPage} / {diffResult!.summary.total_pages}
-                    </span>
-                    <button
-                        id="compare-next-page"
-                        onClick={nextPage}
-                        disabled={pageIndex >= totalPages - 1}
-                        className="flex items-center justify-center w-7 h-7 rounded-lg border border-border text-brand-sage hover:text-brand-dark hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
-                    >
-                        <IconChevronRight size={14} />
-                    </button>
-                </div>
-            </div>
-
-            {/* ── MAIN CONTENT ────────────────────────────────────────────────── */}
-            <div className="flex flex-1 min-h-0 overflow-hidden gap-3 p-3">
-
-                {/* ── LEFT SIDEBAR : Changed pages list (Desktop) ── */}
-                <div className="hidden xl:flex flex-col w-52 shrink-0 bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <div className="px-4 py-3 border-b border-slate-100 shrink-0">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-brand-sage">
-                            Changed Pages
-                        </p>
-                        <p className="text-xs text-brand-sage mt-0.5">
-                            {changedPageList.length} of {summary.total_pages} pages
-                        </p>
+            {/* ═══════════════════════════════════════════════
+                HERO AREA: Header & Full-Width Upload Section
+            ═══════════════════════════════════════════════ */}
+            <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
+                <div className="max-w-7xl mx-auto text-center">
+                    {/* Format Badge */}
+                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#7C3AED]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#ede9fe]">
+                                <IconArrowsLeftRight size={13} stroke={2.5} />
+                            </span>
+                            <span>Visual Diff Engine</span>
+                        </div>
                     </div>
-                    <div className="flex-1 overflow-y-auto custom-scrollbar py-2">
-                        {hasNoChanges ? (
-                            <div className="flex flex-col items-center gap-2 py-6 px-4 text-center">
-                                <IconCheck size={24} className="text-green-500" />
-                                <p className="text-xs text-brand-sage font-medium">
-                                    No differences found
-                                </p>
-                            </div>
-                        ) : (
-                            diffResult!.pages.map((page) => (
-                                <button
-                                    key={page.page_num}
-                                    onClick={() => goToPage(page.page_num)}
-                                    className="w-full flex items-center justify-between gap-2 px-4 py-2.5 text-left transition-colors cursor-pointer text-xs font-medium"
-                                    style={{
-                                        background: currentPage === page.page_num ? `${ACCENT}10` : "transparent",
-                                        color: currentPage === page.page_num ? ACCENT : page.has_changes ? "#1E1702" : "#8C886B",
-                                    }}
-                                >
-                                    <span>Page {page.page_num}</span>
-                                    {page.has_changes ? (
-                                        <span className="flex items-center gap-1">
-                                            {page.deletions.length > 0 && (
-                                                <span className="w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-bold text-white"
-                                                    style={{ background: "#ef4444" }}>
-                                                    {page.deletions.length}
-                                                </span>
-                                            )}
-                                            {page.additions.length > 0 && (
-                                                <span className="w-4 h-4 rounded-sm flex items-center justify-center text-[9px] font-bold text-white"
-                                                    style={{ background: "#22c55e" }}>
-                                                    {page.additions.length}
-                                                </span>
-                                            )}
+
+                    {/* H1 Heading */}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
+                        Compare PDF Files
+                    </h1>
+
+                    {/* Subtitle */}
+                    <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                        Spot changes, additions, and deletions between two PDF versions instantly with side-by-side synchronized diffing.
+                    </p>
+
+                    {/* Full-Width File Upload Card */}
+                    <div className="mt-10">
+                        <ComparePdfClient />
+                    </div>
+                </div>
+            </header>
+
+            {/* ═══════════════════════════════════════════════
+                WRITTEN CONTENT BELOW HERO UPLOADER
+            ═══════════════════════════════════════════════ */}
+            <main className="flex-1">
+                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                How to Compare Two PDF Files Online
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Three simple steps to highlight word-for-word differences between document versions.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {HOW_TO_STEPS.map((s) => {
+                                const StepIcon = s.icon;
+                                return (
+                                    <div
+                                        key={s.step}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="relative">
+                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
+                                                <StepIcon size={26} stroke={1.8} />
+                                            </span>
+                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
+                                                {s.step}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {s.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {s.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Key Features & Benefits ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Why Compare PDFs with PDF Maya?
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Accurate text diffing with synchronized side-by-side viewports and instant metrics.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {FEATURES.map((f) => {
+                                const FeatureIcon = f.icon;
+                                return (
+                                    <div
+                                        key={f.title}
+                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
+                                            <FeatureIcon size={22} stroke={1.8} />
                                         </span>
-                                    ) : (
-                                        <IconCheck size={12} className="text-green-400" />
-                                    )}
-                                </button>
-                            ))
-                        )}
-                    </div>
-                </div>
-
-                {/* ── DUAL PAGE VIEWERS ── */}
-                <div className="flex flex-col flex-1 min-w-0 gap-3 overflow-hidden">
-                    
-                    {/* Mobile Toggle */}
-                    {!hasNoChanges && (
-                        <div className="xl:hidden shrink-0 flex items-center justify-center pt-1 pb-1">
-                            <div className="flex bg-slate-100 p-1 rounded-full w-full max-w-[280px]">
-                                <button
-                                    onClick={() => setMobileView("original")}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all ${
-                                        mobileView === "original"
-                                            ? "bg-white text-red-500 shadow-sm"
-                                            : "text-brand-sage"
-                                    }`}
-                                >
-                                    Original
-                                </button>
-                                <button
-                                    onClick={() => setMobileView("modified")}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-full transition-all ${
-                                        mobileView === "modified"
-                                            ? "bg-white text-green-500 shadow-sm"
-                                            : "text-brand-sage"
-                                    }`}
-                                >
-                                    Modified
-                                </button>
-                            </div>
-                        </div>
-                    )}
-
-                    <div className="flex flex-1 min-w-0 gap-3 overflow-hidden">
-                        {hasNoChanges ? (
-                            <motion.div
-                                initial={{ opacity: 0, y: 16 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="flex-1 flex flex-col items-center justify-center gap-4 bg-white rounded-2xl border border-border shadow-sm"
-                            >
-                                <span className="flex items-center justify-center w-20 h-20 rounded-full bg-green-50 text-green-500">
-                                    <IconCheck size={40} stroke={2.5} />
-                                </span>
-                                <div className="text-center">
-                                    <h2 className="text-xl font-bold text-brand-dark">Documents are identical</h2>
-                                    <p className="text-brand-sage text-sm mt-1">
-                                        No text differences were found between these two PDFs.
-                                    </p>
-                                </div>
-                                <button
-                                    onClick={reset}
-                                    className="mt-2 px-6 py-3 rounded-xl font-bold text-white text-sm flex items-center gap-2 cursor-pointer"
-                                    style={{ background: ACCENT }}
-                                >
-                                    Compare other files
-                                </button>
-                            </motion.div>
-                        ) : (
-                            <>
-                                <div className={`flex-1 min-w-0 min-h-0 xl:flex flex-col ${mobileView === "original" ? "flex" : "hidden"}`}>
-                                    <PageViewer
-                                        pages={pagesA}
-                                        currentPage={currentPage}
-                                        diffPages={diffResult!.pages}
-                                        highlightType="deletions"
-                                        showHighlights={showHighlights}
-                                        scrollRef={scrollARef}
-                                        onScroll={() => syncScroll("a")}
-                                        label="Original"
-                                        labelColor="#ef4444"
-                                    />
-                                </div>
-                                <div className={`flex-1 min-w-0 min-h-0 xl:flex flex-col ${mobileView === "modified" ? "flex" : "hidden"}`}>
-                                    <PageViewer
-                                        pages={pagesB}
-                                        currentPage={currentPage}
-                                        diffPages={diffResult!.pages}
-                                        highlightType="additions"
-                                        showHighlights={showHighlights}
-                                        scrollRef={scrollBRef}
-                                        onScroll={() => syncScroll("b")}
-                                        label="Modified"
-                                        labelColor="#22c55e"
-                                    />
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {/* ── RIGHT SIDEBAR : Diff detail (Desktop) ── */}
-                <div className="hidden xl:flex flex-col w-56 shrink-0 bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-                    <div className="px-4 py-3 border-b border-slate-100 shrink-0">
-                        <p className="text-[11px] font-bold uppercase tracking-widest text-brand-sage">
-                            Page {currentPage} Details
-                        </p>
-                        {currentDiffPage?.has_changes ? (
-                            <span
-                                className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full text-white"
-                                style={{ background: ACCENT }}
-                            >
-                                Modified
-                            </span>
-                        ) : (
-                            <span className="inline-block mt-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">
-                                Unchanged
-                            </span>
-                        )}
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto custom-scrollbar py-3 flex flex-col gap-3 px-4">
-                        {/* Deletions */}
-                        <div>
-                            <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5"
-                                style={{ color: "#ef4444" }}>
-                                ✕ Removed ({currentDiffPage?.deletions.length ?? 0})
-                            </p>
-                            {(currentDiffPage?.deletions ?? []).slice(0, delLimit).map((d, i) => (
-                                <div
-                                    key={i}
-                                    className="text-[11px] py-0.5 px-2 mb-1 rounded font-mono truncate"
-                                    style={{ background: "rgba(239,68,68,0.08)", color: "#b91c1c" }}
-                                    title={d.text}
-                                >
-                                    — {d.text}
-                                </div>
-                            ))}
-                            <div className="flex items-center gap-3 mt-2">
-                                {((currentDiffPage?.deletions.length ?? 0) > delLimit) && (
-                                    <button
-                                        onClick={() => setDelLimit(l => l + 20)}
-                                        className="text-[10px] font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                    >
-                                        Load 20 more ({(currentDiffPage?.deletions.length ?? 0) - delLimit} left) ↓
-                                    </button>
-                                )}
-                                {delLimit > 20 && (
-                                    <button
-                                        onClick={() => setDelLimit(20)}
-                                        className="text-[10px] font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                    >
-                                        Show less ↑
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Additions */}
-                        <div>
-                            <p className="text-[11px] font-bold uppercase tracking-wider mb-1.5"
-                                style={{ color: "#22c55e" }}>
-                                + Added ({currentDiffPage?.additions.length ?? 0})
-                            </p>
-                            {(currentDiffPage?.additions ?? []).slice(0, addLimit).map((a, i) => (
-                                <div
-                                    key={i}
-                                    className="text-[11px] py-0.5 px-2 mb-1 rounded font-mono truncate"
-                                    style={{ background: "rgba(34,197,94,0.08)", color: "#15803d" }}
-                                    title={a.text}
-                                >
-                                    + {a.text}
-                                </div>
-                            ))}
-                            <div className="flex items-center gap-3 mt-2">
-                                {((currentDiffPage?.additions.length ?? 0) > addLimit) && (
-                                    <button
-                                        onClick={() => setAddLimit(l => l + 20)}
-                                        className="text-[10px] font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                    >
-                                        Load 20 more ({(currentDiffPage?.additions.length ?? 0) - addLimit} left) ↓
-                                    </button>
-                                )}
-                                {addLimit > 20 && (
-                                    <button
-                                        onClick={() => setAddLimit(20)}
-                                        className="text-[10px] font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                    >
-                                        Show less ↑
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* ── MOBILE DRAWER ── */}
-            <AnimatePresence>
-                {drawerOpen && (
-                    <>
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={() => setDrawerOpen(false)}
-                            className="fixed inset-0 bg-black/40 z-40 xl:hidden backdrop-blur-sm"
-                        />
-                        <motion.div
-                            initial={{ x: "100%" }}
-                            animate={{ x: 0 }}
-                            exit={{ x: "100%" }}
-                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                            className="fixed top-0 right-0 bottom-0 w-[280px] bg-white shadow-2xl z-50 xl:hidden flex flex-col"
-                        >
-                            <div className="flex items-center justify-between p-4 border-b border-slate-100 shrink-0">
-                                <h3 className="font-bold text-sm text-brand-dark">Compare Details</h3>
-                                <button
-                                    onClick={() => setDrawerOpen(false)}
-                                    className="p-1 rounded-md text-brand-sage hover:bg-slate-100"
-                                >
-                                    <IconX size={18} />
-                                </button>
-                            </div>
-                            
-                            {/* Tabs */}
-                            <div className="flex p-2 bg-slate-50 border-b border-slate-100 shrink-0">
-                                <button
-                                    onClick={() => setDrawerTab("navigation")}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                                        drawerTab === "navigation" ? "bg-white shadow-sm text-brand-dark" : "text-brand-sage"
-                                    }`}
-                                >
-                                    Changed Pages
-                                </button>
-                                <button
-                                    onClick={() => setDrawerTab("details")}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
-                                        drawerTab === "details" ? "bg-white shadow-sm text-brand-dark" : "text-brand-sage"
-                                    }`}
-                                >
-                                    Page {currentPage} Details
-                                </button>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto custom-scrollbar flex flex-col bg-white">
-                                {drawerTab === "navigation" ? (
-                                    <div className="py-2">
-                                        {hasNoChanges ? (
-                                            <div className="flex flex-col items-center gap-2 py-6 px-4 text-center">
-                                                <IconCheck size={24} className="text-green-500" />
-                                                <p className="text-xs text-brand-sage font-medium">
-                                                    No differences found
-                                                </p>
-                                            </div>
-                                        ) : (
-                                            diffResult!.pages.map((page) => (
-                                                <button
-                                                    key={page.page_num}
-                                                    onClick={() => {
-                                                        goToPage(page.page_num);
-                                                        setDrawerOpen(false);
-                                                    }}
-                                                    className="w-full flex items-center justify-between gap-2 px-4 py-3 text-left transition-colors cursor-pointer text-sm font-medium border-b border-slate-50"
-                                                    style={{
-                                                        background: currentPage === page.page_num ? `${ACCENT}10` : "transparent",
-                                                        color: currentPage === page.page_num ? ACCENT : page.has_changes ? "#1E1702" : "#8C886B",
-                                                    }}
-                                                >
-                                                    <span>Page {page.page_num}</span>
-                                                    {page.has_changes ? (
-                                                        <span className="flex items-center gap-1.5">
-                                                            {page.deletions.length > 0 && (
-                                                                <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white"
-                                                                    style={{ background: "#ef4444" }}>
-                                                                    {page.deletions.length}
-                                                                </span>
-                                                            )}
-                                                            {page.additions.length > 0 && (
-                                                                <span className="w-5 h-5 rounded flex items-center justify-center text-[10px] font-bold text-white"
-                                                                    style={{ background: "#22c55e" }}>
-                                                                    {page.additions.length}
-                                                                </span>
-                                                            )}
-                                                        </span>
-                                                    ) : (
-                                                        <IconCheck size={14} className="text-green-400" />
-                                                    )}
-                                                </button>
-                                            ))
-                                        )}
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {f.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {f.body}
+                                        </p>
                                     </div>
-                                ) : (
-                                    <div className="py-4 flex flex-col gap-4 px-4">
-                                        <div className="flex items-center gap-2 mb-2">
-                                            {currentDiffPage?.has_changes ? (
-                                                <span
-                                                    className="text-[11px] font-bold px-2.5 py-1 rounded-full text-white"
-                                                    style={{ background: ACCENT }}
-                                                >
-                                                    Modified
-                                                </span>
-                                            ) : (
-                                                <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-green-100 text-green-700">
-                                                    Unchanged
-                                                </span>
-                                            )}
-                                        </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
 
-                                        {/* Deletions */}
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-wider mb-2"
-                                                style={{ color: "#ef4444" }}>
-                                                ✕ Removed ({currentDiffPage?.deletions.length ?? 0})
-                                            </p>
-                                            {(currentDiffPage?.deletions ?? []).slice(0, delLimit).map((d, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="text-xs py-1.5 px-2.5 mb-1.5 rounded font-mono break-all"
-                                                    style={{ background: "rgba(239,68,68,0.08)", color: "#b91c1c" }}
-                                                >
-                                                    — {d.text}
-                                                </div>
-                                            ))}
-                                            <div className="flex items-center gap-3 mt-3">
-                                                {((currentDiffPage?.deletions.length ?? 0) > delLimit) && (
-                                                    <button
-                                                        onClick={() => setDelLimit(l => l + 20)}
-                                                        className="text-xs font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                                    >
-                                                        Load 20 more ({(currentDiffPage?.deletions.length ?? 0) - delLimit} left) ↓
-                                                    </button>
-                                                )}
-                                                {delLimit > 20 && (
-                                                    <button
-                                                        onClick={() => setDelLimit(20)}
-                                                        className="text-xs font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                                    >
-                                                        Show less ↑
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
+                {/* ── SECTION 3: Common Use Cases ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                When to Use the PDF Compare Tool
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Review contract modifications, audit financial revisions, check editorial proofs, and verify engineering specs.
+                            </p>
+                        </div>
 
-                                        {/* Additions */}
-                                        <div>
-                                            <p className="text-xs font-bold uppercase tracking-wider mb-2"
-                                                style={{ color: "#22c55e" }}>
-                                                + Added ({currentDiffPage?.additions.length ?? 0})
-                                            </p>
-                                            {(currentDiffPage?.additions ?? []).slice(0, addLimit).map((a, i) => (
-                                                <div
-                                                    key={i}
-                                                    className="text-xs py-1.5 px-2.5 mb-1.5 rounded font-mono break-all"
-                                                    style={{ background: "rgba(34,197,94,0.08)", color: "#15803d" }}
-                                                >
-                                                    + {a.text}
-                                                </div>
-                                            ))}
-                                            <div className="flex items-center gap-3 mt-3">
-                                                {((currentDiffPage?.additions.length ?? 0) > addLimit) && (
-                                                    <button
-                                                        onClick={() => setAddLimit(l => l + 20)}
-                                                        className="text-xs font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                                    >
-                                                        Load 20 more ({(currentDiffPage?.additions.length ?? 0) - addLimit} left) ↓
-                                                    </button>
-                                                )}
-                                                {addLimit > 20 && (
-                                                    <button
-                                                        onClick={() => setAddLimit(20)}
-                                                        className="text-xs font-bold text-brand-sage hover:text-brand-dark transition-colors cursor-pointer"
-                                                    >
-                                                        Show less ↑
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {USE_CASES.map((uc) => {
+                                const UcIcon = uc.icon;
+                                return (
+                                    <div
+                                        key={uc.title}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
+                                    >
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
+                                            <UcIcon size={20} stroke={2} />
+                                        </span>
+                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
+                                            {uc.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {uc.body}
+                                        </p>
                                     </div>
-                                )}
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Frequently Asked Questions
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to know about comparing PDF versions side-by-side.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-3.5">
+                            {FAQS.map((faq) => (
+                                <details
+                                    key={faq.q}
+                                    className="group border border-[#E0DED9] rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
+                                >
+                                    <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none font-bold text-brand-dark text-sm sm:text-base hover:bg-[#FAF9F7] transition-colors select-none">
+                                        <span className="pr-4 leading-snug">{faq.q}</span>
+                                        <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#f0ede4] text-brand-dark group-open:rotate-45 transition-transform duration-200">
+                                            <IconPlus size={14} stroke={2.5} />
+                                        </span>
+                                    </summary>
+                                    <div className="px-6 pb-5 pt-3 text-sm text-neutral-600 leading-relaxed border-t border-[#E0DED9] bg-[#FAF9F7]">
+                                        {faq.a}
+                                    </div>
+                                </details>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Explore More PDF Tools
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to convert, organize, and edit documents in one place.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {RELATED_TOOLS.map((tool) => {
+                                const ToolIcon = tool.icon;
+                                return (
+                                    <Link
+                                        key={tool.label}
+                                        href={tool.href}
+                                        className="group relative flex items-start gap-4 p-5 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] hover:bg-white hover:border-brand-teal hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]/60 group-hover:scale-105 transition-transform duration-200">
+                                            <ToolIcon size={22} stroke={1.8} />
+                                        </div>
+                                        <div className="flex-1 min-w-0 pr-3">
+                                            <h3 className="font-bold text-base text-brand-dark group-hover:text-brand-teal transition-colors truncate">
+                                                {tool.label}
+                                            </h3>
+                                            <p className="text-xs text-neutral-500 mt-1 leading-relaxed line-clamp-2">
+                                                {tool.desc}
+                                            </p>
+                                        </div>
+                                        <span className="shrink-0 text-neutral-300 group-hover:text-brand-teal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 mt-0.5">
+                                            <IconArrowUpRight size={17} />
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <Footer />
         </div>
     );
 }
-
-

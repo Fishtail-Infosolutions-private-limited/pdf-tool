@@ -1,92 +1,462 @@
-"use client";
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
-import ToolLayout from "@/components/ToolLayout";
-import { FileUpload } from "@/components/ui/file-upload";
-import { IconSearch } from "@tabler/icons-react";
-import FileStore from "@/lib/file-store";
+import React from "react";
+import type { Metadata } from "next";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import SearchPdfClient from "./SearchPdfClient";
+import Link from "next/link";
+import {
+    IconUpload,
+    IconSettings,
+    IconDownload,
+    IconSearch,
+    IconShieldLock,
+    IconDeviceLaptop,
+    IconSparkles,
+    IconHighlight,
+    IconFileDescription,
+    IconArrowsSort,
+    IconArrowUpRight,
+    IconPlus,
+    IconFileWord,
+    IconTable,
+    IconPhoto,
+    IconArrowsJoin2,
+    IconLayersSubtract,
+    IconPencil,
+    IconFileTypePdf,
+    IconArrowRight,
+} from "@tabler/icons-react";
+
+export const metadata: Metadata = {
+    title: "Search PDF Online Free – Find Words & Highlight Matches | PDF Maya",
+    description:
+        "Search words and phrases inside PDF documents online for free. Instant multi-page text highlighting, match counting, and keyword navigation with 100% privacy.",
+    keywords: [
+        "search pdf",
+        "find word in pdf",
+        "search text in pdf online",
+        "highlight words in pdf",
+        "pdf search tool free",
+        "keyword finder pdf",
+        "free online search pdf",
+    ],
+    alternates: {
+        canonical: "/search-pdf",
+    },
+    openGraph: {
+        title: "Search PDF Online Free – Find Words & Highlight Matches | PDF Maya",
+        description:
+            "Search words and phrases inside PDF documents online for free. Instant text highlighting and keyword navigation with 100% privacy.",
+        url: "/search-pdf",
+        siteName: "PDF Maya",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Search PDF Online Free | PDF Maya",
+        description:
+            "Find any word or sentence in massive PDF files instantly with visual page highlights and match jumps.",
+    },
+};
+
+const HOW_TO_STEPS = [
+    {
+        step: "01",
+        icon: IconUpload,
+        title: "Upload Your PDF File",
+        body: "Select your research paper, manual, or agreement and drop it into the search box above.",
+    },
+    {
+        step: "02",
+        icon: IconSettings,
+        title: "Type Any Search Keyword",
+        body: "Enter your target query. The engine scans all pages instantly and highlights every exact and partial match.",
+    },
+    {
+        step: "03",
+        icon: IconArrowsSort,
+        title: "Jump Between Matches",
+        body: "Use previous and next arrows to auto-scroll directly to each match on any page with highlighted markers.",
+    },
+];
+
+const FEATURES = [
+    {
+        icon: IconHighlight,
+        title: "Instant Multi-Page Highlighting",
+        body: "Highlights every match occurrence in bright yellow across all pages in real time.",
+    },
+    {
+        icon: IconArrowsSort,
+        title: "Fast Keyboard Navigation",
+        body: "Cycle through search results effortlessly with arrow keys and jump straight to relevant sections.",
+    },
+    {
+        icon: IconFileDescription,
+        title: "Live Match Counter",
+        body: "See exactly how many times a word or phrase appears across the entire document.",
+    },
+    {
+        icon: IconSparkles,
+        title: "100% Free with No Sign-up",
+        body: "Search inside documents of any size with zero registrations, paywalls, or software downloads.",
+    },
+    {
+        icon: IconShieldLock,
+        title: "100% Private Client-Side",
+        body: "Your PDF is processed locally in your browser memory and never uploaded or stored on any server.",
+    },
+    {
+        icon: IconDeviceLaptop,
+        title: "Cross-Platform Access",
+        body: "Search documents smoothly on iPad, iPhone, Android, macOS, Windows, and Linux browsers.",
+    },
+];
+
+const USE_CASES = [
+    {
+        icon: IconFileDescription,
+        title: "Legal Agreements & Contracts",
+        body: "Quickly pinpoint termination clauses, indemnity stipulations, and dates inside dense 50+ page legal contracts.",
+    },
+    {
+        icon: IconSearch,
+        title: "Academic Research & Textbooks",
+        body: "Locate author citations, formulas, definitions, and specific index terms without tedious scrolling.",
+    },
+    {
+        icon: IconHighlight,
+        title: "Technical Manuals & Specs",
+        body: "Find part numbers, error codes, and troubleshooting instructions inside huge technical product manuals.",
+    },
+    {
+        icon: IconDeviceLaptop,
+        title: "Financial Filings & Reports",
+        body: "Track quarterly earnings disclosures, EBITDA figures, and balance sheet line items in corporate 10-K filings.",
+    },
+];
+
+const FAQS = [
+    {
+        q: "How do I search for words inside a PDF for free?",
+        a: "Upload your PDF to the tool above and click 'Launch PDF Search Viewer'. Type any keyword into the search bar to see all instances highlighted in real time.",
+    },
+    {
+        q: "Is my document uploaded to a remote server?",
+        a: "No! The search PDF tool runs 100% locally inside your web browser using client-side PDF rendering for total privacy.",
+    },
+    {
+        q: "Can I search scanned image-only PDFs?",
+        a: "If your PDF is a flat image scan without selectable text, use our OCR PDF tool first to add a searchable text layer, then search it.",
+    },
+    {
+        q: "Can I jump directly to each search result?",
+        a: "Yes! Use the next and previous navigation arrows or press Enter to smoothly auto-scroll straight to each highlighted match.",
+    },
+    {
+        q: "Is there a limit on PDF page count or file size?",
+        a: "PDF Maya can comfortably process and index documents up to 100MB and hundreds of pages in modern web browsers.",
+    },
+    {
+        q: "Is any software installation required?",
+        a: "No. Everything works directly in your web browser without installing Adobe Acrobat or browser extensions.",
+    },
+];
+
+const RELATED_TOOLS = [
+    { label: "OCR PDF", href: "/ocr-pdf", desc: "Make scanned PDFs selectable and searchable.", icon: IconFileDescription },
+    { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
+    { label: "PDF to Text", href: "/pdf-to-txt", desc: "Extract raw plain text from PDF documents.", icon: IconFileDescription },
+    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
+    { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
+    { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
+];
 
 export default function SearchPdfPage() {
-    const router = useRouter();
-    const [files, setFiles] = useState<File[]>([]);
-
-    const handleFileSelection = (newFiles: File[]) => {
-        if (newFiles.length === 0) return;
-        const file = newFiles[0];
-        setFiles([file]);
-        FileStore.setFile("search_pdf_file", file);
-        router.push("/search-pdf/search");
+    const jsonLdSoftware = {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "Search PDF Tool - PDF Maya",
+        url: "https://pdfmaya.com/search-pdf",
+        description: "Search words and phrases inside PDF documents online for free with instant highlights.",
+        applicationCategory: "UtilityApplication",
+        operatingSystem: "All",
+        offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+        },
     };
 
-    const descriptionContent = (
-        <div className="flex flex-col gap-5 mt-4">
-            <p className="text-brand-sage leading-relaxed">
-                Instantly find any word or phrase inside your PDF. PDF Maya's Search PDF tool
-                renders every page and highlights every match so you can navigate large documents
-                in seconds — no download, no account required.
-            </p>
-            <h2 className="text-xl font-bold text-brand-dark mt-2">Key Features &amp; Benefits</h2>
-            <ul className="flex flex-col gap-2.5">
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span><strong>Instant Highlighting:</strong> Every match is highlighted in bright yellow across all pages.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span><strong>Jump to Match:</strong> Navigate between results with ↑ ↓ arrows and auto-scroll to each hit.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span><strong>Match Counter:</strong> See exactly how many times a word appears across the document.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span><strong>100% Private:</strong> Your PDF never leaves the browser — all processing is client-side.</span>
-                </li>
-            </ul>
-            <h2 className="text-xl font-bold text-brand-dark mt-2">When to Use This Tool</h2>
-            <ul className="flex flex-col gap-2.5">
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span>Research &amp; Reports: Quickly locate citations, keywords, or section headings.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span>Legal Documents: Find specific clauses or references in long contracts.</span>
-                </li>
-                <li className="flex items-start gap-2.5 text-sm text-brand-sage leading-relaxed">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full flex-shrink-0 bg-[#0369a1]" />
-                    <span>Scanned PDFs with OCR text layer: Search through digitized books and invoices.</span>
-                </li>
-            </ul>
-            <p className="text-sm font-medium text-brand-dark mt-2">
-                Upload your PDF and start searching in under a second with PDF Maya.
-            </p>
-        </div>
-    );
+    const jsonLdHowTo = {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: "How to Search Words in a PDF Online",
+        description: "Step-by-step guide to finding and highlighting keywords in PDF files with PDF Maya.",
+        step: HOW_TO_STEPS.map((s, index) => ({
+            "@type": "HowToStep",
+            position: index + 1,
+            name: s.title,
+            text: s.body,
+        })),
+    };
+
+    const jsonLdFaq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FAQS.map((faq) => ({
+            "@type": "Question",
+            name: faq.q,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.a,
+            },
+        })),
+    };
 
     return (
-        <ToolLayout
-            title="Search PDF - Find Any Word or Phrase Instantly"
-            description={descriptionContent}
-            icon={<IconSearch size={28} stroke={1.5} />}
-            accentColor="#0369a1"
-        >
-            <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-border">
-                <FileUpload
-                    accept={{ "application/pdf": [".pdf"] }}
-                    multiple={false}
-                    files={files}
-                    setFiles={(f) => {
-                        const fileArray = f as File[];
-                        setFiles(fileArray);
-                        if (fileArray.length > 0) {
-                            handleFileSelection(fileArray);
-                        }
-                    }}
-                    onChange={handleFileSelection}
-                />
-            </div>
-        </ToolLayout>
+        <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdHowTo) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+            />
+
+            <Navbar />
+
+            {/* ═══════════════════════════════════════════════
+                HERO AREA: Header & Full-Width Upload Section
+            ═══════════════════════════════════════════════ */}
+            <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
+                <div className="max-w-7xl mx-auto text-center">
+                    {/* Format Badge */}
+                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#0369a1]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e0f2fe]">
+                                <IconSearch size={13} stroke={2.5} />
+                            </span>
+                            <span>Document Search</span>
+                        </div>
+                    </div>
+
+                    {/* H1 Heading */}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
+                        Search PDF Online
+                    </h1>
+
+                    {/* Subtitle */}
+                    <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                        Instantly search words and phrases across all pages with live multi-page highlights and fast keyword navigation.
+                    </p>
+
+                    {/* Full-Width File Upload Card */}
+                    <div className="mt-10">
+                        <SearchPdfClient />
+                    </div>
+                </div>
+            </header>
+
+            {/* ═══════════════════════════════════════════════
+                WRITTEN CONTENT BELOW HERO UPLOADER
+            ═══════════════════════════════════════════════ */}
+            <main className="flex-1">
+                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                How to Search Words in a PDF Online
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Three simple steps to search and highlight any keyword inside your document.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {HOW_TO_STEPS.map((s) => {
+                                const StepIcon = s.icon;
+                                return (
+                                    <div
+                                        key={s.step}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="relative">
+                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
+                                                <StepIcon size={26} stroke={1.8} />
+                                            </span>
+                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
+                                                {s.step}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {s.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {s.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Key Features & Benefits ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Why Search PDFs with PDF Maya?
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Blazing-fast client-side search engine with real-time text matching and navigation.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {FEATURES.map((f) => {
+                                const FeatureIcon = f.icon;
+                                return (
+                                    <div
+                                        key={f.title}
+                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
+                                            <FeatureIcon size={22} stroke={1.8} />
+                                        </span>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {f.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {f.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 3: Common Use Cases ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                When to Use the PDF Search Tool
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Essential for reading contracts, research papers, financial reports, and product guides.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {USE_CASES.map((uc) => {
+                                const UcIcon = uc.icon;
+                                return (
+                                    <div
+                                        key={uc.title}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
+                                    >
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
+                                            <UcIcon size={20} stroke={2} />
+                                        </span>
+                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
+                                            {uc.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {uc.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Frequently Asked Questions
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to know about searching text inside PDF documents.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-3.5">
+                            {FAQS.map((faq) => (
+                                <details
+                                    key={faq.q}
+                                    className="group border border-[#E0DED9] rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
+                                >
+                                    <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none font-bold text-brand-dark text-sm sm:text-base hover:bg-[#FAF9F7] transition-colors select-none">
+                                        <span className="pr-4 leading-snug">{faq.q}</span>
+                                        <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#f0ede4] text-brand-dark group-open:rotate-45 transition-transform duration-200">
+                                            <IconPlus size={14} stroke={2.5} />
+                                        </span>
+                                    </summary>
+                                    <div className="px-6 pb-5 pt-3 text-sm text-neutral-600 leading-relaxed border-t border-[#E0DED9] bg-[#FAF9F7]">
+                                        {faq.a}
+                                    </div>
+                                </details>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Explore More PDF Tools
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to convert, organize, and edit documents in one place.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {RELATED_TOOLS.map((tool) => {
+                                const ToolIcon = tool.icon;
+                                return (
+                                    <Link
+                                        key={tool.label}
+                                        href={tool.href}
+                                        className="group relative flex items-start gap-4 p-5 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] hover:bg-white hover:border-brand-teal hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]/60 group-hover:scale-105 transition-transform duration-200">
+                                            <ToolIcon size={22} stroke={1.8} />
+                                        </div>
+                                        <div className="flex-1 min-w-0 pr-3">
+                                            <h3 className="font-bold text-base text-brand-dark group-hover:text-brand-teal transition-colors truncate">
+                                                {tool.label}
+                                            </h3>
+                                            <p className="text-xs text-neutral-500 mt-1 leading-relaxed line-clamp-2">
+                                                {tool.desc}
+                                            </p>
+                                        </div>
+                                        <span className="shrink-0 text-neutral-300 group-hover:text-brand-teal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 mt-0.5">
+                                            <IconArrowUpRight size={17} />
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <Footer />
+        </div>
     );
 }

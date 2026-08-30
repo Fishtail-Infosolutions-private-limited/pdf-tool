@@ -1,303 +1,470 @@
-"use client";
-import React, { useState } from "react";
+import React from "react";
+import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
-import { FileUpload } from "@/components/ui/file-upload";
+import Footer from "@/components/Footer";
+import PdfToPdfaClient from "./PdfToPdfaClient";
+import Link from "next/link";
 import {
+    IconUpload,
+    IconSettings,
+    IconDownload,
+    IconArchive,
+    IconShieldLock,
+    IconDeviceLaptop,
+    IconSparkles,
+    IconBuildingBank,
+    IconFileDescription,
+    IconShieldCheck,
+    IconArrowUpRight,
+    IconPlus,
+    IconFileWord,
+    IconTable,
+    IconPhoto,
+    IconArrowsJoin2,
+    IconLayersSubtract,
+    IconPencil,
     IconFileTypePdf,
-    IconLoader2,
-    IconCheck,
-    IconInfoCircle,
-    IconAlertTriangle,
+    IconArrowRight,
 } from "@tabler/icons-react";
-import { pdfToPdfa, downloadBlob } from "@/lib/pdf-utils";
-import toast from "react-hot-toast";
-import { motion } from "motion/react";
-type Level = "1b" | "2b" | "3b";
 
-const LEVELS: {
-    value: Level;
-    label: string;
-    badge: string;
-    badgeColor: string;
-    description: string;
-    features: string[];
-    since: string;
-    recommended?: boolean;
-}[] = [
-        {
-            value: "1b",
-            label: "PDF/A-1b",
-            badge: "Most Compatible",
-            badgeColor: "bg-green-100 text-green-700",
-            since: "PDF 1.4 : ISO 19005-1:2005",
-            description:
-                "The widest-supported archival format. Guarantees visual reproduction of the document for long-term archiving. Ideal for legal, government, and regulated industries.",
-            features: [
-                "Embedded fonts & colour profiles (OutputIntent)",
-                "No JavaScript, encryption, or multimedia",
-                "No external file references or links to resources",
-                "Maximum viewer compatibility (Acrobat 5+)",
-            ],
-            recommended: true,
-        },
-        {
-            value: "2b",
-            label: "PDF/A-2b",
-            badge: "Modern Features",
-            badgeColor: "bg-blue-100 text-blue-700",
-            since: "PDF 1.7 : ISO 19005-2:2011",
-            description:
-                "Adds modern PDF capabilities, including transparency, JPEG 2000 compression, and layers, while maintaining archival integrity. Better compression than PDF/A-1b.",
-            features: [
-                "Everything in PDF/A-1b",
-                "Transparency effects & layer support (OCG)",
-                "JPEG 2000 image compression (smaller file sizes)",
-                "Embedding of OpenType fonts",
-                "Digital signatures (PAdES)",
-            ],
-        },
-        {
-            value: "3b",
-            label: "PDF/A-3b",
-            badge: "File Attachments",
-            badgeColor: "bg-purple-100 text-purple-700",
-            since: "PDF 1.7 : ISO 19005-3:2012",
-            description:
-                "Extends PDF/A-2b by allowing any file type (XML, CSV, Excel, etc.) to be embedded as an attachment within the PDF. Perfect for hybrid invoice and reporting formats.",
-            features: [
-                "Everything in PDF/A-2b",
-                "Embed any file type (XML, CSV, XLS, etc.)",
-                "Used in ZUGFeRD, Factur-X invoice standards",
-                "Suitable for complex archival document sets",
-            ],
-        },
-    ];
+export const metadata: Metadata = {
+    title: "Convert PDF to PDF/A Online Free – ISO Archival Standard | PDF Maya",
+    description:
+        "Convert PDF documents to ISO-compliant PDF/A (1b, 2b, 3b) archival format online for free. Ensure long-term preservation for legal, banking, and government archives with 100% privacy.",
+    keywords: [
+        "pdf to pdfa",
+        "convert pdf to pdf/a",
+        "pdf/a converter online",
+        "iso 19005 pdf",
+        "pdfa 1b converter",
+        "pdfa 2b converter",
+        "long term archiving pdf",
+        "free online pdf to pdfa",
+    ],
+    alternates: {
+        canonical: "/pdf-to-pdfa",
+    },
+    openGraph: {
+        title: "Convert PDF to PDF/A Online Free – ISO Archival Standard | PDF Maya",
+        description:
+            "Convert PDF documents to ISO-compliant PDF/A archival format online for free. Ensure long-term preservation for legal, banking, and government archives.",
+        url: "/pdf-to-pdfa",
+        siteName: "PDF Maya",
+        type: "website",
+    },
+    twitter: {
+        card: "summary_large_image",
+        title: "Convert PDF to PDF/A Online Free | PDF Maya",
+        description:
+            "Transform standard PDFs into ISO 19005 compliant PDF/A documents for permanent, long-term archival.",
+    },
+};
 
-const DISCLAIMER_ITEMS = [
-    "Interactive JavaScript or form actions will be removed",
-    "Embedded multimedia (video, audio) will be stripped",
-    "External hyperlinks are kept but may not persist forever",
-    "Transparency & gradients may be flattened in PDF/A-1b mode",
-    "Encrypted or password-protected PDFs cannot be converted",
-    "All fonts will be embedded (may slightly increase file size)",
+const HOW_TO_STEPS = [
+    {
+        step: "01",
+        icon: IconUpload,
+        title: "Upload Your PDF File",
+        body: "Select your PDF document from your device or drag and drop it into the converter above.",
+    },
+    {
+        step: "02",
+        icon: IconSettings,
+        title: "Choose PDF/A Conformance",
+        body: "Select between PDF/A-1b (Universal Legal/Government), PDF/A-2b (Modern Layers), or PDF/A-3b (Data Attachments).",
+    },
+    {
+        step: "03",
+        icon: IconDownload,
+        title: "Download Archival PDF/A",
+        body: "Your ISO-compliant document with embedded font profiles and color intents is ready immediately.",
+    },
+];
+
+const FEATURES = [
+    {
+        icon: IconShieldCheck,
+        title: "Full ISO 19005 Compliance",
+        body: "Embeds color spaces (OutputIntent), embeds all fonts, and flattens unpermitted JavaScript objects.",
+    },
+    {
+        icon: IconBuildingBank,
+        title: "Legal & Regulatory Compliance",
+        body: "Meets mandatory archiving requirements for courts, tax agencies, financial regulators, and public libraries.",
+    },
+    {
+        icon: IconArchive,
+        title: "Guaranteed Visual Fidelity Forever",
+        body: "Ensures your documents can be rendered identically decades from now regardless of future software changes.",
+    },
+    {
+        icon: IconSparkles,
+        title: "100% Free with No Watermarks",
+        body: "Convert your archival records without subscription fees, account setups, or branding watermarks.",
+    },
+    {
+        icon: IconShieldLock,
+        title: "Confidential & Secure",
+        body: "All transmissions are encrypted via SSL/TLS. Files are processed in private memory and deleted immediately.",
+    },
+    {
+        icon: IconDeviceLaptop,
+        title: "Universal Cross-Platform Tool",
+        body: "Convert PDFs directly in your web browser on Mac, Windows, Linux, iPad, and Android devices.",
+    },
+];
+
+const USE_CASES = [
+    {
+        icon: IconBuildingBank,
+        title: "Government Filings & Electronic Courts",
+        body: "Submit court briefs, patent applications, and public filings that mandate PDF/A format compliance.",
+    },
+    {
+        icon: IconFileDescription,
+        title: "Banking & Financial Audits",
+        body: "Archive annual financial statements, tax ledgers, and loan agreements for multi-decade compliance storage.",
+    },
+    {
+        icon: IconArchive,
+        title: "Healthcare & Patient Records",
+        body: "Preserve medical charts, clinical trial records, and health histories according to HIPAA and GDPR standards.",
+    },
+    {
+        icon: IconShieldCheck,
+        title: "Contracts & Real Estate Deeds",
+        body: "Store notarized real estate deeds, title transfers, and corporate bylaws in a non-degrading electronic format.",
+    },
+];
+
+const FAQS = [
+    {
+        q: "What is PDF/A and how does it differ from standard PDF?",
+        a: "PDF/A is an ISO-standardized version of the Portable Document Format specialized for preserving electronic documents for the long term. It forbids features not suited for long-term archiving, such as font linking (fonts must be embedded) and encryption.",
+    },
+    {
+        q: "Which PDF/A profile should I choose?",
+        a: "PDF/A-1b is the most widely supported standard recommended for court filings and government records. PDF/A-2b supports modern transparency and better compression. PDF/A-3b allows embedding raw data files like XML invoices.",
+    },
+    {
+        q: "How do I convert a PDF to PDF/A for free?",
+        a: "Upload your document into the tool above, select your desired PDF/A profile (1b is recommended), and click 'Convert to PDF/A'. Your archival file will download instantly.",
+    },
+    {
+        q: "Are my sensitive archival documents kept private?",
+        a: "Yes. All file uploads are protected with HTTPS encryption. Documents are processed in isolated sandbox environments and deleted immediately after processing.",
+    },
+    {
+        q: "Will the text and formatting change during conversion?",
+        a: "No. The document's visual appearance is locked in with embedded fonts and device-independent color management.",
+    },
+    {
+        q: "Are there any watermarks added to the PDF/A file?",
+        a: "No. PDF Maya never inserts watermarks, branding stamps, or limitations on your output PDF documents.",
+    },
+];
+
+const RELATED_TOOLS = [
+    { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
+    { label: "PDF to Excel", href: "/pdf-to-excel", desc: "Extract PDF tables into editable Excel sheets.", icon: IconTable },
+    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
+    { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
+    { label: "PDF to Text", href: "/pdf-to-txt", desc: "Extract raw plain text from PDF documents.", icon: IconFileDescription },
+    { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
 ];
 
 export default function PdfToPdfaPage() {
-    const [files, setFiles] = useState<File[]>([]);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [success, setSuccess] = useState(false);
-    const [selectedLevel, setSelectedLevel] = useState<Level>("1b");
+    const jsonLdSoftware = {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        name: "PDF to PDF/A Converter - PDF Maya",
+        url: "https://pdfmaya.com/pdf-to-pdfa",
+        description: "Convert PDF documents to ISO-compliant PDF/A archival format online for free.",
+        applicationCategory: "UtilityApplication",
+        operatingSystem: "All",
+        offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+        },
+    };
 
-    const selectedInfo = LEVELS.find((l) => l.value === selectedLevel)!;
+    const jsonLdHowTo = {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: "How to Convert PDF to PDF/A Online",
+        description: "Step-by-step guide to converting a PDF into an ISO 19005 compliant PDF/A file with PDF Maya.",
+        step: HOW_TO_STEPS.map((s, index) => ({
+            "@type": "HowToStep",
+            position: index + 1,
+            name: s.title,
+            text: s.body,
+        })),
+    };
 
-    const handleConvert = async () => {
-        if (files.length === 0) return;
-        setIsProcessing(true);
-        setSuccess(false);
-
-        (async () => {
-            const toastId = toast.loading(`Converting to PDF/A-${selectedLevel.toUpperCase()}...`);
-
-            try {
-                const blob = await pdfToPdfa(files[0], selectedLevel);
-                const newName = files[0].name.replace(/\.pdf$/i, "_pdfa.pdf");
-                downloadBlob(blob, newName);
-                setSuccess(true);
-                toast.success(`Converted to PDF/A-${selectedLevel.toUpperCase()} successfully!`, { id: toastId });
-            } catch (err: any) {
-                const isDev = process.env.NODE_ENV === "development";
-                if (isDev) console.error(err);
-                const rawMsg = err?.message || "Unknown error";
-                toast.error(isDev ? `Error: ${rawMsg}` : "Failed to convert to PDF/A.", { id: toastId });
-            } finally {
-                setIsProcessing(false);
-            }
-        })();
+    const jsonLdFaq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: FAQS.map((faq) => ({
+            "@type": "Question",
+            name: faq.q,
+            acceptedAnswer: {
+                "@type": "Answer",
+                text: faq.a,
+            },
+        })),
     };
 
     return (
-        <div className="min-h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--brand-white)" }}>
+        <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdSoftware) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdHowTo) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdFaq) }}
+            />
+
             <Navbar />
 
-            {/* Subtle background accents */}
-            <div aria-hidden className="pointer-events-none absolute right-0 top-0 w-1/2 h-full opacity-[0.03]" style={{ backgroundImage: `radial-gradient(circle at 80% 50%, #1D4ED8 0%, transparent 60%)` }} />
-            <div aria-hidden className="pointer-events-none absolute inset-0" style={{ backgroundImage: "radial-gradient(circle, #8C886B 1px, transparent 1px)", backgroundSize: "32px 32px", opacity: 0.05 }} />
-
-            <main className="flex-1 max-w-7xl mx-auto px-5 md:px-8 w-full py-28 md:py-36 relative z-10 flex flex-col gap-12">
-
-                {/* ── CENTERED HEADER ── */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-center max-w-3xl mx-auto flex flex-col items-center gap-4"
-                >
-                    <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[#1D4ED8] text-white shadow-lg mb-2">
-                        <IconFileTypePdf size={32} stroke={1.5} />
+            {/* ═══════════════════════════════════════════════
+                HERO AREA: Header & Full-Width Upload Section
+            ═══════════════════════════════════════════════ */}
+            <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
+                <div className="max-w-7xl mx-auto text-center">
+                    {/* Format Badge */}
+                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#dc2626]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#fee2e2]">
+                                <IconFileTypePdf size={13} stroke={2.5} />
+                            </span>
+                            <span>PDF</span>
+                        </div>
+                        <IconArrowRight size={13} className="text-neutral-400" />
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-brand-teal">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e6f4ef]">
+                                <IconShieldCheck size={13} stroke={2.5} />
+                            </span>
+                            <span>ISO PDF/A Archival</span>
+                        </div>
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold leading-tight text-brand-dark tracking-tight">
+
+                    {/* H1 Heading */}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
                         Convert PDF to PDF/A
                     </h1>
-                    <p className="text-lg text-brand-sage leading-relaxed">
-                        Archive your PDF with the ISO-standardized PDF/A format. Fully compliant for long-term document preservation and legal standards.
-                    </p>
-                </motion.div>
 
-                {/* ── DISCLAIMER (Full Width) ── */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="rounded-2xl border border-amber-200 bg-amber-50/50 backdrop-blur-sm p-6 md:p-8"
-                >
-                    <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                            <IconAlertTriangle size={22} className="text-amber-600" />
+                    {/* Subtitle */}
+                    <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                        Convert PDF documents into ISO-standardized PDF/A format for long-term electronic document archiving and legal compliance.
+                    </p>
+
+                    {/* Full-Width File Upload Card */}
+                    <div className="mt-10">
+                        <PdfToPdfaClient />
+                    </div>
+                </div>
+            </header>
+
+            {/* ═══════════════════════════════════════════════
+                WRITTEN CONTENT BELOW HERO UPLOADER
+            ═══════════════════════════════════════════════ */}
+            <main className="flex-1">
+                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                How to Convert PDF to PDF/A Online
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Three simple steps to transform standard PDFs into ISO archival compliance.
+                            </p>
                         </div>
-                        <div className="flex-1">
-                            <h3 className="text-base font-bold text-amber-900 mb-3">Important Performance Disclaimers</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-3 gap-x-8">
-                                {DISCLAIMER_ITEMS.map((item) => (
-                                    <div key={item} className="flex items-start gap-2 text-sm text-amber-800/90">
-                                        <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-amber-500 shrink-0" />
-                                        {item}
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {HOW_TO_STEPS.map((s) => {
+                                const StepIcon = s.icon;
+                                return (
+                                    <div
+                                        key={s.step}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="relative">
+                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
+                                                <StepIcon size={26} stroke={1.8} />
+                                            </span>
+                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
+                                                {s.step}
+                                            </span>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {s.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {s.body}
+                                        </p>
                                     </div>
-                                ))}
-                            </div>
+                                );
+                            })}
                         </div>
                     </div>
-                </motion.div>
+                </section>
 
-                {/* ── TWO-COLUMN CONTENT ── */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-
-                    {/* LEFT SIDE: Level Selector and Details (7 cols) */}
-                    <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="lg:col-span-7 flex flex-col gap-6"
-                    >
-                        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-sm border border-border">
-                            <h2 className="text-xl font-bold text-brand-dark mb-1">Set Conformance Level</h2>
-                            <p className="text-sm text-brand-sage mb-6">Choose the appropriate archival standard for your requirements.</p>
-
-                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                                {LEVELS.map((level) => (
-                                    <button
-                                        key={level.value}
-                                        onClick={() => setSelectedLevel(level.value)}
-                                        className={`relative flex flex-col items-start p-5 rounded-2xl border-2 text-left transition-all duration-300 cursor-pointer group ${selectedLevel === level.value
-                                            ? "border-blue-600 bg-blue-50/50 shadow-md"
-                                            : "border-border bg-white hover:border-slate-300 hover:shadow-sm"
-                                            }`}
-                                    >
-                                        {level.recommended && (
-                                            <span className="absolute -top-2 -right-2 text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-lg bg-green-600 text-white shadow-sm">
-                                                Recommended
-                                            </span>
-                                        )}
-                                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md mb-2 uppercase tracking-wider ${level.badgeColor}`}>
-                                            {level.badge}
-                                        </span>
-                                        <span className="text-lg font-bold text-brand-dark group-hover:text-blue-700 transition-colors">
-                                            {level.label}
-                                        </span>
-                                        <span className="text-[10px] text-brand-sage font-medium mt-1">
-                                            {level.since}
-                                        </span>
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Detailed Feature Table Replacement */}
-                            <div className="rounded-2xl overflow-hidden border border-blue-100 bg-blue-50/30">
-                                <div className="bg-blue-600 px-5 py-3 text-white">
-                                    <div className="flex items-center gap-2">
-                                        <IconInfoCircle size={18} />
-                                        <span className="font-bold text-sm tracking-wide uppercase">{selectedInfo.label} Specifications</span>
-                                    </div>
-                                </div>
-                                <div className="p-6 flex flex-col gap-4">
-                                    <p className="text-sm text-brand-dark leading-relaxed font-medium">
-                                        {selectedInfo.description}
-                                    </p>
-                                    <div className="h-px bg-blue-100" />
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-                                        {selectedInfo.features.map((f) => (
-                                            <div key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
-                                                <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center shrink-0 mt-0.5">
-                                                    <IconCheck size={12} className="text-blue-600" stroke={3} />
-                                                </div>
-                                                {f}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+                {/* ── SECTION 2: Key Features & Benefits ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Why Convert to PDF/A with PDF Maya?
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Rigorous ISO validation engine ensures your archived records stand the test of time.
+                            </p>
                         </div>
-                    </motion.div>
 
-                    {/* RIGHT SIDE: Uploader (5 cols) */}
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="lg:col-span-5 flex flex-col gap-6 sticky top-24"
-                    >
-                        {!success ? (
-                            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl border border-border flex flex-col gap-6">
-                                <h3 className="text-lg font-bold text-brand-dark">Upload your file</h3>
-                                <FileUpload
-                                    accept={{ "application/pdf": [".pdf"] }}
-                                    multiple={false}
-                                    files={files}
-                                    setFiles={setFiles}
-                                />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {FEATURES.map((f) => {
+                                const FeatureIcon = f.icon;
+                                return (
+                                    <div
+                                        key={f.title}
+                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
+                                            <FeatureIcon size={22} stroke={1.8} />
+                                        </span>
+                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
+                                            {f.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {f.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
 
-                                <button
-                                    onClick={handleConvert}
-                                    disabled={files.length === 0 || isProcessing}
-                                    className={`w-full py-4 text-white rounded-2xl font-bold transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98] shadow-md ${files.length === 0
-                                        ? "bg-[#1D4ED8]/30 cursor-not-allowed shadow-none"
-                                        : isProcessing
-                                            ? "bg-[#1D4ED8] opacity-50 cursor-wait"
-                                            : "bg-[#1D4ED8] hover:bg-blue-700 hover:shadow-blue-200 cursor-pointer"
-                                        }`}
+                {/* ── SECTION 3: Common Use Cases ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                When to Use the PDF/A Converter
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Required for legal filings, regulatory auditing, medical charts, and archival repositories.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                            {USE_CASES.map((uc) => {
+                                const UcIcon = uc.icon;
+                                return (
+                                    <div
+                                        key={uc.title}
+                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
+                                    >
+                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
+                                            <UcIcon size={20} stroke={2} />
+                                        </span>
+                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
+                                            {uc.title}
+                                        </h3>
+                                        <p className="text-sm text-neutral-600 leading-relaxed">
+                                            {uc.body}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
+                    <div className="max-w-3xl mx-auto">
+                        <div className="text-center mb-12">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Frequently Asked Questions
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to know about ISO PDF/A archival compliance.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col gap-3.5">
+                            {FAQS.map((faq) => (
+                                <details
+                                    key={faq.q}
+                                    className="group border border-[#E0DED9] rounded-2xl overflow-hidden bg-white shadow-2xs transition-all"
                                 >
-                                    {isProcessing ? (
-                                        <>
-                                            <IconLoader2 className="animate-spin" size={22} />
-                                            <span>Converting to PDF/A-{selectedLevel.toUpperCase()}...</span>
-                                        </>
-                                    ) : (
-                                        <span>Convert to PDF/A-{selectedLevel.toUpperCase()}</span>
-                                    )}
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl border border-green-100 flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-500">
-                                <div className="w-20 h-20 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-6 shadow-sm">
-                                    <IconCheck size={40} stroke={2.5} />
-                                </div>
-                                <h2 className="text-2xl font-bold text-brand-dark mb-2">Success!</h2>
-                                <p className="text-brand-sage mb-6">
-                                    Your <span className="font-bold text-brand-dark">PDF/A-{selectedLevel.toUpperCase()}</span> document is ready and downloading.
-                                </p>
-                                <div className="w-full h-px bg-slate-100 mb-6" />
-                                <button
-                                    onClick={() => {
-                                        setFiles([]);
-                                        setSuccess(false);
-                                    }}
-                                    className="px-8 py-3 rounded-xl bg-white text-black font-medium hover:bg-slate-50 transition-all cursor-pointer shadow-md"
-                                >
-                                    Convert Another File
-                                </button>
-                            </div>
-                        )}
-                    </motion.div>
-                </div>
+                                    <summary className="flex items-center justify-between px-6 py-5 cursor-pointer list-none font-bold text-brand-dark text-sm sm:text-base hover:bg-[#FAF9F7] transition-colors select-none">
+                                        <span className="pr-4 leading-snug">{faq.q}</span>
+                                        <span className="shrink-0 flex items-center justify-center w-7 h-7 rounded-full bg-[#f0ede4] text-brand-dark group-open:rotate-45 transition-transform duration-200">
+                                            <IconPlus size={14} stroke={2.5} />
+                                        </span>
+                                    </summary>
+                                    <div className="px-6 pb-5 pt-3 text-sm text-neutral-600 leading-relaxed border-t border-[#E0DED9] bg-[#FAF9F7]">
+                                        {faq.a}
+                                    </div>
+                                </details>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Explore More PDF Tools
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg">
+                                Everything you need to convert, organize, and edit documents in one place.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {RELATED_TOOLS.map((tool) => {
+                                const ToolIcon = tool.icon;
+                                return (
+                                    <Link
+                                        key={tool.label}
+                                        href={tool.href}
+                                        className="group relative flex items-start gap-4 p-5 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] hover:bg-white hover:border-brand-teal hover:shadow-xs transition-all duration-200"
+                                    >
+                                        <div className="shrink-0 flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]/60 group-hover:scale-105 transition-transform duration-200">
+                                            <ToolIcon size={22} stroke={1.8} />
+                                        </div>
+                                        <div className="flex-1 min-w-0 pr-3">
+                                            <h3 className="font-bold text-base text-brand-dark group-hover:text-brand-teal transition-colors truncate">
+                                                {tool.label}
+                                            </h3>
+                                            <p className="text-xs text-neutral-500 mt-1 leading-relaxed line-clamp-2">
+                                                {tool.desc}
+                                            </p>
+                                        </div>
+                                        <span className="shrink-0 text-neutral-300 group-hover:text-brand-teal group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-200 mt-0.5">
+                                            <IconArrowUpRight size={17} />
+                                        </span>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </section>
             </main>
+
+            <Footer />
         </div>
     );
 }

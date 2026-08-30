@@ -15,6 +15,15 @@ import {
 import { pdfToDocx, downloadBlob } from "@/lib/pdf-utils";
 import toast from "react-hot-toast";
 
+// Microsoft Word Logo Badge Component
+function WordLogoBadge({ size = 28 }: { size?: number }) {
+    return (
+        <div className="flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#bfdbfe] shadow-2xs">
+            <IconFileWord size={size} stroke={2} />
+        </div>
+    );
+}
+
 export default function PdfToWordClient() {
     const [file, setFile] = useState<File | null>(null);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -95,7 +104,7 @@ export default function PdfToWordClient() {
                 {!success ? (
                     <div>
                         {!file ? (
-                            /* State 1: Full-Width Compact Dropzone */
+                            /* State 1: Full-Width Dropzone with Word Logo Showcase */
                             <div
                                 {...getRootProps()}
                                 className={`group flex flex-col items-center justify-center py-8 sm:py-10 px-6 sm:px-12 rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer text-center w-full ${
@@ -123,13 +132,13 @@ export default function PdfToWordClient() {
                                     or drag and drop your PDF file here
                                 </p>
                                 <p className="text-xs text-neutral-500 mt-1">
-                                    Supports all PDF documents (up to 50MB)
+                                    Converts PDF directly into editable Microsoft Word (.docx) format
                                 </p>
                             </div>
                         ) : (
                             /* State 2: File Selected & Ready to Convert */
                             <div className="flex flex-col gap-5 max-w-2xl mx-auto py-2">
-                                {/* Selected File Preview Card */}
+                                {/* Selected File Preview Card with PDF ➔ Word indicator */}
                                 <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9]">
                                     <div className="flex items-center gap-3.5 min-w-0 pr-3">
                                         <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca]">
@@ -139,8 +148,12 @@ export default function PdfToWordClient() {
                                             <p className="font-bold text-sm sm:text-base text-brand-dark truncate">
                                                 {file.name}
                                             </p>
-                                            <p className="text-xs text-neutral-500 mt-0.5">
-                                                {formatFileSize(file.size)} • Ready to convert
+                                            <p className="text-xs text-neutral-500 mt-0.5 flex items-center gap-1.5">
+                                                <span>{formatFileSize(file.size)}</span>
+                                                <span>•</span>
+                                                <span className="text-[#185ABD] font-semibold flex items-center gap-1">
+                                                    <IconFileWord size={13} /> Output: .docx
+                                                </span>
                                             </p>
                                         </div>
                                     </div>
@@ -156,7 +169,7 @@ export default function PdfToWordClient() {
                                     </button>
                                 </div>
 
-                                {/* Convert Action Button */}
+                                {/* Convert Action Button with Word Logo */}
                                 <button
                                     id="convert-pdf-to-word-btn"
                                     type="button"
@@ -185,15 +198,18 @@ export default function PdfToWordClient() {
                         )}
                     </div>
                 ) : (
-                    /* State 3: Conversion Success & Download */
+                    /* State 3: Conversion Success with Word Logo */
                     <div className="flex flex-col items-center justify-center py-6 text-center animate-in fade-in zoom-in-95 duration-200">
-                        <span className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[#e6f4ef] text-brand-teal mb-4 border border-[#bce0d5]">
-                            <IconCheck size={34} stroke={2.5} />
-                        </span>
+                        <div className="relative mb-4">
+                            <WordLogoBadge size={34} />
+                            <span className="absolute -bottom-1 -right-1 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white border-2 border-white">
+                                <IconCheck size={14} stroke={3} />
+                            </span>
+                        </div>
 
                         <h2 className="text-2xl font-bold text-brand-dark">Conversion Complete!</h2>
                         <p className="text-neutral-600 mt-2 text-sm sm:text-base max-w-lg">
-                            Your editable Word document (<span className="font-semibold text-brand-dark">{downloadInfo?.fileName}</span>) has been generated with layout &amp; tables intact.
+                            Your editable Word document (<span className="font-semibold text-brand-dark">{downloadInfo?.fileName}</span>) is ready with layout &amp; tables intact.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center gap-3.5 mt-6 w-full max-w-md">
@@ -202,7 +218,7 @@ export default function PdfToWordClient() {
                                 onClick={handleDownloadAgain}
                                 className="w-full sm:w-1/2 py-3.5 px-5 rounded-xl bg-[#185ABD] hover:bg-[#124b9e] text-white font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                             >
-                                <IconDownload size={18} />
+                                <IconFileWord size={18} />
                                 <span>Download Word</span>
                             </button>
                             <button
