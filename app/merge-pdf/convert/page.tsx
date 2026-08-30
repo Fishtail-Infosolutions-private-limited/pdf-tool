@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import { motion, AnimatePresence, Reorder } from "motion/react";
 import {
     IconArrowsJoin2,
@@ -12,11 +13,12 @@ import {
     IconArrowLeft,
     IconFileTypePdf,
     IconGripVertical,
+    IconUpload,
+    IconDownload,
+    IconRefresh,
 } from "@tabler/icons-react";
 import { downloadBlob, mergePdfs } from "@/lib/pdf-utils";
 import FileStore from "@/lib/file-store";
-import { FileUpload } from "@/components/ui/file-upload";
-// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface PdfItem {
     id: string;
@@ -24,31 +26,27 @@ interface PdfItem {
     size: string;
 }
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
 function uid() {
     return Math.random().toString(36).slice(2, 10);
 }
 
 function formatBytes(bytes: number, decimals = 2) {
-    if (!+bytes) return '0 Bytes';
+    if (!+bytes) return "0 Bytes";
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
 }
 
-// ─── Pdf Card ──────────────────────────────────────────────────────────────
-
 function PdfCard({
     item,
+    index,
     onDelete,
-    dragControls
 }: {
     item: PdfItem;
+    index: number;
     onDelete: () => void;
-    dragControls?: any;
 }) {
     return (
         <motion.div
@@ -56,43 +54,50 @@ function PdfCard({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.22 }}
-            className="group relative flex items-center justify-between p-4 bg-white rounded-2xl border border-slate-200 shadow-sm hover:border-[#047C58]/60 hover:shadow-md transition-all duration-200"
+            transition={{ duration: 0.2 }}
+            className="group relative flex items-center justify-between p-3.5 sm:p-4 bg-white rounded-2xl border border-[#E0DED9] shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
         >
-            <div className="flex items-center gap-4 min-w-0">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0 pr-3">
                 <div
-                    className="cursor-grab active:cursor-grabbing text-slate-300 hover:text-slate-500 transition-colors p-1"
+                    className="cursor-grab active:cursor-grabbing text-neutral-300 hover:text-neutral-600 transition-colors p-1"
                     title="Drag to reorder"
                 >
                     <IconGripVertical size={20} />
                 </div>
 
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-red-50 text-red-500 shrink-0">
-                    <IconFileTypePdf size={24} stroke={1.5} />
+                <div className="flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] shrink-0">
+                    <IconFileTypePdf size={22} stroke={1.8} />
                 </div>
 
                 <div className="min-w-0">
-                    <p className="text-sm font-semibold text-brand-dark truncate" title={item.file.name}>
-                        {item.file.name}
-                    </p>
-                    <p className="text-[11px] text-brand-sage font-medium mt-0.5">
+                    <div className="flex items-center gap-2">
+                        <span className="shrink-0 flex items-center justify-center w-5 h-5 rounded-md bg-[#FAFAF9] border border-[#E0DED9] text-[10px] font-bold text-neutral-600">
+                            {index + 1}
+                        </span>
+                        <p className="text-sm font-bold text-brand-dark truncate max-w-[200px] sm:max-w-md" title={item.file.name}>
+                            {item.file.name}
+                        </p>
+                    </div>
+                    <p className="text-xs text-neutral-500 mt-0.5 ml-7">
                         {item.size}
                     </p>
                 </div>
             </div>
 
             <button
-                onClick={(e) => { e.stopPropagation(); onDelete(); }}
-                title="Remove"
-                className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-50 text-brand-sage hover:bg-red-50 hover:text-red-500 transition-colors cursor-pointer shrink-0"
+                type="button"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete();
+                }}
+                title="Remove file"
+                className="flex items-center justify-center w-8 h-8 rounded-full text-neutral-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer shrink-0"
             >
-                <IconTrash size={18} />
+                <IconTrash size={16} />
             </button>
         </motion.div>
     );
 }
-
-// ─── Main Page ────────────────────────────────────────────────────────────────
 
 export default function MergePdfConvertPage() {
     const router = useRouter();
@@ -158,12 +163,10 @@ export default function MergePdfConvertPage() {
         setError(null);
 
         try {
-            const allFiles = pdfs.map(p => p.file);
+            const allFiles = pdfs.map((p) => p.file);
             const mergedBytes = await mergePdfs(allFiles);
-
-            const blob = new Blob([mergedBytes as any], { type: "application/pdf" });
-            downloadBlob(blob, "merged.pdf");
-
+            const blob = new Blob([new Uint8Array(mergedBytes).buffer], { type: "application/pdf" });
+            downloadBlob(blob, "merged_document.pdf");
             setSuccess(true);
         } catch (err: any) {
             console.error(err);
@@ -175,12 +178,12 @@ export default function MergePdfConvertPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col pt-16" style={{ background: "var(--brand-white)" }}>
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <IconLoader2 size={36} className="animate-spin text-[#047C58]" />
-                        <p className="text-brand-sage text-sm font-medium">Loading your PDFs…</p>
+                        <IconLoader2 size={36} className="animate-spin text-brand-teal" />
+                        <p className="text-neutral-500 text-sm font-medium">Loading your PDFs…</p>
                     </div>
                 </main>
             </div>
@@ -189,102 +192,81 @@ export default function MergePdfConvertPage() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex flex-col pt-16" style={{ background: "var(--brand-white)" }}>
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
-                <main className="flex-1 flex items-center justify-center py-24">
-                    <div className="flex flex-col items-center text-center gap-5 animate-in fade-in zoom-in duration-300">
-                        <span className="flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600">
-                            <IconCheck size={40} stroke={2} />
+                <main className="flex-1 flex items-center justify-center py-20 px-5">
+                    <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-[#E0DED9] w-full max-w-lg flex flex-col items-center text-center gap-6 animate-in fade-in zoom-in-95 duration-200">
+                        <span className="flex items-center justify-center w-20 h-20 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
+                            <IconCheck size={40} stroke={2.5} />
                         </span>
-                        <h1 className="text-2xl font-bold text-brand-dark">PDFs Merged!</h1>
-                        <p className="text-brand-sage max-w-sm">Your documents have been successfully merged into a single PDF.</p>
-                        <div className="flex gap-3 mt-2">
+                        <div>
+                            <h1 className="text-2xl font-bold text-brand-dark">PDFs Merged!</h1>
+                            <p className="text-neutral-600 mt-2 text-sm sm:text-base leading-relaxed">
+                                Your combined document (<span className="font-semibold text-brand-dark">merged_document.pdf</span>) has been downloaded.
+                            </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
                             <button
-                                onClick={() => { setSuccess(false); setPdfs([]); router.push("/merge-pdf"); }}
-                                className="px-6 py-3 rounded-xl bg-white text-brand-dark font-semibold border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
+                                onClick={() => {
+                                    setSuccess(false);
+                                    setPdfs([]);
+                                    router.push("/merge-pdf");
+                                }}
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-white text-brand-dark font-semibold border border-[#E0DED9] hover:bg-[#FAF9F7] transition-all cursor-pointer shadow-2xs text-sm"
                             >
-                                Start over
+                                Start Over
                             </button>
                             <button
                                 onClick={() => setSuccess(false)}
-                                className="px-6 py-3 rounded-xl bg-[#047C58] text-white font-semibold hover:bg-[#036245] transition-all cursor-pointer shadow-md"
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-brand-teal hover:bg-[#036649] text-white font-bold transition-all cursor-pointer shadow-sm text-sm"
                             >
-                                Back to editing
+                                Back to Editing
                             </button>
                         </div>
                     </div>
                 </main>
+                <Footer />
             </div>
         );
     }
 
     return (
-        <div className="h-screen flex flex-col relative overflow-hidden pt-16" style={{ background: "var(--brand-white)" }}>
+        <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
             <Navbar />
 
-            <div aria-hidden className="pointer-events-none absolute inset-0"
-                style={{
-                    backgroundImage: "radial-gradient(circle, #047C58 1px, transparent 1px)",
-                    backgroundSize: "32px 32px",
-                    opacity: 0.03,
-                }}
-            />
-
-            <main className="flex-1 max-w-3xl mx-auto px-4 w-full pt-16 md:pt-24 pb-6 relative z-10 flex flex-col overflow-hidden">
-                <div className="mb-8 shrink-0">
-                    <div className="flex md:hidden items-center gap-2">
+            <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 w-full pt-28 md:pt-32 pb-16 flex flex-col">
+                <div className="mb-6 shrink-0 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
                         <button
+                            type="button"
                             onClick={() => router.push("/merge-pdf")}
-                            aria-label="Back"
-                            className="flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-brand-sage hover:text-brand-dark hover:bg-slate-100 transition-colors cursor-pointer active:scale-[0.97]"
-                        >
-                            <IconArrowLeft size={18} />
-                        </button>
-
-                        <div className="flex items-center gap-2 flex-1 min-w-0">
-                            <span className="flex items-center justify-center w-8 h-8 rounded-lg text-white shrink-0" style={{ background: "#047C58" }}>
-                                <IconArrowsJoin2 size={16} stroke={1.5} />
-                            </span>
-                            <div className="min-w-0">
-                                <h1 className="text-sm font-bold text-brand-dark leading-tight truncate">Merge PDF</h1>
-                                <p className="text-[10px] text-brand-sage leading-tight">{pdfs.length} file{pdfs.length !== 1 ? "s" : ""} loaded</p>
-                            </div>
-                        </div>
-
-                        <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="flex items-center gap-1 px-2.5 py-2 rounded-lg border border-[#047C58] text-[#047C58] text-xs font-semibold hover:bg-[#047C58] hover:text-white transition-all cursor-pointer shadow-sm active:scale-[0.97] shrink-0"
-                        >
-                            <IconPlus size={13} /> Add
-                        </button>
-                    </div>
-
-                    <div className="hidden md:flex items-center gap-4">
-                        <button
-                            onClick={() => router.push("/merge-pdf")}
-                            className="flex items-center gap-1.5 text-sm font-medium text-brand-sage hover:text-brand-dark hover:bg-slate-100 px-3 py-1.5 rounded-lg -ml-2 transition-colors cursor-pointer"
+                            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-neutral-600 hover:text-brand-dark px-3 py-1.5 rounded-xl border border-[#E0DED9] bg-white hover:bg-[#FAF9F7] transition-all cursor-pointer shadow-2xs"
                         >
                             <IconArrowLeft size={16} /> Back
                         </button>
-                        <div className="w-px h-5 bg-slate-200" />
-                        <div className="flex items-center gap-3">
-                            <span className="flex items-center justify-center w-10 h-10 rounded-xl text-white" style={{ background: "#047C58" }}>
-                                <IconArrowsJoin2 size={20} stroke={1.5} />
+                        <div className="flex items-center gap-2">
+                            <span className="flex items-center justify-center w-8 h-8 rounded-lg bg-[#e6f4ef] text-brand-teal">
+                                <IconArrowsJoin2 size={18} stroke={2} />
                             </span>
                             <div>
-                                <h1 className="text-xl font-bold text-brand-dark">Merge PDF</h1>
-                                <p className="text-xs text-brand-sage">{pdfs.length} document{pdfs.length !== 1 ? "s" : ""} loaded</p>
+                                <h1 className="text-base sm:text-lg font-bold text-brand-dark leading-tight">
+                                    Organize & Merge PDFs
+                                </h1>
+                                <p className="text-xs text-neutral-500">
+                                    {pdfs.length} document{pdfs.length !== 1 ? "s" : ""} loaded
+                                </p>
                             </div>
                         </div>
-                        <div className="ml-auto">
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="flex items-center gap-2 px-4 py-2 rounded-xl border border-[#047C58] text-[#047C58] text-sm font-semibold hover:bg-[#047C58] hover:text-white transition-all cursor-pointer shadow-sm active:scale-[0.98]"
-                            >
-                                <IconPlus size={16} /> Add More PDFs
-                            </button>
-                        </div>
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-[#E0DED9] text-brand-dark text-xs sm:text-sm font-bold hover:bg-[#FAF9F7] hover:border-brand-teal transition-all cursor-pointer shadow-2xs"
+                    >
+                        <IconPlus size={16} className="text-brand-teal" />
+                        <span>Add More PDFs</span>
+                    </button>
                 </div>
 
                 <input
@@ -296,21 +278,23 @@ export default function MergePdfConvertPage() {
                     onChange={(e) => addFiles(e.target.files)}
                 />
 
-                <div className="bg-white rounded-3xl border border-border shadow-sm p-6 md:p-8 flex flex-col flex-1 min-h-0">
-                    <p className="text-sm text-brand-sage mb-6 shrink-0">
-                        Drag and drop the files to rearrange their order. The top file will be the first in the merged document.
+                <div className="bg-white rounded-3xl border border-[#E0DED9] shadow-sm p-5 sm:p-8 flex flex-col flex-1">
+                    <p className="text-xs sm:text-sm text-neutral-500 mb-5">
+                        Drag and drop the cards using the grip handle (⋮⋮) to arrange their order. The topmost file will appear first in the merged document.
                     </p>
 
-                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 min-h-0 pb-4">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar pr-1 min-h-[250px] max-h-[500px] pb-4">
                         {pdfs.length === 0 ? (
-                            <div className="bg-white rounded-2xl">
-                                <FileUpload
-                                    multiple
-                                    accept={{ "application/pdf": [".pdf"] }}
-                                    files={[]}
-                                    setFiles={() => { }}
-                                    onChange={handleFileArray}
-                                />
+                            <div className="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed border-[#E0DED9] rounded-2xl bg-[#FAFAF9]">
+                                <IconUpload size={32} className="text-neutral-400 mb-2" />
+                                <p className="text-sm font-bold text-brand-dark">No files loaded</p>
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="mt-3 px-5 py-2 rounded-xl bg-brand-teal text-white font-bold text-xs"
+                                >
+                                    Select PDF Files
+                                </button>
                             </div>
                         ) : (
                             <Reorder.Group
@@ -321,10 +305,11 @@ export default function MergePdfConvertPage() {
                                 as="div"
                             >
                                 <AnimatePresence>
-                                    {pdfs.map((pdf) => (
+                                    {pdfs.map((pdf, index) => (
                                         <Reorder.Item key={pdf.id} value={pdf} as="div">
                                             <PdfCard
                                                 item={pdf}
+                                                index={index}
                                                 onDelete={() => deletePdf(pdf.id)}
                                             />
                                         </Reorder.Item>
@@ -334,34 +319,42 @@ export default function MergePdfConvertPage() {
                         )}
                     </div>
 
-                    <div className="shrink-0 mt-4">
+                    <div className="shrink-0 mt-6 pt-4 border-t border-[#E0DED9]">
                         {error && (
-                            <div className="mb-6 p-4 bg-red-50 text-red-600 text-sm rounded-xl flex items-start gap-2 border border-red-100">
-                                <span className="w-1.5 h-1.5 mt-1.5 rounded-full bg-red-500 shrink-0" />
+                            <div className="mb-4 p-3.5 bg-red-50 text-red-700 text-xs sm:text-sm rounded-xl flex items-center gap-2 border border-red-200 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
                                 {error}
                             </div>
                         )}
 
-                        <div className="pt-2">
+                        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <p className="text-xs text-neutral-500">
+                                {pdfs.length < 2
+                                    ? "Add at least 2 PDF files to enable merging."
+                                    : `Ready to combine ${pdfs.length} files into one PDF.`}
+                            </p>
+
                             <button
+                                type="button"
                                 onClick={handleMerge}
                                 disabled={pdfs.length < 2 || isProcessing}
-                                className={`w-full md:w-auto md:ml-auto md:px-12 py-4 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-md active:scale-[0.98] text-[15px] ${pdfs.length < 2
-                                    ? "bg-[#047C58]/30 cursor-not-allowed shadow-none"
-                                    : isProcessing
-                                        ? "bg-[#047C58] opacity-50 cursor-wait"
-                                        : "bg-[#047C58] hover:bg-[#036245] cursor-pointer"
-                                    }`}
+                                className={`w-full sm:w-auto sm:min-w-[220px] py-4 px-8 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-sm text-sm sm:text-base ${
+                                    pdfs.length < 2
+                                        ? "bg-brand-teal/40 cursor-not-allowed shadow-none"
+                                        : isProcessing
+                                            ? "bg-brand-teal opacity-60 cursor-wait"
+                                            : "bg-brand-teal hover:bg-[#036649] cursor-pointer active:scale-[0.99]"
+                                }`}
                             >
                                 {isProcessing && <IconLoader2 className="animate-spin" size={20} />}
-                                {isProcessing ? "Merging PDFs…" : `Merge ${pdfs.length} PDF${pdfs.length !== 1 ? 's' : ''}`}
+                                {isProcessing ? "Merging PDFs…" : `Merge ${pdfs.length} PDF${pdfs.length !== 1 ? "s" : ""}`}
                             </button>
                         </div>
                     </div>
                 </div>
             </main>
 
+            <Footer />
         </div>
     );
 }
-
