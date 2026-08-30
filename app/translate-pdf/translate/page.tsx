@@ -70,7 +70,10 @@ export default function TranslatePdfMayaPage() {
         const loadPdf = async () => {
             try {
                 const pdfjs = await import("pdfjs-dist");
-                pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+                pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+                    "pdfjs-dist/build/pdf.worker.min.mjs",
+                    import.meta.url
+                ).toString();
 
                 const arrayBuffer = await f.arrayBuffer();
                 const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;

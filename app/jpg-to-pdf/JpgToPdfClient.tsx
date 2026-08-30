@@ -14,6 +14,8 @@ import {
     IconArrowRight,
     IconSortAscending,
     IconLayersLinked,
+    IconAdjustmentsHorizontal,
+    IconSparkles,
 } from "@tabler/icons-react";
 import { imagesToPdf, downloadBlob } from "@/lib/pdf-utils";
 import FileStore from "@/lib/file-store";
@@ -148,7 +150,7 @@ export default function JpgToPdfClient() {
                                         <button
                                             type="button"
                                             onClick={handleReset}
-                                            className="text-xs font-semibold text-neutral-500 hover:text-neutral-800 transition-colors"
+                                            className="text-xs font-semibold text-neutral-500 hover:text-neutral-800 transition-colors cursor-pointer"
                                         >
                                             Clear All
                                         </button>
@@ -171,7 +173,8 @@ export default function JpgToPdfClient() {
                                                 <button
                                                     type="button"
                                                     onClick={() => removeFile(i)}
-                                                    className="text-neutral-400 hover:text-red-500 transition-colors"
+                                                    className="text-neutral-400 hover:text-red-500 transition-colors cursor-pointer"
+                                                    title="Remove image"
                                                 >
                                                     <IconX size={15} />
                                                 </button>
@@ -180,39 +183,62 @@ export default function JpgToPdfClient() {
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
+                                    {/* ── Customize & Reorder Button ── */}
                                     <button
                                         type="button"
                                         onClick={handleCustomArrange}
-                                        className="py-3.5 px-5 rounded-xl bg-white hover:bg-[#FAF9F7] text-brand-dark border border-[#E0DED9] font-bold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs"
+                                        className="group relative p-4 rounded-2xl bg-white hover:bg-[#FAF9F7] text-left border-2 border-[#E0DED9] hover:border-brand-teal/70 transition-all cursor-pointer shadow-2xs flex flex-col justify-between gap-2"
                                     >
-                                        <IconSortAscending size={18} />
-                                        <span>Reorder &amp; Adjust Pages</span>
+                                        <div className="flex items-center justify-between w-full">
+                                            <div className="flex items-center gap-2 text-brand-dark font-bold text-sm sm:text-base">
+                                                <span className="w-7 h-7 rounded-lg bg-[#e6f4ef] text-brand-teal flex items-center justify-center group-hover:scale-105 transition-transform">
+                                                    <IconAdjustmentsHorizontal size={17} stroke={2.2} />
+                                                </span>
+                                                <span>Customize &amp; Reorder</span>
+                                            </div>
+                                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-teal/10 text-brand-teal border border-brand-teal/20 shrink-0">
+                                                Full Editor
+                                            </span>
+                                        </div>
+                                        <p className="text-[11px] text-neutral-500 leading-snug pl-9">
+                                            Reorder, rotate, adjust margins, orientation &amp; page sizes (A4, Letter, Fit)
+                                        </p>
                                     </button>
 
+                                    {/* ── Direct Convert Button ── */}
                                     <button
                                         id="convert-jpg-to-pdf-btn"
                                         type="button"
                                         onClick={handleDirectConvert}
                                         disabled={isProcessing}
-                                        className={`py-3.5 px-6 rounded-xl font-bold text-sm text-white transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer ${
+                                        className={`group p-4 rounded-2xl font-bold text-sm sm:text-base text-white transition-all flex flex-col justify-between gap-2 shadow-sm text-left active:scale-[0.99] cursor-pointer ${
                                             isProcessing
                                                 ? "bg-[#d97706] opacity-70 cursor-wait"
                                                 : "bg-[#d97706] hover:bg-[#b45309] hover:shadow-md"
                                         }`}
                                     >
-                                        {isProcessing ? (
-                                            <>
-                                                <IconLoader2 className="animate-spin" size={18} />
-                                                <span>Converting…</span>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <IconLayersLinked size={18} />
-                                                <span>Convert to PDF</span>
-                                                <IconArrowRight size={15} />
-                                            </>
-                                        )}
+                                        <div className="flex items-center justify-between w-full">
+                                            <div className="flex items-center gap-2">
+                                                <span className="w-7 h-7 rounded-lg bg-white/20 text-white flex items-center justify-center">
+                                                    {isProcessing ? (
+                                                        <IconLoader2 className="animate-spin" size={17} />
+                                                    ) : (
+                                                        <IconLayersLinked size={17} />
+                                                    )}
+                                                </span>
+                                                <span>{isProcessing ? "Converting…" : "Quick Convert to PDF"}</span>
+                                            </div>
+                                            {!isProcessing && (
+                                                <IconArrowRight
+                                                    size={17}
+                                                    className="opacity-80 group-hover:translate-x-0.5 transition-transform shrink-0"
+                                                />
+                                            )}
+                                        </div>
+                                        <p className="text-[11px] text-white/85 leading-snug pl-9">
+                                            Instantly compile all images into standard A4 portrait PDF document
+                                        </p>
                                     </button>
                                 </div>
                             </div>
