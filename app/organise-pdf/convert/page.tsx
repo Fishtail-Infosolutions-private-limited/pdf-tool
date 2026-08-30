@@ -188,7 +188,7 @@ async function buildOrganisedPdf(pages: PageItem[], sourceFiles: SourceFile[]): 
             // PDF source
             if (!loadedPdfs.has(src.id)) {
                 const ab = await src.file.arrayBuffer();
-                const srcPdf = await PDFDocument.load(ab);
+                const srcPdf = await PDFDocument.load(ab, { ignoreEncryption: true });
                 loadedPdfs.set(src.id, srcPdf);
             }
             const srcPdf = loadedPdfs.get(src.id)!;
@@ -826,7 +826,7 @@ export default function OrganisePdfConvertPage() {
 
         try {
             const bytes = await buildOrganisedPdf(pages, sourceFiles);
-            const blob = new Blob([bytes as unknown as BlobPart], { type: "application/pdf" });
+            const blob = new Blob([new Uint8Array(bytes).buffer], { type: "application/pdf" });
             downloadBlob(blob, "organised.pdf");
             setSuccess(true);
         } catch (err: any) {
@@ -840,12 +840,12 @@ export default function OrganisePdfConvertPage() {
     // ── Loading screen ────────────────────────────────────────
     if (isLoading && pages.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col" style={{ background: "var(--brand-white)" }}>
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <IconLoader2 size={36} className="animate-spin text-[#047C58]" />
-                        <p className="text-brand-sage text-sm font-medium">Reading PDF pages…</p>
+                        <IconLoader2 size={36} className="animate-spin text-brand-teal" />
+                        <p className="text-neutral-500 text-sm font-medium">Reading PDF pages…</p>
                     </div>
                 </main>
             </div>
@@ -855,29 +855,29 @@ export default function OrganisePdfConvertPage() {
     // ── Success screen ────────────────────────────────────────
     if (success) {
         return (
-            <div className="min-h-screen flex flex-col" style={{ background: "var(--brand-white)" }}>
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
-                <main className="flex-1 flex items-center justify-center pt-16 py-24">
-                    <div className="flex flex-col items-center text-center gap-5">
-                        <span className="flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600">
-                            <IconCheck size={40} stroke={2} />
-                        </span>
-                        <h1 className="text-2xl font-bold text-brand-dark">PDF Downloaded!</h1>
-                        <p className="text-brand-sage max-w-sm">
+                <main className="flex-1 flex items-center justify-center p-6">
+                    <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E0DED9] max-w-lg w-full text-center flex flex-col items-center gap-4 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="w-20 h-20 bg-[#e6f4ef] rounded-2xl border border-[#bce0d5] flex items-center justify-center mx-auto mb-2 text-brand-teal">
+                            <IconCheck size={40} stroke={2.5} />
+                        </div>
+                        <h1 className="text-2xl font-bold text-brand-dark">PDF Processed!</h1>
+                        <p className="text-neutral-600 text-sm leading-relaxed">
                             Your organised PDF with {pages.length} page{pages.length !== 1 ? "s" : ""} has been downloaded.
                         </p>
-                        <div className="flex gap-3 mt-2">
+                        <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
                             <button
                                 onClick={() => { setSuccess(false); setPages([]); setSourceFiles([]); router.push("/organise-pdf"); }}
-                                className="px-6 py-3 rounded-xl bg-white text-brand-dark font-semibold border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-white text-brand-dark font-semibold border border-[#E0DED9] hover:bg-[#FAF9F7] transition-all cursor-pointer shadow-2xs text-sm"
                             >
-                                Start over
+                                Start Over
                             </button>
                             <button
                                 onClick={() => setSuccess(false)}
-                                className="px-6 py-3 rounded-xl bg-[#047C58] text-white font-semibold hover:bg-[#036245] transition-all cursor-pointer shadow-md"
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-brand-teal text-white font-bold hover:bg-[#036649] transition-all cursor-pointer shadow-sm text-sm"
                             >
-                                Continue editing
+                                Continue Editing
                             </button>
                         </div>
                     </div>

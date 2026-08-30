@@ -312,8 +312,8 @@ export default function RemovePagesToolPage() {
             {/* Split View */}
             <div className="flex flex-col lg:flex-row flex-1 overflow-hidden relative">
                 {/* Pages Grid */}
-                <main className="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
-                    <div className="max-w-6xl mx-auto flex flex-wrap justify-center gap-5 sm:gap-6 pb-24">
+                <main className="flex-1 overflow-y-auto p-6 sm:p-8 md:p-10 custom-scrollbar">
+                    <div className="max-w-6xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8 pb-28">
                         <AnimatePresence>
                             {pages.map((p) => {
                                 const isRemoved = removedPages.has(p.pageIndex);
@@ -448,16 +448,15 @@ function PageCard({
             onMouseEnter={() => setHovered(true)}
             onMouseLeave={() => setHovered(false)}
             onClick={onToggle}
-            className="relative flex flex-col items-center gap-2.5 group select-none cursor-pointer"
-            style={{ width: 140 }}
+            className="w-full flex flex-col items-center gap-3 select-none cursor-pointer group"
         >
             <div
-                className={`relative w-full rounded-2xl overflow-hidden border-2 transition-all duration-200 p-2 shadow-2xs ${
+                className={`relative w-full rounded-2xl overflow-hidden border-2 transition-all duration-200 p-3 sm:p-4 flex items-center justify-center ${
                     isRemoved
-                        ? "border-red-500 opacity-60 bg-red-50/20"
+                        ? "border-red-500 bg-red-50/30 opacity-75 shadow-inner"
                         : hovered
-                            ? "border-red-400 shadow-md bg-[#FAF9F7]"
-                            : "border-[#E0DED9] bg-[#FAFAF9]"
+                            ? "border-red-400 shadow-md bg-white -translate-y-1"
+                            : "border-[#E0DED9] bg-white shadow-2xs"
                 }`}
                 style={{ aspectRatio: "0.707" }}
             >
@@ -465,13 +464,24 @@ function PageCard({
                     src={page.thumbnail}
                     alt={`Page ${page.pageIndex}`}
                     draggable={false}
-                    className="w-full h-full object-contain pointer-events-none drop-shadow-2xs"
+                    className="max-w-full max-h-full object-contain pointer-events-none drop-shadow-sm rounded-sm"
                 />
 
-                {/* Red cross overlay when removed (Desktop only) */}
+                {/* Page Number Top Badge */}
+                <div className="absolute top-2 left-2 z-10">
+                    <span className={`flex items-center justify-center w-6 h-6 rounded-lg text-[11px] font-bold border transition-colors shadow-2xs ${
+                        isRemoved
+                            ? "bg-[#fee2e2] text-[#dc2626] border-[#fecaca]"
+                            : "bg-white text-neutral-700 border-[#E0DED9]"
+                    }`}>
+                        {page.pageIndex}
+                    </span>
+                </div>
+
+                {/* Red cross overlay when removed (Desktop) */}
                 {isRemoved && (
-                    <div className="hidden lg:flex absolute inset-0 items-center justify-center bg-red-500/15 backdrop-blur-[1px]">
-                        <div className="w-14 h-14 rounded-2xl bg-red-500 flex items-center justify-center text-white shadow-lg">
+                    <div className="hidden lg:flex absolute inset-0 items-center justify-center bg-red-500/20 backdrop-blur-[0.5px]">
+                        <div className="w-14 h-14 rounded-2xl bg-red-500 flex items-center justify-center text-white shadow-lg animate-in zoom-in-90 duration-150">
                             <IconTrash size={28} stroke={2} />
                         </div>
                     </div>
@@ -479,34 +489,34 @@ function PageCard({
 
                 {/* Mobile removed tint state */}
                 {isRemoved && (
-                    <div className="lg:hidden absolute inset-0 bg-red-500/10 pointer-events-none" />
+                    <div className="lg:hidden absolute inset-0 bg-red-500/15 pointer-events-none" />
                 )}
 
-                {/* Hover overlay hint (Desktop only) */}
+                {/* Hover overlay hint (Desktop only when not removed) */}
                 {!isRemoved && hovered && (
                     <div className="hidden lg:flex absolute inset-0 bg-red-500/10 items-center justify-center">
-                        <div className="w-10 h-10 rounded-xl bg-white/95 flex items-center justify-center text-red-500 shadow-md transition-transform hover:scale-110 border border-red-200">
-                            <IconTrash size={20} stroke={2} />
+                        <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-red-500 shadow-md transition-transform hover:scale-110 border border-red-200">
+                            <IconTrash size={24} stroke={2} />
                         </div>
                     </div>
                 )}
 
                 {/* Mobile-only checkbox indicator */}
                 <div className="lg:hidden absolute top-2 right-2 z-10">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-colors shadow-2xs ${
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center border-2 transition-colors shadow-2xs ${
                         isRemoved ? "bg-red-500 border-red-500 text-white shadow-sm" : "bg-white/90 border-[#E0DED9]"
                     }`}>
-                        {isRemoved && <IconX size={14} stroke={3} />}
+                        {isRemoved ? <IconTrash size={14} stroke={2.5} /> : <IconX size={14} className="text-neutral-400" />}
                     </div>
                 </div>
             </div>
 
-            <div className={`text-xs font-bold px-3 py-1 rounded-full shadow-2xs transition-colors ${
+            <div className={`text-xs font-bold px-3 py-1 rounded-xl shadow-2xs transition-all ${
                 isRemoved
                     ? "bg-[#fee2e2] text-[#dc2626] border border-[#fecaca]"
-                    : "bg-white text-brand-dark border border-[#E0DED9] group-hover:border-neutral-400"
+                    : "bg-white text-neutral-700 border border-[#E0DED9] group-hover:border-red-300 group-hover:text-red-500"
             }`}>
-                Page {page.pageIndex}
+                {isRemoved ? "Marked for Deletion" : `Page ${page.pageIndex}`}
             </div>
         </motion.div>
     );
