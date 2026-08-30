@@ -204,7 +204,7 @@ export default function RemovePagesToolPage() {
                 const { PDFDocument } = await import("pdf-lib");
 
                 const ab = await file.arrayBuffer();
-                const sourceDoc = await PDFDocument.load(ab);
+                const sourceDoc = await PDFDocument.load(ab, { ignoreEncryption: true });
                 const pdfDoc = await PDFDocument.create();
 
                 for (let i = 1; i <= pages.length; i++) {
@@ -232,12 +232,12 @@ export default function RemovePagesToolPage() {
     // ── Render States ────────────────────────────────────────────────────────
     if (isLoading && pages.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col bg-[#F7F6F3]">
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <IconLoader2 size={36} className="animate-spin text-[#059669]" />
-                        <p className="text-brand-sage text-sm font-medium">Read pages ({loadingProgress}%)...</p>
+                        <IconLoader2 size={36} className="animate-spin text-brand-teal" />
+                        <p className="text-neutral-500 text-sm font-medium">Read pages ({loadingProgress}%)...</p>
                     </div>
                 </main>
             </div>
@@ -246,26 +246,26 @@ export default function RemovePagesToolPage() {
 
     if (success) {
         return (
-            <div className="min-h-screen flex flex-col bg-[#F7F6F3]">
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center p-6">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-border max-w-lg w-full text-center"
+                        className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#E0DED9] max-w-lg w-full text-center flex flex-col items-center gap-4"
                     >
-                        <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <IconCheck size={40} className="text-emerald-500" stroke={2} />
+                        <div className="w-20 h-20 bg-[#e6f4ef] rounded-2xl border border-[#bce0d5] flex items-center justify-center mx-auto mb-2 text-brand-teal">
+                            <IconCheck size={40} stroke={2.5} />
                         </div>
-                        <h2 className="text-2xl font-bold text-brand-dark mb-4">
+                        <h2 className="text-2xl font-bold text-brand-dark">
                             Pages Removed Successfully!
                         </h2>
-                        <p className="text-brand-sage mb-8">
-                            Your modified PDF has been downloaded.
+                        <p className="text-neutral-600 text-sm leading-relaxed">
+                            Your modified PDF has been downloaded with the selected pages deleted.
                         </p>
                         <button
                             onClick={() => router.push("/remove-pages")}
-                            className="bg-[#059669] text-white px-8 py-3.5 rounded-full font-semibold hover:bg-emerald-700 transition-all shadow-md hover:shadow-lg w-full"
+                            className="bg-brand-teal text-white px-8 py-3.5 rounded-xl font-bold hover:bg-[#036649] transition-all shadow-sm w-full cursor-pointer mt-2 text-sm"
                         >
                             Remove Pages from Another PDF
                         </button>
@@ -276,7 +276,7 @@ export default function RemovePagesToolPage() {
     }
 
     return (
-        <div className="h-screen flex flex-col bg-[#F7F6F3] pt-[64px] overflow-hidden">
+        <div className="h-screen flex flex-col bg-[#FAFAF9] pt-[64px] overflow-hidden">
             <Navbar />
 
             {/* Header Toolbar */}
