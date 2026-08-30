@@ -24,6 +24,7 @@ import {
     IconArrowsLeftRight,
     IconListDetails,
 } from "@tabler/icons-react";
+import Navbar from "@/components/Navbar";
 
 interface BBox {
     x: number;
@@ -61,7 +62,7 @@ interface PageImage {
     dataUrl: string;
 }
 
-const ACCENT = "#7C3AED";
+const ACCENT = "#047C58";
 
 function DropZone({
     id,
@@ -147,15 +148,25 @@ function DropZone({
                 ) : (
                     <>
                         <span
-                            className="flex items-center justify-center w-12 h-12 rounded-2xl"
-                            style={{ background: `${color}10`, color }}
+                            className="flex items-center justify-center w-12 h-12 rounded-2xl bg-white border border-[#E0DED9] text-neutral-400"
                         >
-                            <IconUpload size={22} stroke={1.8} />
+                            <IconUpload size={24} stroke={1.8} />
                         </span>
                         <div className="text-center">
                             <p className="font-bold text-sm text-brand-dark">{label}</p>
                             <p className="text-xs text-neutral-500 mt-0.5">{sublabel}</p>
                         </div>
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                inputRef.current?.click();
+                            }}
+                            className="text-xs font-bold px-4 py-2 rounded-xl text-white transition-all cursor-pointer shadow-sm hover:opacity-90 active:scale-[0.98]"
+                            style={{ background: color }}
+                        >
+                            Select PDF
+                        </button>
                     </>
                 )}
             </div>
@@ -208,7 +219,7 @@ function PageViewer({
                     className="flex items-center justify-center w-6 h-6 rounded-md text-white text-xs font-bold shrink-0"
                     style={{ background: labelColor }}
                 >
-                    {label === "Original" ? "A" : "B"}
+                    {label.includes("File A") || label.includes("Original") ? "A" : "B"}
                 </span>
                 <span className="text-sm font-semibold" style={{ color: labelColor }}>
                     {label}
@@ -261,9 +272,9 @@ function PageViewer({
                             ))}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center gap-3 py-20 text-neutral-400">
-                            <IconFiles size={32} stroke={1.5} />
-                            <p className="text-sm font-medium">No page available</p>
+                        <div className="flex flex-col items-center justify-center py-20 text-neutral-400 gap-2">
+                            <IconAlertCircle size={32} />
+                            <p className="text-xs">Page not available in this document</p>
                         </div>
                     )}
                 </div>
@@ -275,30 +286,21 @@ function PageViewer({
 export default function ComparePdfClient() {
     const [fileA, setFileA] = useState<File | null>(null);
     const [fileB, setFileB] = useState<File | null>(null);
-
     const [step, setStep] = useState<"upload" | "processing" | "results">("upload");
-    const [processingMsg, setProcessingMsg] = useState("Analysing documents…");
+    const [processingMsg, setProcessingMsg] = useState("");
     const [error, setError] = useState<string | null>(null);
 
     const [diffResult, setDiffResult] = useState<DiffResult | null>(null);
     const [pagesA, setPagesA] = useState<PageImage[]>([]);
     const [pagesB, setPagesB] = useState<PageImage[]>([]);
-
     const [currentPage, setCurrentPage] = useState(1);
     const [showHighlights, setShowHighlights] = useState(true);
 
-    const scrollARef = useRef<HTMLDivElement>(null);
-    const scrollBRef = useRef<HTMLDivElement>(null);
+    const scrollARef = useRef<HTMLDivElement | null>(null);
+    const scrollBRef = useRef<HTMLDivElement | null>(null);
     const isSyncing = useRef(false);
 
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [drawerTab, setDrawerTab] = useState<"navigation" | "details">("navigation");
-    const [mobileView, setMobileView] = useState<"original" | "modified">("original");
-
-    const [delLimit, setDelLimit] = useState(20);
-    const [addLimit, setAddLimit] = useState(20);
-
-    const syncScroll = useCallback((source: "a" | "b") => {
+    const syncScroll = (source: "a" | "b") => {
         if (isSyncing.current) return;
         isSyncing.current = true;
         const src = source === "a" ? scrollARef.current : scrollBRef.current;
@@ -307,8 +309,10 @@ export default function ComparePdfClient() {
             dst.scrollTop = src.scrollTop;
             dst.scrollLeft = src.scrollLeft;
         }
-        requestAnimationFrame(() => { isSyncing.current = false; });
-    }, []);
+        setTimeout(() => {
+            isSyncing.current = false;
+        }, 50);
+    };
 
     const renderPages = useCallback(async (file: File): Promise<PageImage[]> => {
         const pdfjsLib = await import("pdfjs-dist");
@@ -317,22 +321,20 @@ export default function ComparePdfClient() {
             import.meta.url
         ).toString();
 
-        const buf = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const results: PageImage[] = [];
 
         for (let i = 1; i <= pdf.numPages; i++) {
             const page = await pdf.getPage(i);
-            const viewport = page.getViewport({ scale: 1.8 });
+            const viewport = page.getViewport({ scale: 1.5 });
             const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            if (!ctx) continue;
             canvas.width = viewport.width;
             canvas.height = viewport.height;
-            const ctx = canvas.getContext("2d")!;
             await page.render({ canvasContext: ctx, viewport } as any).promise;
-            results.push({
-                pageNum: i,
-                dataUrl: canvas.toDataURL("image/jpeg", 0.9),
-            });
+            results.push({ pageNum: i, dataUrl: canvas.toDataURL("image/png") });
         }
         return results;
     }, []);
@@ -340,44 +342,42 @@ export default function ComparePdfClient() {
     const runCompare = useCallback(async () => {
         if (!fileA || !fileB) return;
 
-        (async () => {
-            setStep("processing");
-            setError(null);
+        setStep("processing");
+        setError(null);
 
-            try {
-                setProcessingMsg("Extracting & comparing text…");
-                const form = new FormData();
-                form.append("file_a", fileA, fileA.name);
-                form.append("file_b", fileB, fileB.name);
+        try {
+            setProcessingMsg("Extracting & comparing text…");
+            const form = new FormData();
+            form.append("file_a", fileA, fileA.name);
+            form.append("file_b", fileB, fileB.name);
 
-                const diffRes = await fetch("/api/compare-pdf", {
-                    method: "POST",
-                    body: form,
-                });
+            const diffRes = await fetch("/api/compare-pdf", {
+                method: "POST",
+                body: form,
+            });
 
-                if (!diffRes.ok) {
-                    const body = await diffRes.json().catch(() => ({}));
-                    throw new Error(body.error || `Server error ${diffRes.status}`);
-                }
-
-                const diff: DiffResult = await diffRes.json();
-                setDiffResult(diff);
-
-                setProcessingMsg("Rendering " + fileA.name + "…");
-                const imgA = await renderPages(fileA);
-                setPagesA(imgA);
-
-                setProcessingMsg("Rendering " + fileB.name + "…");
-                const imgB = await renderPages(fileB);
-                setPagesB(imgB);
-
-                setCurrentPage(1);
-                setStep("results");
-            } catch (err: any) {
-                setError(err?.message || "An unexpected error occurred.");
-                setStep("upload");
+            if (!diffRes.ok) {
+                const body = await diffRes.json().catch(() => ({}));
+                throw new Error(body.error || `Server error ${diffRes.status}`);
             }
-        })();
+
+            const diff: DiffResult = await diffRes.json();
+            setDiffResult(diff);
+
+            setProcessingMsg("Rendering " + fileA.name + "…");
+            const imgA = await renderPages(fileA);
+            setPagesA(imgA);
+
+            setProcessingMsg("Rendering " + fileB.name + "…");
+            const imgB = await renderPages(fileB);
+            setPagesB(imgB);
+
+            setCurrentPage(1);
+            setStep("results");
+        } catch (err: any) {
+            setError(err?.message || "An unexpected error occurred.");
+            setStep("upload");
+        }
     }, [fileA, fileB, renderPages]);
 
     const pageList = diffResult ? diffResult.pages : [];
@@ -386,8 +386,6 @@ export default function ComparePdfClient() {
 
     const goToPage = (num: number) => {
         setCurrentPage(num);
-        setDelLimit(20);
-        setAddLimit(20);
         scrollARef.current && (scrollARef.current.scrollTop = 0);
         scrollBRef.current && (scrollBRef.current.scrollTop = 0);
     };
@@ -398,8 +396,6 @@ export default function ComparePdfClient() {
     const nextPage = () => {
         if (pageIndex < totalPages - 1) goToPage(pageList[pageIndex + 1].page_num);
     };
-
-    const changedPageList = diffResult?.summary.changed_pages ?? [];
 
     const reset = () => {
         setFileA(null);
@@ -418,51 +414,37 @@ export default function ComparePdfClient() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <DropZone
                         id="drop-zone-a"
-                        label="Original PDF (Version A)"
-                        sublabel="Drag & drop or browse"
+                        label="Original Document (File A)"
+                        sublabel="Drop first PDF version here"
                         file={fileA}
                         onFile={setFileA}
-                        color="#ef4444"
+                        color="#dc2626"
                     />
                     <DropZone
                         id="drop-zone-b"
-                        label="Modified PDF (Version B)"
-                        sublabel="Drag & drop or browse"
+                        label="Modified Document (File B)"
+                        sublabel="Drop second PDF version here"
                         file={fileB}
                         onFile={setFileB}
-                        color="#22c55e"
+                        color="#047C58"
                     />
                 </div>
 
-                <div className="flex items-center justify-center gap-6 text-xs text-neutral-500 mt-4">
-                    <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(239,68,68,0.4)" }} />
-                        Removed text (A only)
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-sm" style={{ background: "rgba(34,197,94,0.4)" }} />
-                        Added text (B only)
-                    </span>
-                </div>
-
                 {error && (
-                    <div className="flex items-start gap-2 p-3 mt-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs font-medium">
-                        <IconAlertCircle size={16} className="shrink-0 mt-0.5" />
-                        {error}
+                    <div className="mt-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+                        <IconAlertCircle size={16} className="shrink-0" />
+                        <span>{error}</span>
                     </div>
                 )}
 
                 <button
-                    id="compare-pdf-btn"
+                    id="compare-btn"
                     type="button"
                     onClick={runCompare}
                     disabled={!fileA || !fileB}
-                    className="w-full mt-5 py-4 rounded-xl font-bold text-white text-[15px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm active:scale-[0.99] cursor-pointer"
+                    className="w-full mt-5 py-4 rounded-xl font-bold text-white text-[15px] flex items-center justify-center gap-2.5 transition-all duration-200 shadow-sm active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                        background: fileA && fileB
-                            ? `linear-gradient(135deg, ${ACCENT}, #6d28d9)`
-                            : "#D1D5DB",
-                        cursor: fileA && fileB ? "pointer" : "not-allowed",
+                        background: fileA && fileB ? "#047C58" : "#D1D5DB",
                     }}
                 >
                     <IconArrowsLeftRight size={20} />
@@ -478,8 +460,7 @@ export default function ComparePdfClient() {
             <div className="w-full bg-white rounded-3xl border border-[#E0DED9] p-10 flex flex-col items-center justify-center text-center gap-6 shadow-sm">
                 <div className="relative flex items-center justify-center w-20 h-20">
                     <span
-                        className="flex items-center justify-center w-16 h-16 rounded-2xl text-white shadow-sm"
-                        style={{ background: ACCENT }}
+                        className="flex items-center justify-center w-16 h-16 rounded-2xl text-white shadow-sm bg-brand-teal"
                     >
                         <IconLoader2 size={32} className="animate-spin" />
                     </span>
@@ -494,104 +475,108 @@ export default function ComparePdfClient() {
     }
 
     const summary = diffResult!.summary;
-    const currentDiffPage = diffResult!.pages.find((p) => p.page_num === currentPage);
-    const hasNoChanges = summary.changed_pages.length === 0;
 
+    // Full-Screen Takeover Mode for Visual Diff Studio (no landing page content underneath)
     return (
-        <div className="w-full bg-white rounded-3xl border border-[#E0DED9] shadow-sm flex flex-col overflow-hidden text-left">
-            {/* Toolbar */}
-            <div className="flex items-center gap-3 px-5 py-3 border-b border-[#E0DED9] bg-[#FAFAF9] flex-wrap">
-                <button
-                    type="button"
-                    onClick={reset}
-                    className="flex items-center gap-1.5 text-xs font-bold text-neutral-600 hover:text-brand-dark transition-colors cursor-pointer px-2.5 py-1.5 rounded-lg hover:bg-neutral-200/60"
-                >
-                    <IconArrowLeft size={15} />
-                    New Comparison
-                </button>
+        <div className="fixed inset-0 z-50 bg-[#FAFAF9] flex flex-col">
+            <Navbar />
+            <main className="flex-1 flex flex-col pt-16 overflow-hidden">
+                <div className="flex-1 flex flex-col overflow-hidden bg-white border-t border-[#E0DED9]">
+                    {/* Toolbar */}
+                    <div className="flex items-center gap-3 px-5 py-3 border-b border-[#E0DED9] bg-[#FAFAF9] flex-wrap shrink-0">
+                        <button
+                            type="button"
+                            onClick={reset}
+                            className="flex items-center gap-1.5 text-xs font-bold text-neutral-600 hover:text-brand-dark transition-colors cursor-pointer px-3 py-1.5 rounded-xl border border-[#E0DED9] bg-white hover:bg-[#FAF9F7] shadow-2xs"
+                        >
+                            <IconArrowLeft size={15} />
+                            New Comparison
+                        </button>
 
-                <div className="w-px h-5 bg-[#E0DED9]" />
+                        <div className="w-px h-5 bg-[#E0DED9]" />
 
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
-                        <IconMinus size={12} />
-                        {summary.total_deleted_words} removed
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
-                        style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
-                        <IconPlus size={12} />
-                        {summary.total_added_words} added
-                    </span>
-                    <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-neutral-600">
-                        <IconArrowsLeftRight size={12} />
-                        {summary.changed_pages.length} pages changed
-                    </span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
+                                style={{ background: "rgba(239,68,68,0.1)", color: "#ef4444" }}>
+                                <IconMinus size={12} />
+                                {summary.total_deleted_words} removed
+                            </span>
+                            <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full"
+                                style={{ background: "rgba(34,197,94,0.1)", color: "#22c55e" }}>
+                                <IconPlus size={12} />
+                                {summary.total_added_words} added
+                            </span>
+                            <span className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-neutral-600">
+                                <IconArrowsLeftRight size={12} />
+                                {summary.changed_pages.length} pages changed
+                            </span>
+                        </div>
+
+                        <div className="flex-1" />
+
+                        <button
+                            type="button"
+                            onClick={() => setShowHighlights((v) => !v)}
+                            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer"
+                            style={showHighlights
+                                ? { background: ACCENT, borderColor: ACCENT, color: "white" }
+                                : { background: "white", borderColor: "#E0DED9", color: "#8C886B" }
+                            }
+                        >
+                            {showHighlights ? <IconEye size={13} /> : <IconEyeOff size={13} />}
+                            <span>Highlights</span>
+                        </button>
+
+                        <div className="flex items-center gap-1.5">
+                            <button
+                                type="button"
+                                onClick={prevPage}
+                                disabled={pageIndex <= 0}
+                                className="flex items-center justify-center w-8 h-8 rounded-xl border border-[#E0DED9] text-neutral-500 hover:text-brand-dark hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-40"
+                            >
+                                <IconChevronLeft size={15} />
+                            </button>
+                            <span className="text-xs font-bold text-brand-dark min-w-[70px] text-center">
+                                {currentPage} / {diffResult!.summary.total_pages}
+                            </span>
+                            <button
+                                type="button"
+                                onClick={nextPage}
+                                disabled={pageIndex >= totalPages - 1}
+                                className="flex items-center justify-center w-8 h-8 rounded-xl border border-[#E0DED9] text-neutral-500 hover:text-brand-dark hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-40"
+                            >
+                                <IconChevronRight size={15} />
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Full height side-by-side Viewers */}
+                    <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 min-h-0 overflow-hidden bg-[#FAFAF9]">
+                        <PageViewer
+                            pages={pagesA}
+                            currentPage={currentPage}
+                            diffPages={pageList}
+                            highlightType="deletions"
+                            showHighlights={showHighlights}
+                            scrollRef={scrollARef}
+                            onScroll={() => syncScroll("a")}
+                            label="Original Document (File A)"
+                            labelColor="#ef4444"
+                        />
+                        <PageViewer
+                            pages={pagesB}
+                            currentPage={currentPage}
+                            diffPages={pageList}
+                            highlightType="additions"
+                            showHighlights={showHighlights}
+                            scrollRef={scrollBRef}
+                            onScroll={() => syncScroll("b")}
+                            label="Modified Document (File B)"
+                            labelColor="#22c55e"
+                        />
+                    </div>
                 </div>
-
-                <div className="flex-1" />
-
-                <button
-                    type="button"
-                    onClick={() => setShowHighlights((v) => !v)}
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border transition-all cursor-pointer"
-                    style={showHighlights
-                        ? { background: ACCENT, borderColor: ACCENT, color: "white" }
-                        : { background: "white", borderColor: "#E0DED9", color: "#8C886B" }
-                    }
-                >
-                    {showHighlights ? <IconEye size={13} /> : <IconEyeOff size={13} />}
-                    <span>Highlights</span>
-                </button>
-
-                <div className="flex items-center gap-1.5">
-                    <button
-                        type="button"
-                        onClick={prevPage}
-                        disabled={pageIndex <= 0}
-                        className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#E0DED9] text-neutral-500 hover:text-brand-dark hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-40"
-                    >
-                        <IconChevronLeft size={14} />
-                    </button>
-                    <span className="text-xs font-semibold text-brand-dark min-w-[70px] text-center">
-                        {currentPage} / {diffResult!.summary.total_pages}
-                    </span>
-                    <button
-                        type="button"
-                        onClick={nextPage}
-                        disabled={pageIndex >= totalPages - 1}
-                        className="flex items-center justify-center w-7 h-7 rounded-lg border border-[#E0DED9] text-neutral-500 hover:text-brand-dark hover:bg-neutral-100 transition-colors cursor-pointer disabled:opacity-40"
-                    >
-                        <IconChevronRight size={14} />
-                    </button>
-                </div>
-            </div>
-
-            {/* Viewers */}
-            <div className="flex flex-col lg:flex-row gap-4 p-4 h-[650px] overflow-hidden">
-                <PageViewer
-                    pages={pagesA}
-                    currentPage={currentPage}
-                    diffPages={pageList}
-                    highlightType="deletions"
-                    showHighlights={showHighlights}
-                    scrollRef={scrollARef}
-                    onScroll={() => syncScroll("a")}
-                    label="Original"
-                    labelColor="#ef4444"
-                />
-                <PageViewer
-                    pages={pagesB}
-                    currentPage={currentPage}
-                    diffPages={pageList}
-                    highlightType="additions"
-                    showHighlights={showHighlights}
-                    scrollRef={scrollBRef}
-                    onScroll={() => syncScroll("b")}
-                    label="Modified"
-                    labelColor="#22c55e"
-                />
-            </div>
+            </main>
         </div>
     );
 }
