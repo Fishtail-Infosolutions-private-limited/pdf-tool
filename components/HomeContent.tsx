@@ -350,9 +350,6 @@ export default function HomeContent() {
                         transition={{ duration: 0.45 }}
                         className="text-center mb-14"
                     >
-                        <p className="text-xs font-semibold uppercase tracking-widest text-brand-teal mb-3">
-                            Workflow
-                        </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
                             How It Works
                         </h2>
@@ -461,9 +458,6 @@ export default function HomeContent() {
                         transition={{ duration: 0.45 }}
                         className="text-center mb-12"
                     >
-                        <p className="text-xs font-semibold uppercase tracking-widest text-brand-teal mb-3">
-                            FAQ
-                        </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
                             Frequently Asked Questions(FAQs)
                         </h2>
