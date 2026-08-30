@@ -5,24 +5,19 @@ import { useDropzone } from "react-dropzone";
 import {
     IconPencil,
     IconLoader2,
-    IconCheck,
-    IconDownload,
-    IconRefresh,
     IconUpload,
-    IconFileTypePdf,
-    IconTypography,
-    IconX,
-    IconArrowRight,
+    IconFilePlus,
 } from "@tabler/icons-react";
+import Navbar from "@/components/Navbar";
 import FileStore from "@/lib/file-store";
 
 const PdfEditor = dynamic(() => import("@/components/PdfEditor"), {
     ssr: false,
     loading: () => (
-        <div className="flex-1 flex items-center justify-center py-32">
+        <div className="flex-1 flex items-center justify-center py-32 bg-[#FAFAF9]">
             <div className="flex flex-col items-center gap-4">
                 <div className="w-10 h-10 rounded-full border-4 border-brand-teal border-t-transparent animate-spin" />
-                <p className="text-neutral-500 text-sm font-medium">Loading PDF editor…</p>
+                <p className="text-neutral-600 text-sm font-medium">Loading PDF editor…</p>
             </div>
         </div>
     ),
@@ -52,10 +47,28 @@ export default function EditPdfClient() {
         noClick: !!file,
     });
 
+    const handleStartBlank = async () => {
+        try {
+            const { PDFDocument } = await import("pdf-lib");
+            const pdfDoc = await PDFDocument.create();
+            pdfDoc.addPage([595.28, 841.89]); // Standard A4 in points
+            const pdfBytes = await pdfDoc.save();
+            const blankBlob = new Blob([pdfBytes as any], { type: "application/pdf" });
+            const blankFile = new File([blankBlob], "blank_document.pdf", { type: "application/pdf" });
+            setFile(blankFile);
+        } catch (e) {
+            console.error("Failed to create blank PDF:", e);
+        }
+    };
+
+    // When a file is active, render full-screen editor mode without any landing page content underneath
     if (file) {
         return (
-            <div className="w-full">
-                <PdfEditor file={file} setFile={setFile} />
+            <div className="fixed inset-0 z-50 bg-[#FAFAF9] flex flex-col">
+                <Navbar />
+                <main className="flex-1 flex flex-col pt-16 overflow-hidden">
+                    <PdfEditor file={file} setFile={setFile} />
+                </main>
             </div>
         );
     }
@@ -92,6 +105,17 @@ export default function EditPdfClient() {
                     <p className="text-xs text-neutral-500 mt-1">
                         Add text, shapes, highlight, annotate, draw, and sign PDF pages (up to 50MB)
                     </p>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-[#E0DED9] flex items-center justify-center">
+                    <button
+                        type="button"
+                        onClick={handleStartBlank}
+                        className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-600 hover:text-brand-teal px-3 py-1.5 rounded-lg hover:bg-[#FAF9F7] transition-colors cursor-pointer"
+                    >
+                        <IconFilePlus size={16} />
+                        <span>Start with a blank document</span>
+                    </button>
                 </div>
             </div>
         </div>
