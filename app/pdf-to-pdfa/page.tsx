@@ -25,12 +25,15 @@ import {
     IconPencil,
     IconFileTypePdf,
     IconArrowRight,
+    IconAlertTriangle,
+    IconCheck,
+    IconInfoCircle,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
     title: "Convert PDF to PDF/A Online Free – ISO Archival Standard | PDF Maya",
     description:
-        "Convert PDF documents to ISO-compliant PDF/A (1b, 2b, 3b) archival format online for free. Ensure long-term preservation for legal, banking, and government archives with 100% privacy.",
+        "Archive your PDF with the ISO-standardized PDF/A format. Fully compliant for long-term document preservation and legal standards.",
     keywords: [
         "pdf to pdfa",
         "convert pdf to pdf/a",
@@ -38,6 +41,7 @@ export const metadata: Metadata = {
         "iso 19005 pdf",
         "pdfa 1b converter",
         "pdfa 2b converter",
+        "pdfa 3b converter",
         "long term archiving pdf",
         "free online pdf to pdfa",
     ],
@@ -47,7 +51,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: "Convert PDF to PDF/A Online Free – ISO Archival Standard | PDF Maya",
         description:
-            "Convert PDF documents to ISO-compliant PDF/A archival format online for free. Ensure long-term preservation for legal, banking, and government archives.",
+            "Archive your PDF with the ISO-standardized PDF/A format. Fully compliant for long-term document preservation and legal standards.",
         url: "/pdf-to-pdfa",
         siteName: "PDF Maya",
         type: "website",
@@ -56,7 +60,7 @@ export const metadata: Metadata = {
         card: "summary_large_image",
         title: "Convert PDF to PDF/A Online Free | PDF Maya",
         description:
-            "Transform standard PDFs into ISO 19005 compliant PDF/A documents for permanent, long-term archival.",
+            "Archive your PDF with the ISO-standardized PDF/A format. Fully compliant for long-term document preservation and legal standards.",
     },
 };
 
@@ -70,15 +74,63 @@ const HOW_TO_STEPS = [
     {
         step: "02",
         icon: IconSettings,
-        title: "Choose PDF/A Conformance",
-        body: "Select between PDF/A-1b (Universal Legal/Government), PDF/A-2b (Modern Layers), or PDF/A-3b (Data Attachments).",
+        title: "Set Conformance Level",
+        body: "Choose the appropriate archival standard: PDF/A-1b (Universal), PDF/A-2b (Modern Layers), or PDF/A-3b (File Attachments).",
     },
     {
         step: "03",
         icon: IconDownload,
         title: "Download Archival PDF/A",
-        body: "Your ISO-compliant document with embedded font profiles and color intents is ready immediately.",
+        body: "Your ISO-compliant document with embedded font profiles and color OutputIntents is downloaded immediately.",
     },
+];
+
+const CONFORMANCE_PROFILES = [
+    {
+        name: "PDF/A-1b",
+        badge: "Recommended • Most Compatible",
+        iso: "PDF 1.4 : ISO 19005-1:2005",
+        summary: "The widest-supported archival format. Guarantees visual reproduction of the document for long-term archiving. Ideal for legal, government, and regulated industries.",
+        specs: [
+            "Embedded fonts & colour profiles (OutputIntent)",
+            "No JavaScript, encryption, or multimedia",
+            "No external file references or links to resources",
+            "Maximum viewer compatibility (Acrobat 5+)",
+        ],
+    },
+    {
+        name: "PDF/A-2b",
+        badge: "Modern Features",
+        iso: "PDF 1.7 : ISO 19005-2:2011",
+        summary: "Modern ISO standard supporting native transparency, OpenType fonts, JPEG 2000 compression, and layer structures.",
+        specs: [
+            "Supports native transparency and gradient layers",
+            "Embedded OpenType and Unicode font mappings",
+            "JPEG 2000 image compression for crisp photos",
+            "Preserves layer structures and digital signatures",
+        ],
+    },
+    {
+        name: "PDF/A-3b",
+        badge: "File Attachments",
+        iso: "PDF 1.7 : ISO 19005-3:2012",
+        summary: "Allows embedding secondary files (XML invoices, CSV, raw data, CAD drawings) alongside visual PDF pages for hybrid archiving.",
+        specs: [
+            "Embeds XML, CSV, spreadsheets, and CAD drawings",
+            "Standard for ZUGFeRD, Factur-X & electronic invoicing",
+            "Full visual fidelity with machine-readable payloads",
+            "Certified for multi-format archival requirements",
+        ],
+    },
+];
+
+const PERFORMANCE_DISCLAIMERS = [
+    "Interactive JavaScript or form actions will be removed",
+    "Embedded multimedia (video, audio) will be stripped",
+    "External hyperlinks are kept but may not persist forever",
+    "Transparency & gradients may be flattened in PDF/A-1b mode",
+    "Encrypted or password-protected PDFs cannot be converted",
+    "All fonts will be embedded (may slightly increase file size)",
 ];
 
 const FEATURES = [
@@ -151,12 +203,12 @@ const FAQS = [
         a: "Upload your document into the tool above, select your desired PDF/A profile (1b is recommended), and click 'Convert to PDF/A'. Your archival file will download instantly.",
     },
     {
-        q: "Are my sensitive archival documents kept private?",
-        a: "Yes. All file uploads are protected with HTTPS encryption. Documents are processed in isolated sandbox environments and deleted immediately after processing.",
+        q: "What happens to JavaScript and multimedia in PDF/A mode?",
+        a: "Per ISO 19005 standards, all interactive JavaScript, form actions, and embedded video/audio files are removed to ensure the document can be rendered identically in the future without execution risks.",
     },
     {
-        q: "Will the text and formatting change during conversion?",
-        a: "No. The document's visual appearance is locked in with embedded fonts and device-independent color management.",
+        q: "Are my sensitive archival documents kept private?",
+        a: "Yes. All file uploads are protected with HTTPS encryption. Documents are processed in isolated sandbox environments and deleted immediately after processing.",
     },
     {
         q: "Are there any watermarks added to the PDF/A file?",
@@ -179,7 +231,7 @@ export default function PdfToPdfaPage() {
         "@type": "WebApplication",
         name: "PDF to PDF/A Converter - PDF Maya",
         url: "https://pdfmaya.com/pdf-to-pdfa",
-        description: "Convert PDF documents to ISO-compliant PDF/A archival format online for free.",
+        description: "Archive your PDF with the ISO-standardized PDF/A format. Fully compliant for long-term document preservation and legal standards.",
         applicationCategory: "UtilityApplication",
         operatingSystem: "All",
         offers: {
@@ -261,7 +313,7 @@ export default function PdfToPdfaPage() {
 
                     {/* Subtitle */}
                     <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Convert PDF documents into ISO-standardized PDF/A format for long-term electronic document archiving and legal compliance.
+                        Archive your PDF with the ISO-standardized PDF/A format. Fully compliant for long-term document preservation and legal standards.
                     </p>
 
                     {/* Full-Width File Upload Card */}
@@ -275,7 +327,87 @@ export default function PdfToPdfaPage() {
                 WRITTEN CONTENT BELOW HERO UPLOADER
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: PDF/A Conformance Standards & Specifications ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="text-center max-w-3xl mx-auto mb-14">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Set Conformance Level
+                            </h2>
+                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
+                                Choose the appropriate archival standard for your requirements.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {CONFORMANCE_PROFILES.map((p) => (
+                                <div
+                                    key={p.name}
+                                    className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col justify-between gap-6 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
+                                >
+                                    <div>
+                                        <div className="inline-block px-2.5 py-1 text-xs font-bold rounded-lg bg-brand-teal/10 text-brand-teal border border-brand-teal/20 mb-3">
+                                            {p.badge}
+                                        </div>
+                                        <h3 className="text-2xl font-bold text-brand-dark tracking-tight">
+                                            {p.name}
+                                        </h3>
+                                        <p className="text-xs font-semibold text-brand-teal mt-0.5">
+                                            {p.iso}
+                                        </p>
+                                        <p className="text-sm text-neutral-600 leading-relaxed mt-3">
+                                            {p.summary}
+                                        </p>
+                                    </div>
+
+                                    <div className="pt-4 border-t border-[#E0DED9] flex flex-col gap-2">
+                                        <p className="text-xs font-bold text-brand-dark uppercase tracking-wider">
+                                            {p.name} Specifications:
+                                        </p>
+                                        {p.specs.map((item, idx) => (
+                                            <div key={idx} className="flex items-start gap-2 text-xs text-neutral-600">
+                                                <span className="shrink-0 w-4 h-4 rounded-full bg-[#e6f4ef] text-brand-teal flex items-center justify-center mt-0.5">
+                                                    <IconCheck size={11} stroke={3} />
+                                                </span>
+                                                <span>{item}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Important Performance Disclaimers ── */}
+                <section className="py-16 md:py-20 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-4xl mx-auto bg-white rounded-3xl border border-[#fef3c7] p-8 md:p-10 shadow-xs">
+                        <div className="flex items-center gap-3 text-[#92400e] mb-4">
+                            <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#fef3c7] text-[#d97706] border border-[#fde68a]">
+                                <IconAlertTriangle size={22} stroke={2} />
+                            </span>
+                            <div>
+                                <h2 className="text-xl md:text-2xl font-bold text-brand-dark">
+                                    Important Performance Disclaimers
+                                </h2>
+                                <p className="text-xs sm:text-sm text-neutral-500 mt-0.5">
+                                    Strict ISO archival compliance modifies document features as follows:
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-6">
+                            {PERFORMANCE_DISCLAIMERS.map((disc, idx) => (
+                                <div key={idx} className="flex items-start gap-3 p-3.5 rounded-xl bg-[#FAFAF9] border border-[#E0DED9] text-xs sm:text-sm text-neutral-700">
+                                    <span className="w-2 h-2 rounded-full bg-[#d97706] mt-1.5 shrink-0" />
+                                    <span className="leading-snug">{disc}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 3: How It Works (3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
@@ -316,7 +448,7 @@ export default function PdfToPdfaPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
+                {/* ── SECTION 4: Key Features & Benefits ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
@@ -352,7 +484,7 @@ export default function PdfToPdfaPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 5: Common Use Cases ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
@@ -388,7 +520,7 @@ export default function PdfToPdfaPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 6: Frequently Asked Questions ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -421,7 +553,7 @@ export default function PdfToPdfaPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
