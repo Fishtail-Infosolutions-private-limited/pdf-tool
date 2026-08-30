@@ -150,8 +150,6 @@ export default function ExtractImagesPage() {
 
         setFileName(file.name.replace(/\.pdf$/i, ""));
 
-        const toastId = toast.loading("Searching for embedded images…");
-
         const formData = new FormData();
         formData.append("file", file, file.name);
 
@@ -169,16 +167,14 @@ export default function ExtractImagesPage() {
             .then((data: { images: ExtractedImage[]; total: number }) => {
                 if (data.total === 0) {
                     setNoImages(true);
-                    toast("No embedded images found in this PDF.", { id: toastId, icon: "🔍" });
                 } else {
                     setImages(data.images);
-                    toast.success(`Found ${data.total} image${data.total !== 1 ? "s" : ""}!`, { id: toastId });
                 }
             })
             .catch((err) => {
                 console.error(err);
                 setError(err.message || "Failed to extract images.");
-                toast.error(err.message || "Failed to extract images.", { id: toastId });
+                toast.error(err.message || "Failed to extract images.");
             })
             .finally(() => setLoading(false));
     }, []);
@@ -196,10 +192,10 @@ export default function ExtractImagesPage() {
     const clearAll = () => setSelected(new Set());
     const allSelected = images.length > 0 && selected.size === images.length;
 
-    const downloadImage = (item: ExtractedImage) => (async () => {
-        downloadDataUrl(item.dataUrl, item.name);
-        toast.success(`Downloaded ${item.name}`);
-    })();
+    const downloadImage = (img: ExtractedImage) => {
+        downloadDataUrl(img.dataUrl, img.name);
+        toast.success(`Downloaded ${img.name}`);
+    };
 
     const downloadSelected = async () => {
         if (selected.size === 0) {
@@ -248,7 +244,7 @@ export default function ExtractImagesPage() {
     };
 
     return (
-        <div className="h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--brand-white)" }}>
+        <div className="h-screen flex flex-col relative overflow-hidden bg-[#FAFAF9]">
             <Navbar />
 
             <div aria-hidden className="pointer-events-none absolute inset-0"

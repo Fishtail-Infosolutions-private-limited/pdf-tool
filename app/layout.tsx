@@ -98,7 +98,7 @@ export default function RootLayout({
           <FingerprintProvider>
             {children}
             <Toaster
-              position="top-center"
+              position="top-right"
               toastOptions={{
                 style: {
                   background: "#ffffff",

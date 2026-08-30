@@ -145,8 +145,6 @@ export default function ConvertPagesToJpgPage() {
 
         setFileName(file.name.replace(/\.pdf$/i, ""));
 
-        const toastId = toast.loading("Rendering PDF pages…");
-
         const formData = new FormData();
         formData.append("file", file, file.name);
 
@@ -163,12 +161,11 @@ export default function ConvertPagesToJpgPage() {
             })
             .then((data: { pages: PageItem[]; total: number }) => {
                 setPages(data.pages);
-                toast.success(`Loaded ${data.total} page${data.total !== 1 ? "s" : ""}`, { id: toastId });
             })
             .catch((err) => {
                 console.error(err);
                 setError(err.message || "Failed to render pages.");
-                toast.error(err.message || "Failed to render pages.", { id: toastId });
+                toast.error(err.message || "Failed to render pages.");
             })
             .finally(() => setLoading(false));
     }, []);
@@ -238,15 +235,15 @@ export default function ConvertPagesToJpgPage() {
     };
 
     return (
-        <div className="h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--brand-white)" }}>
+        <div className="h-screen flex flex-col relative overflow-hidden bg-[#FAFAF9]">
             <Navbar />
 
             {/* Background */}
             <div aria-hidden className="pointer-events-none absolute inset-0"
                 style={{
-                    backgroundImage: "radial-gradient(circle, #8C886B 1px, transparent 1px)",
+                    backgroundImage: "radial-gradient(circle, #047C58 1px, transparent 1px)",
                     backgroundSize: "32px 32px",
-                    opacity: 0.05,
+                    opacity: 0.04,
                 }}
             />
 
@@ -256,19 +253,19 @@ export default function ConvertPagesToJpgPage() {
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => router.push("/pdf-to-jpg")}
-                            className="flex items-center gap-1.5 text-sm font-medium text-brand-sage hover:text-brand-dark hover:bg-slate-100 px-3 py-1.5 rounded-lg -ml-3 transition-colors cursor-pointer"
+                            className="flex items-center gap-1.5 text-sm font-bold text-neutral-600 hover:text-brand-dark px-3 py-1.5 rounded-xl border border-[#E0DED9] bg-white hover:bg-[#FAF9F7] transition-all cursor-pointer shadow-2xs"
                         >
                             <IconArrowLeft size={16} />
                             Back
                         </button>
-                        <div className="w-px h-5 bg-slate-200" />
+                        <div className="w-px h-5 bg-[#E0DED9]" />
                         <div className="flex items-center gap-3">
-                            <span className="flex items-center justify-center w-10 h-10 rounded-xl text-white" style={{ background: "#EAB308" }}>
+                            <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#fef3c7] text-[#d97706] border border-[#fde68a]">
                                 <IconPhoto size={20} stroke={1.5} />
                             </span>
                             <div>
                                 <h1 className="text-xl font-bold text-brand-dark leading-tight">Convert Pages to JPG</h1>
-                                <p className="text-xs text-brand-sage">{fileName}</p>
+                                <p className="text-xs text-neutral-500">{fileName}</p>
                             </div>
                         </div>
                     </div>
@@ -302,7 +299,7 @@ export default function ConvertPagesToJpgPage() {
 
                             <button
                                 onClick={downloadAll}
-                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-slate-200 bg-white text-sm font-medium text-brand-dark hover:bg-slate-50 transition-all cursor-pointer shadow-sm active:scale-[0.98]"
+                                className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-[#E0DED9] bg-white text-sm font-semibold text-brand-dark hover:bg-[#FAF9F7] transition-all cursor-pointer shadow-2xs active:scale-[0.98]"
                             >
                                 <IconPackage size={15} />
                                 Download All
@@ -315,19 +312,19 @@ export default function ConvertPagesToJpgPage() {
                     {/* States */}
                     {loading && (
                         <div className="flex flex-col items-center justify-center py-32 gap-4">
-                            <IconLoader2 size={40} className="animate-spin text-[#EAB308]" />
-                            <p className="text-brand-sage font-medium">Rendering your PDF pages…</p>
-                            <p className="text-sm text-brand-sage opacity-70">This may take a moment for large files</p>
+                            <IconLoader2 size={40} className="animate-spin text-brand-teal" />
+                            <p className="text-brand-dark font-bold text-base">Rendering your PDF pages…</p>
+                            <p className="text-xs text-neutral-500">This may take a moment for large files</p>
                         </div>
                     )}
 
                     {!loading && error && (
                         <div className="flex flex-col items-center justify-center py-32 gap-4 text-center">
-                            <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-500 text-3xl">✗</div>
-                            <p className="font-semibold text-brand-dark">{error}</p>
+                            <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] text-2xl font-bold">✗</div>
+                            <p className="font-semibold text-brand-dark text-sm sm:text-base">{error}</p>
                             <button
                                 onClick={() => router.push("/pdf-to-jpg")}
-                                className="mt-2 px-8 py-3 rounded-xl bg-white text-black font-medium hover:bg-slate-50 transition-all cursor-pointer shadow-md"
+                                className="mt-2 px-8 py-3 rounded-xl bg-brand-teal text-white font-bold hover:bg-[#036649] transition-all cursor-pointer shadow-sm text-sm"
                             >
                                 Upload Another PDF
                             </button>
@@ -341,13 +338,13 @@ export default function ConvertPagesToJpgPage() {
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-yellow-50 border border-yellow-200 text-sm font-medium text-yellow-800"
+                                    className="mb-5 flex items-center gap-3 px-4 py-3 rounded-xl bg-[#e6f4ef] border border-[#bce0d5] text-sm font-medium text-brand-teal"
                                 >
-                                    <IconCheck size={16} className="text-yellow-600" />
+                                    <IconCheck size={16} className="text-brand-teal" />
                                     {selected.size} page{selected.size !== 1 ? "s" : ""} selected
                                     <button
                                         onClick={clearAll}
-                                        className="ml-auto text-yellow-600 hover:text-yellow-800 underline text-xs cursor-pointer"
+                                        className="ml-auto text-brand-teal hover:underline text-xs cursor-pointer font-bold"
                                     >
                                         Clear
                                     </button>
