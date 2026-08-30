@@ -329,12 +329,12 @@ function SplitPdfConvertContent() {
     // ── Loading screen ──
     if (isLoading || !file || pages.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col" style={{ background: "var(--brand-white)" }}>
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
                         <IconLoader2 size={36} className="animate-spin text-[#F97316]" />
-                        <p className="text-brand-sage text-sm font-medium">Reading PDF pages…</p>
+                        <p className="text-neutral-500 text-sm font-medium">Reading PDF pages…</p>
                     </div>
                 </main>
             </div>
@@ -344,27 +344,31 @@ function SplitPdfConvertContent() {
     // ── Success screen ──
     if (success) {
         return (
-            <div className="min-h-screen flex flex-col" style={{ background: "var(--brand-white)" }}>
+            <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
                 <Navbar />
-                <main className="flex-1 flex items-center justify-center py-24">
-                    <div className="flex flex-col items-center text-center gap-5 animate-in fade-in zoom-in duration-300">
-                        <span className="flex items-center justify-center w-20 h-20 rounded-full bg-orange-100 text-[#F97316]">
-                            <IconCheck size={40} stroke={2} />
+                <main className="flex-1 flex items-center justify-center py-24 px-4">
+                    <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-[#E0DED9] w-full max-w-lg flex flex-col items-center text-center gap-5 animate-in fade-in zoom-in duration-300">
+                        <span className="flex items-center justify-center w-20 h-20 rounded-2xl bg-orange-50 text-[#F97316] border border-orange-200">
+                            <IconCheck size={40} stroke={2.5} />
                         </span>
-                        <h1 className="text-2xl font-bold text-brand-dark">PDF Processed!</h1>
-                        <p className="text-brand-sage max-w-sm">Your document has been successfully split and downloaded.</p>
-                        <div className="flex gap-3 mt-2">
+                        <div>
+                            <h1 className="text-2xl font-bold text-brand-dark">PDF Processed!</h1>
+                            <p className="text-neutral-600 mt-2 text-sm max-w-sm leading-relaxed">
+                                Your document has been successfully split and downloaded.
+                            </p>
+                        </div>
+                        <div className="flex flex-col sm:flex-row gap-3 w-full mt-2">
                             <button
                                 onClick={() => { setSuccess(false); router.push("/split-pdf"); }}
-                                className="px-6 py-3 rounded-xl bg-white text-brand-dark font-semibold border border-slate-200 hover:bg-slate-50 transition-all cursor-pointer shadow-sm"
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-white text-brand-dark font-semibold border border-[#E0DED9] hover:bg-[#FAF9F7] transition-all cursor-pointer shadow-2xs text-sm"
                             >
-                                Start over
+                                Start Over
                             </button>
                             <button
                                 onClick={() => setSuccess(false)}
-                                className="px-6 py-3 rounded-xl bg-[#F97316] text-white font-semibold hover:bg-[#ea580c] transition-all cursor-pointer shadow-md"
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-[#F97316] text-white font-bold hover:bg-[#ea580c] transition-all cursor-pointer shadow-sm text-sm"
                             >
-                                Back to editing
+                                Back to Editing
                             </button>
                         </div>
                     </div>
@@ -374,7 +378,7 @@ function SplitPdfConvertContent() {
     }
 
     return (
-        <div className="h-screen flex flex-col relative overflow-hidden" style={{ background: "var(--brand-white)" }}>
+        <div className="h-screen flex flex-col relative overflow-hidden bg-[#FAFAF9]">
             <Navbar />
 
             {/* Dot background */}

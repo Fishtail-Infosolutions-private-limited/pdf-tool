@@ -656,7 +656,7 @@ export interface PdfRange {
 export async function splitPdf(file: File, ranges: PdfRange[], mergeAll: boolean = false): Promise<Uint8Array | Uint8Array[]> {
     const { PDFDocument } = await import("pdf-lib");
     const arrayBuffer = await file.arrayBuffer();
-    const pdf = await PDFDocument.load(arrayBuffer);
+    const pdf = await PDFDocument.load(arrayBuffer, { ignoreEncryption: true });
     const totalPages = pdf.getPageCount();
 
     if (mergeAll) {
