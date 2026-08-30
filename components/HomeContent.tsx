@@ -29,7 +29,6 @@ const CAPABILITIES = [
         title: "PDF Converter",
         description:
             "Convert documents between PDF and popular file formats with a fast, browser-based pdf converter. Turn PDFs into editable documents or convert Word, Excel, PowerPoint, and images into PDF files.",
-        note: "Popular tools: PDF to Word, Word to PDF, PDF to JPG, JPG to PDF, and PPT to PDF.",
         icon: IconArrowsRightLeft,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -45,7 +44,6 @@ const CAPABILITIES = [
         title: "PDF Editor",
         description:
             "Make changes to your documents directly in your browser with a simple pdf editor. Add text, images, shapes, annotations, page numbers, and other elements without rebuilding the original document.",
-        note: "Use it when you need to make quick corrections or prepare a PDF for sharing.",
         icon: IconPencil,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -60,7 +58,6 @@ const CAPABILITIES = [
         title: "PDF Tools for Every Document Task",
         description:
             "Find the right pdf tool for everyday document work. Merge files, split documents, extract pages, compress PDFs, repair damaged files, run OCR, and organize pages from one online workspace.",
-        note: "Choose a tool, upload your document, and download the finished file when processing is complete.",
         icon: IconStack,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -75,7 +72,6 @@ const CAPABILITIES = [
         title: "Convert Files to PDF",
         description:
             "Turn everyday documents and images into PDF files while keeping your workflow simple. Convert Word documents, spreadsheets, presentations, and images into a format that is easy to share, store, and submit.",
-        note: "Use convert word to pdf, Excel to PDF, PowerPoint to PDF, or image to PDF when you need a reliable final document.",
         icon: IconFileArrowRight,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -90,7 +86,6 @@ const CAPABILITIES = [
         title: "Convert PDF to Other Formats",
         description:
             "Need information from a PDF in another format? Convert your document into editable or shareable files depending on what you need to do next.",
-        note: "Use pdf to word for editable documents, pdf to jpg or pdf to png for images, and PDF to other supported formats without installing additional software.",
         icon: IconFileWord,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -105,7 +100,6 @@ const CAPABILITIES = [
         title: "Compress and Organise PDFs",
         description:
             "Keep large documents easier to share and manage. Compress PDF files to reduce unnecessary file size, or organise pages by merging, splitting, extracting, removing, rotating, and rearranging them.",
-        note: "For larger documents, use a pdf splitter when you need to separate specific pages into individual files.",
         icon: IconLayersSubtract,
         accent: "#047C58",
         bg: "#e6f4ef",
@@ -292,7 +286,7 @@ export default function HomeContent() {
                         </p>
                     </motion.div>
 
-                    {/* 6 Capabilities Cards Grid */}
+                    {/* 6 Capabilities Cards Grid (Clean, Minimal & Modern) */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {CAPABILITIES.map((cap, i) => {
                             const Icon = cap.icon;
@@ -320,16 +314,10 @@ export default function HomeContent() {
                                         <p className="text-sm text-neutral-600 leading-relaxed">
                                             {cap.description}
                                         </p>
-
-                                        {cap.note && (
-                                            <p className="text-xs text-neutral-500 font-medium leading-relaxed bg-white p-3 rounded-xl border border-[#E0DED9]/80">
-                                                {cap.note}
-                                            </p>
-                                        )}
                                     </div>
 
-                                    {/* Tool Links */}
-                                    <div className="mt-6 pt-4 border-t border-[#E0DED9]">
+                                    {/* Direct Tool Links */}
+                                    <div className="mt-6 pt-5 border-t border-[#E0DED9]">
                                         <div className="flex flex-wrap gap-2">
                                             {cap.tools.map((tool) => (
                                                 <Link
@@ -473,6 +461,9 @@ export default function HomeContent() {
                         transition={{ duration: 0.45 }}
                         className="text-center mb-12"
                     >
+                        <p className="text-xs font-semibold uppercase tracking-widest text-brand-teal mb-3">
+                            FAQ
+                        </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
                             Frequently Asked Questions(FAQs)
                         </h2>
