@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react";
 import { downloadBlob, downloadZip, pdfToImages, splitPdf, PdfRange } from "@/lib/pdf-utils";
 import FileStore from "@/lib/file-store";
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function uid() {
@@ -128,7 +129,6 @@ function SplitPdfConvertContent() {
         pdfToImages(f, "image/jpeg", 1)
             .then((renderedPages) => {
                 setPages(renderedPages);
-                // Setup default single custom range to span first page, or user can edit
                 if (renderedPages.length > 0) {
                     setCustomRanges([{ id: uid(), startRaw: "", endRaw: "" }]);
                 }
@@ -153,11 +153,8 @@ function SplitPdfConvertContent() {
         return parseToRanges(extractInput, totalPages);
     }, [extractInput, totalPages]);
 
-    // Validate extractInput: must only contain digits, commas, hyphens, spaces;
-    // each token must be a valid page number or range within 1..totalPages
     const extractError = useMemo(() => {
         if (!extractInput.trim()) return null;
-        // Check for invalid characters
         if (/[^0-9,\- ]/.test(extractInput)) return "Only numbers, commas and hyphens are allowed (e.g. 1, 3, 5-8)";
         const parts = extractInput.split(",");
         for (let raw of parts) {
@@ -181,7 +178,6 @@ function SplitPdfConvertContent() {
     }, [extractInput, totalPages]);
 
     const handleGridPageClick = (pageNum: number) => {
-        // In split-by-range mode: page clicks do nothing (avoids accidental range resets)
         if (topMode === "split") return;
 
         if (topMode === "extract") {
@@ -205,7 +201,6 @@ function SplitPdfConvertContent() {
     };
 
     const updateRange = (id: string, field: "startRaw" | "endRaw", val: string) => {
-        // Only accept digit characters (or empty string to allow clearing)
         const cleaned = val.replace(/[^0-9]/g, "");
         setCustomRanges(
             customRanges.map((r) =>
@@ -214,7 +209,6 @@ function SplitPdfConvertContent() {
         );
     };
 
-    // Derived validity for each range — used for red highlight & button state
     const rangeValidity = customRanges.map((r) => {
         const s = parseInt(r.startRaw, 10);
         const e = parseInt(r.endRaw, 10);
@@ -226,7 +220,6 @@ function SplitPdfConvertContent() {
 
     const allRangesValid = rangeValidity.every((rv) => rv.valid);
 
-    // Fixed mode: parse fixedSizeRaw and derive groups for the preview
     const fixedSizeParsed = parseInt(fixedSizeRaw, 10);
     const fixedSizeValid = !isNaN(fixedSizeParsed) && fixedSizeParsed >= 1 && fixedSizeParsed <= totalPages;
     const fixedGroups: { start: number; end: number }[] = fixedSizeValid
@@ -256,7 +249,6 @@ function SplitPdfConvertContent() {
                 rangesToProcess = rangeValidity.map(rv => ({ start: rv.s, end: rv.e }));
                 shouldMergeAll = mergeRanges;
             } else {
-                // Fixed sizes
                 if (!fixedSizeValid) {
                     setError("Please enter a valid page size for fixed split.");
                     return;
@@ -265,7 +257,6 @@ function SplitPdfConvertContent() {
                 shouldMergeAll = false;
             }
         } else {
-            // Extract — Use preserved ranges from input parts
             rangesToProcess = extractRanges;
             if (rangesToProcess.length === 0) {
                 setError("Please select at least 1 page to extract.");
@@ -287,17 +278,15 @@ function SplitPdfConvertContent() {
             const baseName = file.name.replace(/\.[^/.]+$/, "");
 
             if (shouldMergeAll || rangesToProcess.length === 1) {
-                // Single PDF blob
                 const pdfBytes = Array.isArray(output) ? output[0] : output;
-                const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
+                const blob = new Blob([new Uint8Array(pdfBytes).buffer], { type: "application/pdf" });
                 downloadBlob(blob, topMode === "extract" ? `${baseName}-extracted.pdf` : `${baseName}-split.pdf`);
             } else {
-                // Return ZIP of PDFs
                 const itemsToZip = (output as Uint8Array[]).map((bytes, i) => {
                     const r = rangesToProcess[i];
                     return {
                         name: `${baseName}-${r.start === r.end ? r.start : `${r.start}-${r.end}`}.pdf`,
-                        data: new Blob([bytes as any], { type: "application/pdf" })
+                        data: new Blob([new Uint8Array(bytes).buffer], { type: "application/pdf" })
                     };
                 });
                 await downloadZip(itemsToZip, `${baseName}-split.zip`);
@@ -311,20 +300,17 @@ function SplitPdfConvertContent() {
         }
     };
 
-    // Evaluate if a page is selected in extract mode
     const isPageHighlighted = (pageNum: number) => {
         if (topMode === "extract") return selectedPagesSet.has(pageNum);
         if (topMode === "split") {
             if (splitMode === "custom") {
                 return rangeValidity.some(rv => rv.valid && pageNum >= rv.s && pageNum <= rv.e);
             } else {
-                // In fixed mode, everything is conceptually chosen for a split. 
                 return true;
             }
         }
         return false;
     };
-
 
     // ── Loading screen ──
     if (isLoading || !file || pages.length === 0) {
@@ -333,7 +319,7 @@ function SplitPdfConvertContent() {
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
-                        <IconLoader2 size={36} className="animate-spin text-[#F97316]" />
+                        <IconLoader2 size={36} className="animate-spin text-brand-teal" />
                         <p className="text-neutral-500 text-sm font-medium">Reading PDF pages…</p>
                     </div>
                 </main>
@@ -348,7 +334,7 @@ function SplitPdfConvertContent() {
                 <Navbar />
                 <main className="flex-1 flex items-center justify-center py-24 px-4">
                     <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-sm border border-[#E0DED9] w-full max-w-lg flex flex-col items-center text-center gap-5 animate-in fade-in zoom-in duration-300">
-                        <span className="flex items-center justify-center w-20 h-20 rounded-2xl bg-orange-50 text-[#F97316] border border-orange-200">
+                        <span className="flex items-center justify-center w-20 h-20 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
                             <IconCheck size={40} stroke={2.5} />
                         </span>
                         <div>
@@ -366,7 +352,7 @@ function SplitPdfConvertContent() {
                             </button>
                             <button
                                 onClick={() => setSuccess(false)}
-                                className="flex-1 py-3.5 px-5 rounded-xl bg-[#F97316] text-white font-bold hover:bg-[#ea580c] transition-all cursor-pointer shadow-sm text-sm"
+                                className="flex-1 py-3.5 px-5 rounded-xl bg-brand-teal text-white font-bold hover:bg-[#036649] transition-all cursor-pointer shadow-sm text-sm"
                             >
                                 Back to Editing
                             </button>
@@ -384,56 +370,54 @@ function SplitPdfConvertContent() {
             {/* Dot background */}
             <div aria-hidden className="pointer-events-none absolute inset-0"
                 style={{
-                    backgroundImage: "radial-gradient(circle, #F97316 1px, transparent 1px)",
+                    backgroundImage: "radial-gradient(circle, #047C58 1px, transparent 1px)",
                     backgroundSize: "32px 32px",
-                    opacity: 0.05,
+                    opacity: 0.04,
                 }}
             />
 
             <main className="flex-1 max-w-7xl mx-auto px-4 md:px-8 w-full pt-24 pb-6 relative z-10 flex flex-col lg:flex-row gap-6 min-h-0">
 
-                {/* ── Header details (Visible small mostly, but part of structural flow) ── */}
+                {/* ── Header details (Mobile) ── */}
                 <div className="w-full lg:hidden flex items-center gap-2 mb-2 shrink-0">
                     <button
                         onClick={() => router.push("/split-pdf")}
                         aria-label="Back"
-                        className="flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-brand-sage hover:text-brand-dark hover:bg-slate-100 transition-colors cursor-pointer active:scale-[0.97]"
+                        className="flex items-center justify-center w-8 h-8 shrink-0 rounded-lg text-neutral-500 hover:text-brand-dark hover:bg-neutral-100 transition-colors cursor-pointer active:scale-[0.97]"
                     >
                         <IconArrowLeft size={18} />
                     </button>
                     <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="flex items-center justify-center w-8 h-8 rounded-lg text-white shrink-0 bg-[#F97316]">
+                        <span className="flex items-center justify-center w-8 h-8 rounded-lg text-brand-teal shrink-0 bg-[#e6f4ef] border border-[#bce0d5]">
                             <IconScissors size={16} stroke={1.5} />
                         </span>
                         <div className="min-w-0">
                             <h1 className="text-sm font-bold text-brand-dark leading-tight truncate">Split PDF</h1>
-                            <p className="text-[10px] text-brand-sage leading-tight truncate">{file.name} ({totalPages} pages)</p>
+                            <p className="text-[10px] text-neutral-500 leading-tight truncate">{file.name} ({totalPages} pages)</p>
                         </div>
                     </div>
                 </div>
 
                 {/* ── Left Grid / Range Preview Area ── */}
-                {/* Fixed mode: show range-group visual preview */}
                 {topMode === "split" && splitMode === "fixed" ? (
-                    <div className="flex-1 min-w-0 bg-white border border-border rounded-2xl flex flex-col shadow-sm overflow-hidden">
-                        <div className="hidden lg:flex items-center gap-4 px-5 py-4 border-b border-slate-100 bg-white z-10 shrink-0">
-                            <button onClick={() => router.push("/split-pdf")} className="flex items-center justify-center w-10 h-10 rounded-xl text-brand-sage hover:text-brand-dark hover:bg-slate-100 transition-colors cursor-pointer">
+                    <div className="flex-1 min-w-0 bg-white border border-[#E0DED9] rounded-2xl flex flex-col shadow-sm overflow-hidden">
+                        <div className="hidden lg:flex items-center gap-4 px-5 py-4 border-b border-[#E0DED9] bg-white z-10 shrink-0">
+                            <button onClick={() => router.push("/split-pdf")} className="flex items-center justify-center w-10 h-10 rounded-xl text-neutral-500 hover:text-brand-dark hover:bg-[#FAF9F7] transition-colors cursor-pointer">
                                 <IconArrowLeft size={20} />
                             </button>
                             <div>
                                 <h1 className="text-xl font-bold text-brand-dark">Split PDF</h1>
-                                <p className="text-xs text-brand-sage">{file.name} • {totalPages} pages</p>
+                                <p className="text-xs text-neutral-500">{file.name} • {totalPages} pages</p>
                             </div>
                         </div>
 
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-5">
-
                             {!fixedSizeValid ? (
                                 <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
-                                    <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center">
-                                        <IconScissors size={28} className="text-slate-300" />
+                                    <div className="w-14 h-14 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center">
+                                        <IconScissors size={28} className="text-neutral-400" />
                                     </div>
-                                    <p className="text-brand-sage text-sm font-medium">Enter a page size on the right<br />to preview how the PDF will be split</p>
+                                    <p className="text-neutral-500 text-sm font-medium">Enter a page size on the right<br />to preview how the PDF will be split</p>
                                 </div>
                             ) : (
                                 <div className="flex flex-wrap gap-6">
@@ -449,30 +433,27 @@ function SplitPdfConvertContent() {
                                                 transition={{ duration: 0.25, delay: gi * 0.05 }}
                                                 className="flex flex-col gap-2"
                                             >
-                                                <span className="text-xs font-bold text-brand-sage text-center">Range {gi + 1}</span>
-                                                <div className="flex items-center gap-2 border-2 border-dashed border-[#F97316]/40 rounded-2xl p-3 bg-orange-50/20">
-                                                    {/* First page */}
+                                                <span className="text-xs font-bold text-neutral-500 text-center">Range {gi + 1}</span>
+                                                <div className="flex items-center gap-2 border-2 border-dashed border-brand-teal/40 rounded-2xl p-3 bg-[#e6f4ef]/20">
                                                     {firstPage && (
                                                         <div className="flex flex-col items-center gap-1.5">
-                                                            <div className="w-20 h-28 rounded-xl overflow-hidden border-2 border-[#F97316]/30 bg-white shadow-sm flex items-center justify-center p-1">
+                                                            <div className="w-20 h-28 rounded-xl overflow-hidden border-2 border-brand-teal/30 bg-white shadow-sm flex items-center justify-center p-1">
                                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                                 <img src={firstPage.dataUrl} alt={`Page ${grp.start}`} className="max-w-full max-h-full object-contain" />
                                                             </div>
-                                                            <span className="text-[11px] font-bold text-[#F97316]">{grp.start}</span>
+                                                            <span className="text-[11px] font-bold text-brand-teal">{grp.start}</span>
                                                         </div>
                                                     )}
-                                                    {/* Ellipsis */}
                                                     {hasMiddle && (
-                                                        <span className="text-slate-400 font-bold text-lg tracking-widest px-1 select-none">•••</span>
+                                                        <span className="text-neutral-400 font-bold text-lg tracking-widest px-1 select-none">•••</span>
                                                     )}
-                                                    {/* Last page */}
                                                     {lastPage && (
                                                         <div className="flex flex-col items-center gap-1.5">
-                                                            <div className="w-20 h-28 rounded-xl overflow-hidden border-2 border-[#F97316]/30 bg-white shadow-sm flex items-center justify-center p-1">
+                                                            <div className="w-20 h-28 rounded-xl overflow-hidden border-2 border-brand-teal/30 bg-white shadow-sm flex items-center justify-center p-1">
                                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                                 <img src={lastPage.dataUrl} alt={`Page ${grp.end}`} className="max-w-full max-h-full object-contain" />
                                                             </div>
-                                                            <span className="text-[11px] font-bold text-[#F97316]">{grp.end}</span>
+                                                            <span className="text-[11px] font-bold text-brand-teal">{grp.end}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -484,14 +465,14 @@ function SplitPdfConvertContent() {
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 min-w-0 bg-white border border-border rounded-2xl flex flex-col shadow-sm overflow-hidden">
-                        <div className="hidden lg:flex items-center gap-4 px-5 py-4 border-b border-slate-100 bg-white z-10 shrink-0">
-                            <button onClick={() => router.push("/split-pdf")} className="flex items-center justify-center w-10 h-10 rounded-xl text-brand-sage hover:text-brand-dark hover:bg-slate-100 transition-colors cursor-pointer">
+                    <div className="flex-1 min-w-0 bg-white border border-[#E0DED9] rounded-2xl flex flex-col shadow-sm overflow-hidden">
+                        <div className="hidden lg:flex items-center gap-4 px-5 py-4 border-b border-[#E0DED9] bg-white z-10 shrink-0">
+                            <button onClick={() => router.push("/split-pdf")} className="flex items-center justify-center w-10 h-10 rounded-xl text-neutral-500 hover:text-brand-dark hover:bg-[#FAF9F7] transition-colors cursor-pointer">
                                 <IconArrowLeft size={20} />
                             </button>
                             <div>
                                 <h1 className="text-xl font-bold text-brand-dark">Split PDF</h1>
-                                <p className="text-xs text-brand-sage">{file.name} • {totalPages} pages</p>
+                                <p className="text-xs text-neutral-500">{file.name} • {totalPages} pages</p>
                             </div>
                         </div>
 
@@ -507,23 +488,22 @@ function SplitPdfConvertContent() {
                                             animate={{ opacity: 1, scale: 1 }}
                                             transition={{ duration: 0.2 }}
                                             onClick={() => handleGridPageClick(p.pageNum)}
-                                            className={`relative flex flex-col items-center gap-2 group ${topMode === "extract" ? "cursor-pointer" : "cursor-default"
-                                                }`}
+                                            className={`relative flex flex-col items-center gap-2 group ${topMode === "extract" ? "cursor-pointer" : "cursor-default"}`}
                                             title={topMode === "extract" ? "Click to select" : undefined}
                                         >
-                                            <div className={`relative w-full aspect-3/4 rounded-xl overflow-hidden border-2 transition-all p-2 bg-[#f9f9f9] shadow-sm flex items-center justify-center
-                                                ${selected ? "border-[#F97316] shadow-md ring-2 ring-[#F97316]/20 bg-orange-50/10" : "border-slate-200 hover:border-slate-300"}`}
+                                            <div className={`relative w-full aspect-3/4 rounded-xl overflow-hidden border-2 transition-all p-2 bg-[#FAFAF9] shadow-2xs flex items-center justify-center
+                                                ${selected ? "border-brand-teal shadow-sm ring-2 ring-brand-teal/20 bg-[#e6f4ef]/20" : "border-[#E0DED9] hover:border-neutral-400"}`}
                                             >
                                                 {topMode === "extract" && (
                                                     <div className={`absolute top-2 right-2 w-5 h-5 rounded-md border-2 flex items-center justify-center z-10 transition-colors
-                                                        ${selected ? "bg-[#F97316] border-[#F97316] text-white" : "border-slate-300 bg-white/80 opacity-0 group-hover:opacity-100"}`}>
+                                                        ${selected ? "bg-brand-teal border-brand-teal text-white" : "border-[#E0DED9] bg-white/90 opacity-0 group-hover:opacity-100"}`}>
                                                         {selected && <IconCheck size={14} stroke={3} />}
                                                     </div>
                                                 )}
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={p.dataUrl} alt={`Page ${p.pageNum}`} className="max-w-full max-h-full object-contain pointer-events-none drop-shadow-sm" />
+                                                <img src={p.dataUrl} alt={`Page ${p.pageNum}`} className="max-w-full max-h-full object-contain pointer-events-none drop-shadow-2xs" />
                                             </div>
-                                            <span className={`text-xs font-semibold px-2 py-1 rounded-md transition-colors ${selected ? "bg-[#F97316] text-white" : "text-brand-sage bg-slate-100 group-hover:bg-slate-200"}`}>
+                                            <span className={`text-xs font-semibold px-2 py-1 rounded-md transition-colors ${selected ? "bg-brand-teal text-white" : "text-neutral-500 bg-[#FAFAF9] border border-[#E0DED9] group-hover:bg-[#FAF9F7]"}`}>
                                                 Page {p.pageNum}
                                             </span>
                                         </motion.div>
@@ -537,7 +517,7 @@ function SplitPdfConvertContent() {
                 {/* ── Mobile FAB ── */}
                 <button
                     onClick={() => setIsMobileDrawerOpen(true)}
-                    className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-[#F97316] text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:bg-[#ea580c] transition-all border-2 border-white active:scale-95"
+                    className="lg:hidden fixed bottom-6 right-6 w-14 h-14 bg-brand-teal text-white rounded-full shadow-2xl flex items-center justify-center z-40 hover:bg-[#036649] transition-all border-2 border-white active:scale-95 cursor-pointer"
                     aria-label="Settings"
                 >
                     <IconSettings size={28} stroke={1.5} />
@@ -567,19 +547,19 @@ function SplitPdfConvertContent() {
                         <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
                     </div>
 
-                    <div className="bg-white lg:rounded-2xl lg:border lg:border-border lg:shadow-sm flex flex-col gap-0 overflow-y-auto custom-scrollbar flex-1 pb-8 lg:pb-0">
+                    <div className="bg-white lg:rounded-2xl lg:border lg:border-[#E0DED9] lg:shadow-sm flex flex-col gap-0 overflow-y-auto custom-scrollbar flex-1 pb-8 lg:pb-0">
 
                         {/* Top Mode Tabs */}
-                        <div className="flex border-b border-border">
+                        <div className="flex border-b border-[#E0DED9]">
                             <button
                                 onClick={() => setTopMode("split")}
-                                className={`flex-1 py-4 text-sm font-bold border-b-2 transition-colors ${topMode === "split" ? "border-[#F97316] text-[#F97316] bg-orange-50/30" : "border-transparent text-brand-sage hover:text-brand-dark hover:bg-slate-50"}`}
+                                className={`flex-1 py-4 text-sm font-bold border-b-2 transition-colors cursor-pointer ${topMode === "split" ? "border-brand-teal text-brand-teal bg-[#e6f4ef]/30" : "border-transparent text-neutral-500 hover:text-brand-dark hover:bg-[#FAFAF9]"}`}
                             >
                                 Split by range
                             </button>
                             <button
                                 onClick={() => setTopMode("extract")}
-                                className={`flex-1 py-4 text-sm font-bold border-b-2 transition-colors ${topMode === "extract" ? "border-[#F97316] text-[#F97316] bg-orange-50/30" : "border-transparent text-brand-sage hover:text-brand-dark hover:bg-slate-50"}`}
+                                className={`flex-1 py-4 text-sm font-bold border-b-2 transition-colors cursor-pointer ${topMode === "extract" ? "border-brand-teal text-brand-teal bg-[#e6f4ef]/30" : "border-transparent text-neutral-500 hover:text-brand-dark hover:bg-[#FAFAF9]"}`}
                             >
                                 Extract pages
                             </button>
@@ -591,14 +571,14 @@ function SplitPdfConvertContent() {
                                 <>
                                     <div className="flex items-center justify-between">
                                         <h2 className="text-sm font-bold text-brand-dark flex items-center gap-2">
-                                            <IconFileTypePdf size={18} className="text-[#F97316]" />
+                                            <IconFileTypePdf size={18} className="text-brand-teal" />
                                             Range mode:
                                         </h2>
                                     </div>
 
-                                    <div className="flex bg-slate-100 rounded-lg p-1">
-                                        <button onClick={() => setSplitMode("custom")} className={`flex-1 py-1.5 text-sm font-semibold rounded-md transition-all ${splitMode === "custom" ? "bg-white shadow-sm border border-slate-200 text-[#F97316]" : "text-brand-sage border border-transparent"}`}>Custom</button>
-                                        <button onClick={() => setSplitMode("fixed")} className={`flex-1 py-1.5 text-sm font-semibold rounded-md transition-all ${splitMode === "fixed" ? "bg-white shadow-sm border border-slate-200 text-[#F97316]" : "text-brand-sage border border-transparent"}`}>Fixed</button>
+                                    <div className="flex bg-[#FAFAF9] border border-[#E0DED9] rounded-xl p-1">
+                                        <button onClick={() => setSplitMode("custom")} className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-all cursor-pointer ${splitMode === "custom" ? "bg-white shadow-2xs border border-[#E0DED9] text-brand-teal" : "text-neutral-500 border border-transparent"}`}>Custom</button>
+                                        <button onClick={() => setSplitMode("fixed")} className={`flex-1 py-1.5 text-sm font-bold rounded-lg transition-all cursor-pointer ${splitMode === "fixed" ? "bg-white shadow-2xs border border-[#E0DED9] text-brand-teal" : "text-neutral-500 border border-transparent"}`}>Fixed</button>
                                     </div>
 
                                     {splitMode === "custom" ? (
@@ -612,20 +592,20 @@ function SplitPdfConvertContent() {
                                                             initial={{ opacity: 0, height: 0 }}
                                                             animate={{ opacity: 1, height: "auto" }}
                                                             exit={{ opacity: 0, height: 0, overflow: 'hidden' }}
-                                                            className="bg-slate-50 p-3 rounded-xl border border-slate-200"
+                                                            className="bg-[#FAFAF9] p-3 rounded-xl border border-[#E0DED9]"
                                                         >
                                                             <div className="flex items-center justify-between mb-3">
                                                                 <span className="text-xs font-bold text-brand-dark">Range {i + 1}</span>
                                                                 {customRanges.length > 1 && (
-                                                                    <button onClick={() => deleteRange(range.id)} className="text-brand-sage hover:text-red-500 transition-colors w-5 h-5 flex items-center justify-center rounded-md hover:bg-red-50">
+                                                                    <button onClick={() => deleteRange(range.id)} className="text-neutral-400 hover:text-red-500 transition-colors w-5 h-5 flex items-center justify-center rounded-md hover:bg-red-50 cursor-pointer">
                                                                         <IconX size={14} stroke={2.5} />
                                                                     </button>
                                                                 )}
                                                             </div>
                                                             <div className="flex items-center gap-2">
                                                                 {/* from page */}
-                                                                <div className={`flex-1 bg-white border rounded-lg flex items-center overflow-hidden transition-colors ${!validity.startOk && range.startRaw !== "" ? "border-red-400 ring-1 ring-red-400" : "border-slate-200 focus-within:border-[#F97316] focus-within:ring-1 focus-within:ring-[#F97316]"}`}>
-                                                                    <span className="text-[10px] text-brand-sage pl-2 pr-1 py-2.5 select-none shrink-0 whitespace-nowrap">from</span>
+                                                                <div className={`flex-1 bg-white border rounded-lg flex items-center overflow-hidden transition-colors ${!validity.startOk && range.startRaw !== "" ? "border-red-400 ring-1 ring-red-400" : "border-[#E0DED9] focus-within:border-brand-teal focus-within:ring-1 focus-within:ring-brand-teal"}`}>
+                                                                    <span className="text-[10px] text-neutral-500 pl-2 pr-1 py-2.5 select-none shrink-0 whitespace-nowrap">from</span>
                                                                     <input
                                                                         inputMode="numeric"
                                                                         pattern="[0-9]*"
@@ -634,18 +614,18 @@ function SplitPdfConvertContent() {
                                                                         onChange={(e) => updateRange(range.id, 'startRaw', e.target.value)}
                                                                         className={`flex-1 text-sm font-semibold outline-none py-2.5 pr-2 text-right bg-transparent min-w-0 ${!validity.startOk && range.startRaw !== "" ? "text-red-500" : "text-brand-dark"}`}
                                                                     />
-                                                                    <div className="flex flex-col border-l border-slate-200 shrink-0">
-                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.startRaw || "0", 10); const next = cur + 1; if (next <= totalPages) updateRange(range.id, 'startRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-orange-50 hover:text-[#F97316] text-slate-400 border-b border-slate-200 transition-colors active:bg-orange-100">
+                                                                    <div className="flex flex-col border-l border-[#E0DED9] shrink-0">
+                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.startRaw || "0", 10); const next = cur + 1; if (next <= totalPages) updateRange(range.id, 'startRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-[#e6f4ef] hover:text-brand-teal text-neutral-400 border-b border-[#E0DED9] transition-colors cursor-pointer">
                                                                             <svg width="7" height="5" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                                                         </button>
-                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.startRaw || "2", 10); const next = cur - 1; if (next >= 1) updateRange(range.id, 'startRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-orange-50 hover:text-[#F97316] text-slate-400 transition-colors active:bg-orange-100">
+                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.startRaw || "2", 10); const next = cur - 1; if (next >= 1) updateRange(range.id, 'startRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-[#e6f4ef] hover:text-brand-teal text-neutral-400 transition-colors cursor-pointer">
                                                                             <svg width="7" height="5" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                                                         </button>
                                                                     </div>
                                                                 </div>
                                                                 {/* to page */}
-                                                                <div className={`flex-1 bg-white border rounded-lg flex items-center overflow-hidden transition-colors ${(!validity.endOk && range.endRaw !== "") || (!validity.orderOk && range.startRaw !== "" && range.endRaw !== "") ? "border-red-400 ring-1 ring-red-400" : "border-slate-200 focus-within:border-[#F97316] focus-within:ring-1 focus-within:ring-[#F97316]"}`}>
-                                                                    <span className="text-[10px] text-brand-sage pl-2 pr-1 py-2.5 select-none shrink-0">to</span>
+                                                                <div className={`flex-1 bg-white border rounded-lg flex items-center overflow-hidden transition-colors ${(!validity.endOk && range.endRaw !== "") || (!validity.orderOk && range.startRaw !== "" && range.endRaw !== "") ? "border-red-400 ring-1 ring-red-400" : "border-[#E0DED9] focus-within:border-brand-teal focus-within:ring-1 focus-within:ring-brand-teal"}`}>
+                                                                    <span className="text-[10px] text-neutral-500 pl-2 pr-1 py-2.5 select-none shrink-0">to</span>
                                                                     <input
                                                                         inputMode="numeric"
                                                                         pattern="[0-9]*"
@@ -654,18 +634,17 @@ function SplitPdfConvertContent() {
                                                                         onChange={(e) => updateRange(range.id, 'endRaw', e.target.value)}
                                                                         className={`flex-1 text-sm font-semibold outline-none py-2.5 pr-2 text-right bg-transparent min-w-0 ${(!validity.endOk && range.endRaw !== "") || (!validity.orderOk && range.startRaw !== "" && range.endRaw !== "") ? "text-red-500" : "text-brand-dark"}`}
                                                                     />
-                                                                    <div className="flex flex-col border-l border-slate-200 shrink-0">
-                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.endRaw || "0", 10); const next = cur + 1; if (next <= totalPages) updateRange(range.id, 'endRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-orange-50 hover:text-[#F97316] text-slate-400 border-b border-slate-200 transition-colors active:bg-orange-100">
+                                                                    <div className="flex flex-col border-l border-[#E0DED9] shrink-0">
+                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.endRaw || "0", 10); const next = cur + 1; if (next <= totalPages) updateRange(range.id, 'endRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-[#e6f4ef] hover:text-brand-teal text-neutral-400 border-b border-[#E0DED9] transition-colors cursor-pointer">
                                                                             <svg width="7" height="5" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                                                         </button>
-                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.endRaw || "2", 10); const next = cur - 1; if (next >= 1) updateRange(range.id, 'endRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-orange-50 hover:text-[#F97316] text-slate-400 transition-colors active:bg-orange-100">
+                                                                        <button type="button" onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(range.endRaw || "2", 10); const next = cur - 1; if (next >= 1) updateRange(range.id, 'endRaw', String(next)); }} className="flex items-center justify-center w-7 h-5 hover:bg-[#e6f4ef] hover:text-brand-teal text-neutral-400 transition-colors cursor-pointer">
                                                                             <svg width="7" height="5" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                                                                         </button>
                                                                     </div>
                                                                 </div>
                                                             </div>
 
-                                                            {/* inline hint when order is wrong */}
                                                             {!validity.orderOk && validity.startOk && validity.endOk && (
                                                                 <p className="text-[10px] text-red-500 mt-1.5 font-medium">"From" must be ≤ "To"</p>
                                                             )}
@@ -675,15 +654,15 @@ function SplitPdfConvertContent() {
                                             </AnimatePresence>
                                             <button
                                                 onClick={addRange}
-                                                className="mt-1 flex items-center justify-center w-full py-2.5 rounded-xl border border-dashed border-[#F97316] text-[#F97316] hover:bg-orange-50 transition-colors text-sm font-semibold gap-1.5"
+                                                className="mt-1 flex items-center justify-center w-full py-2.5 rounded-xl border border-dashed border-brand-teal text-brand-teal hover:bg-[#e6f4ef] transition-colors text-sm font-bold gap-1.5 cursor-pointer"
                                             >
                                                 <IconPlus size={16} stroke={2} /> Add Range
                                             </button>
 
                                             <div className="mt-4 px-1 flex flex-col gap-1">
                                                 <div className="flex items-center justify-between text-xs">
-                                                    <span className="text-brand-sage font-medium">Files to be generated:</span>
-                                                    <span className="text-brand-dark font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
+                                                    <span className="text-neutral-500 font-medium">Files to be generated:</span>
+                                                    <span className="text-brand-teal font-bold bg-[#e6f4ef] px-2 py-0.5 rounded border border-[#bce0d5]">
                                                         {allRangesValid ? (mergeRanges ? 1 : customRanges.length) : 0} PDF file{(allRangesValid ? (mergeRanges ? 1 : customRanges.length) : 0) !== 1 ? 's' : ''}
                                                     </span>
                                                 </div>
@@ -691,30 +670,28 @@ function SplitPdfConvertContent() {
                                         </div>
                                     ) : (
                                         /* ── Fixed mode input ── */
-                                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                            <p className="text-xs text-brand-sage mb-3 font-medium leading-relaxed">
+                                        <div className="bg-[#FAFAF9] p-4 rounded-xl border border-[#E0DED9]">
+                                            <p className="text-xs text-neutral-500 mb-3 font-medium leading-relaxed">
                                                 Split the PDF into chunks of <strong>N pages</strong> each. A preview will appear on the left.
                                             </p>
                                             <div className={`bg-white border rounded-xl flex items-center overflow-hidden transition-colors ${fixedSizeRaw !== "" && !fixedSizeValid
                                                 ? "border-red-400 ring-1 ring-red-400"
-                                                : "border-slate-200 focus-within:border-[#F97316] focus-within:ring-1 focus-within:ring-[#F97316]"
+                                                : "border-[#E0DED9] focus-within:border-brand-teal focus-within:ring-1 focus-within:ring-brand-teal"
                                                 }`}>
-                                                <span className="text-[11px] text-brand-sage pl-3 pr-2 py-3 select-none shrink-0 whitespace-nowrap">pages per chunk</span>
+                                                <span className="text-[11px] text-neutral-500 pl-3 pr-2 py-3 select-none shrink-0 whitespace-nowrap">pages per chunk</span>
                                                 <input
                                                     inputMode="numeric"
                                                     pattern="[0-9]*"
                                                     placeholder="—"
                                                     value={fixedSizeRaw}
                                                     onChange={(e) => setFixedSizeRaw(e.target.value.replace(/[^0-9]/g, ""))}
-                                                    className={`flex-1 text-base font-semibold outline-none py-3 pr-2 text-right bg-transparent min-w-0 ${fixedSizeRaw !== "" && !fixedSizeValid ? "text-red-500" : "text-brand-dark"
-                                                        }`}
+                                                    className={`flex-1 text-base font-semibold outline-none py-3 pr-2 text-right bg-transparent min-w-0 ${fixedSizeRaw !== "" && !fixedSizeValid ? "text-red-500" : "text-brand-dark"}`}
                                                 />
-                                                {/* Custom ▲▼ steppers */}
-                                                <div className="flex flex-col border-l border-slate-200 shrink-0">
+                                                <div className="flex flex-col border-l border-[#E0DED9] shrink-0">
                                                     <button
                                                         type="button"
                                                         onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(fixedSizeRaw || "0", 10); const next = cur + 1; if (next <= totalPages) setFixedSizeRaw(String(next)); }}
-                                                        className="flex items-center justify-center w-8 h-5 hover:bg-orange-50 hover:text-[#F97316] text-slate-400 transition-colors border-b border-slate-200 active:bg-orange-100"
+                                                        className="flex items-center justify-center w-8 h-5 hover:bg-[#e6f4ef] hover:text-brand-teal text-neutral-400 transition-colors border-b border-[#E0DED9] cursor-pointer"
                                                         aria-label="Increase"
                                                     >
                                                         <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 5L5 1L9 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -722,7 +699,7 @@ function SplitPdfConvertContent() {
                                                     <button
                                                         type="button"
                                                         onMouseDown={(e) => { e.preventDefault(); const cur = parseInt(fixedSizeRaw || "2", 10); const next = cur - 1; if (next >= 1) setFixedSizeRaw(String(next)); }}
-                                                        className="flex items-center justify-center w-8 h-5 hover:bg-orange-50 hover:text-[#F97316] text-slate-400 transition-colors active:bg-orange-100"
+                                                        className="flex items-center justify-center w-8 h-5 hover:bg-[#e6f4ef] hover:text-brand-teal text-neutral-400 transition-colors cursor-pointer"
                                                         aria-label="Decrease"
                                                     >
                                                         <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
@@ -734,8 +711,8 @@ function SplitPdfConvertContent() {
                                             )}
                                             <div className="mt-4 flex flex-col gap-1">
                                                 <div className="flex items-center justify-between text-xs">
-                                                    <span className="text-brand-sage font-medium">Files to be generated:</span>
-                                                    <span className="text-brand-dark font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
+                                                    <span className="text-neutral-500 font-medium">Files to be generated:</span>
+                                                    <span className="text-brand-teal font-bold bg-[#e6f4ef] px-2 py-0.5 rounded border border-[#bce0d5]">
                                                         {fixedSizeValid ? fixedGroups.length : 0} PDF file{(fixedSizeValid ? fixedGroups.length : 0) !== 1 ? 's' : ''}
                                                     </span>
                                                 </div>
@@ -744,9 +721,9 @@ function SplitPdfConvertContent() {
                                     )}
 
                                     {splitMode === "custom" && (
-                                        <label className="flex items-center gap-3 mt-2 cursor-pointer p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                                        <label className="flex items-center gap-3 mt-2 cursor-pointer p-2 rounded-lg hover:bg-[#FAFAF9] transition-colors">
                                             <div
-                                                className={`relative rounded-full transition-colors duration-200 border-2 ${mergeRanges ? "bg-[#F97316] border-[#F97316]" : "bg-slate-200 border-slate-200"}`}
+                                                className={`relative rounded-full transition-colors duration-200 border-2 ${mergeRanges ? "bg-brand-teal border-brand-teal" : "bg-slate-200 border-slate-200"}`}
                                                 onClick={() => setMergeRanges((v) => !v)}
                                                 style={{ height: "22px", width: "40px", flexShrink: 0 }}
                                             >
@@ -763,26 +740,25 @@ function SplitPdfConvertContent() {
                                 <>
                                     <div className="flex flex-col gap-3">
                                         <h2 className="text-sm font-bold text-brand-dark flex items-center gap-2">
-                                            <IconFileTypePdf size={18} className="text-[#F97316]" />
+                                            <IconFileTypePdf size={18} className="text-brand-teal" />
                                             Pages to Extract:
                                         </h2>
-                                        <p className="text-[13px] text-brand-sage leading-relaxed">
+                                        <p className="text-[13px] text-neutral-500 leading-relaxed">
                                             Select pages you want to extract by clicking them on the left, or type their page numbers below:
                                         </p>
-                                        <div className={`bg-white border rounded-xl px-3 py-1 text-sm flex items-center shadow-sm transition-colors ${extractError
+                                        <div className={`bg-white border rounded-xl px-3 py-1 text-sm flex items-center shadow-2xs transition-colors ${extractError
                                             ? "border-red-400 ring-1 ring-red-400 focus-within:border-red-400 focus-within:ring-red-400"
-                                            : "border-slate-300 focus-within:border-[#F97316] focus-within:ring-1 focus-within:ring-[#F97316]"
+                                            : "border-[#E0DED9] focus-within:border-brand-teal focus-within:ring-1 focus-within:ring-brand-teal"
                                             }`}>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. 1, 3, 5-8"
                                                 value={extractInput}
                                                 onChange={(e) => {
-                                                    // Only allow digits, commas, hyphens, spaces
                                                     const filtered = e.target.value.replace(/[^0-9,\- ]/g, "");
                                                     setExtractInput(filtered);
                                                 }}
-                                                className="w-full py-2.5 outline-none font-medium placeholder:text-slate-300"
+                                                className="w-full py-2.5 outline-none font-medium text-brand-dark placeholder:text-neutral-400"
                                             />
                                         </div>
                                         {extractError ? (
@@ -793,12 +769,12 @@ function SplitPdfConvertContent() {
                                         ) : (
                                             <div className="mt-1 flex flex-col gap-1 px-1">
                                                 <div className="flex items-center justify-between text-xs">
-                                                    <span className="text-brand-sage font-medium">Selected:</span>
+                                                    <span className="text-neutral-500 font-medium">Selected:</span>
                                                     <span className="text-brand-dark font-semibold">{selectedPagesSet.size} page{selectedPagesSet.size !== 1 ? 's' : ''}</span>
                                                 </div>
                                                 <div className="flex items-center justify-between text-xs">
-                                                    <span className="text-brand-sage font-medium">Files to be generated:</span>
-                                                    <span className="text-brand-dark font-bold bg-orange-50 px-2 py-0.5 rounded border border-orange-100">
+                                                    <span className="text-neutral-500 font-medium">Files to be generated:</span>
+                                                    <span className="text-brand-teal font-bold bg-[#e6f4ef] px-2 py-0.5 rounded border border-[#bce0d5]">
                                                         {(extractRanges.length > 0 && !extractError) ? (mergeExtracted ? 1 : extractRanges.length) : 0} PDF file{((extractRanges.length > 0 && !extractError) ? (mergeExtracted ? 1 : extractRanges.length) : 0) !== 1 ? 's' : ''}
                                                     </span>
                                                 </div>
@@ -806,9 +782,9 @@ function SplitPdfConvertContent() {
                                         )}
                                     </div>
 
-                                    <label className="flex items-center gap-3 mt-4 cursor-pointer p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                                    <label className="flex items-center gap-3 mt-4 cursor-pointer p-2 rounded-lg hover:bg-[#FAFAF9] transition-colors">
                                         <div
-                                            className={`relative rounded-full transition-colors duration-200 border-2 ${mergeExtracted ? "bg-[#F97316] border-[#F97316]" : "bg-slate-200 border-slate-200"}`}
+                                            className={`relative rounded-full transition-colors duration-200 border-2 ${mergeExtracted ? "bg-brand-teal border-brand-teal" : "bg-slate-200 border-slate-200"}`}
                                             onClick={() => setMergeExtracted((v) => !v)}
                                             style={{ height: "22px", width: "40px", flexShrink: 0 }}
                                         >
@@ -820,7 +796,7 @@ function SplitPdfConvertContent() {
                             )}
 
                             {error && (
-                                <div className="p-3 bg-red-50 text-red-600 text-xs rounded-xl flex items-start gap-2">
+                                <div className="p-3.5 bg-red-50 text-red-700 text-xs rounded-xl flex items-start gap-2 border border-red-200 font-medium">
                                     <span className="w-1.5 h-1.5 mt-1 rounded-full bg-red-500 shrink-0" />
                                     {error}
                                 </div>
@@ -834,13 +810,13 @@ function SplitPdfConvertContent() {
                                     || (topMode === "split" && splitMode === "fixed" && !fixedSizeValid)
                                     || (topMode === "extract" && (!!extractError || selectedPagesSet.size === 0))
                                 }
-                                className={`w-full mt-2 py-3.5 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-md active:scale-[0.98] text-[15px] ${(topMode === "split" && splitMode === "custom" && !allRangesValid)
+                                className={`w-full mt-2 py-4 rounded-xl font-bold text-white transition-all duration-200 flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] text-[15px] ${(topMode === "split" && splitMode === "custom" && !allRangesValid)
                                     || (topMode === "split" && splitMode === "fixed" && !fixedSizeValid)
                                     || (topMode === "extract" && (!!extractError || (extractInput.trim() !== "" && selectedPagesSet.size === 0)))
-                                    ? "bg-red-400 cursor-not-allowed shadow-none"
+                                    ? "bg-brand-teal/40 cursor-not-allowed shadow-none"
                                     : isProcessing
-                                        ? "bg-[#F97316] opacity-50 cursor-wait"
-                                        : "bg-[#F97316] hover:bg-[#ea580c] cursor-pointer"
+                                        ? "bg-brand-teal opacity-60 cursor-wait"
+                                        : "bg-brand-teal hover:bg-[#036649] cursor-pointer"
                                     }`}
                             >
                                 {isProcessing && <IconLoader2 className="animate-spin" size={18} />}
@@ -868,9 +844,8 @@ function SplitPdfConvertContent() {
 
 export default function SplitPdfConvertPage() {
     return (
-        <Suspense fallback={<div className="h-screen bg-brand-white"></div>}>
+        <Suspense fallback={<div className="h-screen bg-[#FAFAF9]"></div>}>
             <SplitPdfConvertContent />
         </Suspense>
     );
 }
-
