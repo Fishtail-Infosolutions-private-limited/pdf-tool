@@ -13,7 +13,6 @@ import {
     IconDeviceLaptop,
     IconSparkles,
     IconMail,
-    IconUpload as IconWebUpload,
     IconDeviceFloppy,
     IconFileDescription,
     IconArrowUpRight,
@@ -23,9 +22,10 @@ import {
     IconPhoto,
     IconArrowsJoin2,
     IconPencil,
-    IconFileTypePdf,
-    IconArrowRight,
+    IconCheck,
+    IconUserCheck,
     IconTrendingDown,
+    IconTrash,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -63,20 +63,17 @@ export const metadata: Metadata = {
 
 const HOW_TO_STEPS = [
     {
-        step: "01",
-        icon: IconUpload,
+        step: "1",
         title: "Upload Your PDF File",
         body: "Select your large PDF document from your device or drag and drop it into the compressor area above.",
     },
     {
-        step: "02",
-        icon: IconSettings,
+        step: "2",
         title: "Choose Compression Level",
         body: "Select from Standard (Recommended), Extreme, or High Quality according to your file size requirements.",
     },
     {
-        step: "03",
-        icon: IconDownload,
+        step: "3",
         title: "Download Compressed PDF",
         body: "Your optimized PDF is generated instantly. Download and check how many MBs you saved with zero quality degradation.",
     },
@@ -85,31 +82,37 @@ const HOW_TO_STEPS = [
 const FEATURES = [
     {
         icon: IconTrendingDown,
+        color: "bg-[#e6f4ef] text-brand-teal",
         title: "Up to 90% File Size Reduction",
         body: "Removes duplicate font structures, flattens unused layers, and compresses heavy graphics down to lightweight sizes.",
     },
     {
         icon: IconSparkles,
+        color: "bg-[#e6f4ea] text-[#107C41]",
         title: "Crisp Text & Vector Preservation",
         body: "Intelligent resampling ensures high-DPI text, vector blueprints, charts, and logos remain clear and readable.",
     },
     {
         icon: IconMail,
+        color: "bg-[#e0ecfc] text-[#185ABD]",
         title: "Email & Web Portal Optimized",
         body: "Easily meet strict 5MB, 10MB, or 25MB attachment limits on Gmail, Outlook, Yahoo, and government portals.",
     },
     {
         icon: IconLayersSubtract,
+        color: "bg-[#fef3c7] text-[#d97706]",
         title: "100% Free with No Watermarks",
         body: "Compress your PDF documents with zero fees, no registration, no advertisements, and no watermarks.",
     },
     {
         icon: IconShieldLock,
+        color: "bg-[#eef2ff] text-[#4f46e5]",
         title: "Encrypted & Automatically Deleted",
         body: "All transmissions are encrypted via SSL/TLS. Files are processed in private memory and deleted immediately.",
     },
     {
         icon: IconDeviceLaptop,
+        color: "bg-[#e0f2fe] text-[#0284c7]",
         title: "Runs on Any Device",
         body: "Compress large e-books, scan bundles, and corporate manuals directly in your browser on Mac, Windows, iOS, and Android.",
     },
@@ -119,22 +122,22 @@ const USE_CASES = [
     {
         icon: IconMail,
         title: "Email Attachments & Inboxes",
-        body: "Avoid bounced emails by reducing oversized PDF attachments below standard 20MB and 25MB gateway thresholds.",
+        desc: "Avoid bounced emails by reducing oversized PDF attachments below standard 20MB and 25MB gateway thresholds.",
     },
     {
-        icon: IconWebUpload,
+        icon: IconFileDescription,
         title: "Job Applications & Visa Portals",
-        body: "Comply with tight 1MB or 2MB resume and document upload limits on government visa, university, and job portals.",
+        desc: "Comply with tight 1MB or 2MB resume and document upload limits on government visa, university, and job portals.",
     },
     {
         icon: IconDeviceFloppy,
         title: "Cloud & Mobile Storage Savings",
-        body: "Free up gigabytes of storage space on your Google Drive, Dropbox, iCloud, and phone storage by compressing archives.",
+        desc: "Free up gigabytes of storage space on your Google Drive, Dropbox, iCloud, and phone storage by compressing archives.",
     },
     {
-        icon: IconFileDescription,
+        icon: IconTrendingDown,
         title: "Client Pitch Handouts & Catalogs",
-        body: "Send snappy, lightweight digital brochures that download in milliseconds on client smartphones and tablets.",
+        desc: "Send snappy, lightweight digital brochures that download in milliseconds on client smartphones and tablets.",
     },
 ];
 
@@ -148,26 +151,26 @@ const FAQS = [
         a: "No. PDF Maya optimizes image data and removes redundant metadata while keeping font vectors and text characters razor sharp.",
     },
     {
-        q: "How much can I reduce my PDF size?",
-        a: "Depending on the number of images and graphics in your PDF, you can typically reduce file size by 50% to 90% using the recommended Standard preset.",
+        q: "How much file size can I expect to save?",
+        a: "Depending on the original file structure (image-heavy vs text-heavy), file size reduction typically ranges from 40% to over 90%.",
     },
     {
-        q: "Are my uploaded PDF documents private and safe?",
-        a: "Yes. All file transfers are secured with SSL/TLS encryption. Documents are processed in isolated sandbox environments and automatically deleted right after your session.",
+        q: "Are my confidential files secure during compression?",
+        a: "Yes. All file uploads and downloads are encrypted via HTTPS. Files are processed on isolated sandboxes and automatically deleted right after compression.",
     },
     {
-        q: "Can I compress multiple files without paying?",
-        a: "Yes. PDF Maya is completely free with no hidden charges, daily quotas, or subscriptions.",
+        q: "Can I compress password-protected PDF files?",
+        a: "You must first unlock password-protected files using our Unlock PDF tool before optimizing and compressing their file size.",
     },
     {
-        q: "Are any watermarks added to my compressed document?",
-        a: "No. PDF Maya never inserts watermarks, branding stamps, or limitations on your output PDF documents.",
+        q: "Is there any software installation required?",
+        a: "No. PDF Maya works 100% online in your web browser without downloading desktop software or plugins.",
     },
 ];
 
 const RELATED_TOOLS = [
     { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
-    { label: "Split PDF", href: "/split-pdf", desc: "Separate PDF pages or extract custom page ranges.", icon: IconLayersSubtract },
+    { label: "Split PDF", href: "/split-pdf", desc: "Extract specific pages or page ranges from a PDF.", icon: IconArrowsJoin2 },
     { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
     { label: "PDF to Excel", href: "/pdf-to-excel", desc: "Extract PDF tables into editable Excel sheets.", icon: IconTable },
     { label: "PDF to JPG", href: "/pdf-to-jpg", desc: "Convert PDF pages to high-resolution images.", icon: IconPhoto },
@@ -194,7 +197,7 @@ export default function CompressPdfPage() {
         "@context": "https://schema.org",
         "@type": "HowTo",
         name: "How to Compress PDF Files Online",
-        description: "Step-by-step guide to reducing PDF file size with PDF Maya.",
+        description: "Step-by-step guide to reducing PDF file sizes with PDF Maya.",
         step: HOW_TO_STEPS.map((s, index) => ({
             "@type": "HowToStep",
             position: index + 1,
@@ -235,13 +238,14 @@ export default function CompressPdfPage() {
 
             {/* ═══════════════════════════════════════════════
                 HERO AREA: Header & Full-Width Upload Section
+                (Preserved intact)
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
                     {/* Format Badge */}
                     <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#7c3aed]">
-                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#ede9fe]">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-brand-teal">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e6f4ef]">
                                 <IconLayersSubtract size={13} stroke={2.5} />
                             </span>
                             <span>Document Optimization</span>
@@ -250,12 +254,12 @@ export default function CompressPdfPage() {
 
                     {/* H1 Heading */}
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
-                        Compress PDF File Size
+                        Compress PDF Online Free
                     </h1>
 
                     {/* Subtitle */}
                     <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Significantly reduce PDF file size while preserving high visual quality and text sharpness. Fast, secure, and completely free.
+                        Reduce PDF file size significantly while retaining maximum visual clarity. Fast, free, and completely secure.
                     </p>
 
                     {/* Full-Width File Upload Card */}
@@ -266,42 +270,64 @@ export default function CompressPdfPage() {
             </header>
 
             {/* ═══════════════════════════════════════════════
-                WRITTEN CONTENT BELOW HERO UPLOADER
+                REFINED CONTENT SECTIONS (Clean, Modern, Open UI)
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: How to Convert (Centered 1, 2, 3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                How to Compress PDF Files Online
+                                How to Compress PDF Files
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Three simple steps to reduce document size without sacrificing clarity.
+                            <p className="text-base text-neutral-600">
+                                Shrink PDF document size in 3 simple steps.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {HOW_TO_STEPS.map((s) => {
-                                const StepIcon = s.icon;
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                            {HOW_TO_STEPS.map((item) => (
+                                <div key={item.step} className="flex flex-col items-center text-center space-y-4">
+                                    <span className="w-12 h-12 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center font-extrabold text-brand-dark text-lg shadow-2xs">
+                                        {item.step}
+                                    </span>
+                                    <h3 className="text-lg font-bold text-brand-dark">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-600 leading-relaxed max-w-xs">
+                                        {item.body}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Feature Matrix (Refined 6-Item Grid, Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                The Best PDF Compressor Online
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                Reduce file size smartly by stripping redundant stream objects while preserving text sharpness and high-res media.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            {FEATURES.map((feature, idx) => {
+                                const FeatureIcon = feature.icon;
                                 return (
-                                    <div
-                                        key={s.step}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <div className="relative">
-                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
-                                                <StepIcon size={26} stroke={1.8} />
-                                            </span>
-                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
-                                                {s.step}
-                                            </span>
+                                    <div key={idx} className="flex flex-col items-center text-center space-y-3.5">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${feature.color}`}>
+                                            <FeatureIcon size={26} stroke={2} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {s.title}
+                                        <h3 className="text-lg font-bold text-brand-dark">
+                                            {feature.title}
                                         </h3>
                                         <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {s.body}
+                                            {feature.body}
                                         </p>
                                     </div>
                                 );
@@ -310,70 +336,105 @@ export default function CompressPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
-                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                Why Compress PDFs with PDF Maya?
-                            </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Intelligent compression algorithms balance maximum MB savings with crystal-clear readability.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {FEATURES.map((f) => {
-                                const FeatureIcon = f.icon;
-                                return (
-                                    <div
-                                        key={f.title}
-                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
-                                            <FeatureIcon size={22} stroke={1.8} />
-                                        </span>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {f.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {f.body}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                When to Use the PDF Compressor
+                                Advanced Compression &amp; Maximum Visual Fidelity
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Perfect for email attachments, online job submissions, government portals, and storage optimization.
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                PDF Maya applies intelligent algorithms to shrink file footprint without compromising read quality.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {USE_CASES.map((uc) => {
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Smart Image Downsampling &amp; Deflation
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Heavy photos and bitmap assets are re-encoded with modern compression, reducing dimensions without introducing visual artifacts.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Redundant Metadata &amp; Font Subsetting
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Strips unused embedded font glyphs, duplicate color profiles, and orphaned objects to maximize byte savings.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Vector &amp; Typography Clarity
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Text character outlines, SVG charts, and vector diagrams remain crisp at any zoom level, ensuring professional print and screen readability.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Fast Multi-Megabyte Processing
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Compress massive 100MB+ document scans, financial presentations, and catalogs in seconds without browser timeouts.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Practical PDF Compression Use Cases
+                            </h2>
+                            <p className="text-base text-neutral-600">
+                                Accelerate everyday document transmission across personal, academic, and business workflows.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div
-                                        key={uc.title}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
-                                    >
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
-                                            <UcIcon size={20} stroke={2} />
-                                        </span>
-                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
-                                            {uc.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {uc.body}
+                                    <div key={idx} className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={20} stroke={2} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-brand-dark">
+                                                {uc.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-13">
+                                            {uc.desc}
                                         </p>
                                     </div>
                                 );
@@ -382,7 +443,64 @@ export default function CompressPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 5: Privacy & Security Trust Strip (Refined & Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Your Documents Stay Private &amp; Secure
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                We prioritize document confidentiality and data security at every stage of the process.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ea] text-[#107C41] border border-[#bfe4cd] flex items-center justify-center shadow-2xs">
+                                    <IconShieldLock size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">256-Bit SSL/TLS</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    All transmissions are secured with end-to-end HTTPS encryption.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] flex items-center justify-center shadow-2xs">
+                                    <IconTrash size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Instant File Deletion</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Uploaded PDFs and compressed files are purged automatically from memory.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5] flex items-center justify-center shadow-2xs">
+                                    <IconUserCheck size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">No Account Needed</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Compress unlimited files without registration, emails, or paywalls.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#c0daf8] flex items-center justify-center shadow-2xs">
+                                    <IconDeviceLaptop size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Universal Support</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Works seamlessly in any browser on macOS, Windows, iOS, and Android.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 6: Frequently Asked Questions ──
+                    (Preserved intact as requested) */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -390,7 +508,7 @@ export default function CompressPdfPage() {
                                 Frequently Asked Questions
                             </h2>
                             <p className="mt-3 text-neutral-600 text-base sm:text-lg">
-                                Everything you need to know about optimizing and reducing PDF file sizes.
+                                Everything you need to know about compressing PDF files.
                             </p>
                         </div>
 
@@ -415,7 +533,7 @@ export default function CompressPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">

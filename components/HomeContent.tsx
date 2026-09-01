@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
@@ -458,7 +458,9 @@ export default function HomeContent() {
                         transition={{ duration: 0.45 }}
                         className="text-center mb-12"
                     >
-                        <h2 className="text-3xl md:text-4xl font-bold text-brand-dark">
+                        <h2 className="text-3xl md:text-4xl font-bold 
+                        
+                        text-brand-dark">
                             Frequently Asked Questions(FAQs)
                         </h2>
                         <p className="mt-3 text-neutral-600 text-base sm:text-lg">

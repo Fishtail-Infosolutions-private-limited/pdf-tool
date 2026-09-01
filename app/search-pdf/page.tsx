@@ -25,6 +25,12 @@ import {
     IconPencil,
     IconFileTypePdf,
     IconArrowRight,
+    IconCheck,
+    IconUserCheck,
+    IconTrash,
+    IconSchool,
+    IconGavel,
+    IconReceipt,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -61,20 +67,17 @@ export const metadata: Metadata = {
 
 const HOW_TO_STEPS = [
     {
-        step: "01",
-        icon: IconUpload,
+        step: "1",
         title: "Upload Your PDF File",
         body: "Select your research paper, manual, or agreement and drop it into the search box above.",
     },
     {
-        step: "02",
-        icon: IconSettings,
+        step: "2",
         title: "Type Any Search Keyword",
         body: "Enter your target query. The engine scans all pages instantly and highlights every exact and partial match.",
     },
     {
-        step: "03",
-        icon: IconArrowsSort,
+        step: "3",
         title: "Jump Between Matches",
         body: "Use previous and next arrows to auto-scroll directly to each match on any page with highlighted markers.",
     },
@@ -83,31 +86,37 @@ const HOW_TO_STEPS = [
 const FEATURES = [
     {
         icon: IconHighlight,
+        color: "bg-[#e0ecfc] text-[#185ABD]",
         title: "Instant Multi-Page Highlighting",
         body: "Highlights every match occurrence in bright yellow across all pages in real time.",
     },
     {
         icon: IconArrowsSort,
+        color: "bg-[#e6f4ea] text-[#107C41]",
         title: "Fast Keyboard Navigation",
         body: "Cycle through search results effortlessly with arrow keys and jump straight to relevant sections.",
     },
     {
         icon: IconFileDescription,
+        color: "bg-[#fef3c7] text-[#d97706]",
         title: "Live Match Counter",
         body: "See exactly how many times a word or phrase appears across the entire document.",
     },
     {
         icon: IconSparkles,
+        color: "bg-[#e6f4ef] text-brand-teal",
         title: "100% Free with No Sign-up",
         body: "Search inside documents of any size with zero registrations, paywalls, or software downloads.",
     },
     {
         icon: IconShieldLock,
+        color: "bg-[#eef2ff] text-[#4f46e5]",
         title: "100% Private Client-Side",
         body: "Your PDF is processed locally in your browser memory and never uploaded or stored on any server.",
     },
     {
         icon: IconDeviceLaptop,
+        color: "bg-[#e0f2fe] text-[#0284c7]",
         title: "Cross-Platform Access",
         body: "Search documents smoothly on iPad, iPhone, Android, macOS, Windows, and Linux browsers.",
     },
@@ -115,24 +124,24 @@ const FEATURES = [
 
 const USE_CASES = [
     {
-        icon: IconFileDescription,
+        icon: IconGavel,
         title: "Legal Agreements & Contracts",
-        body: "Quickly pinpoint termination clauses, indemnity stipulations, and dates inside dense 50+ page legal contracts.",
+        desc: "Quickly pinpoint termination clauses, indemnity stipulations, and dates inside dense 50+ page contracts.",
     },
     {
-        icon: IconSearch,
+        icon: IconSchool,
         title: "Academic Research & Textbooks",
-        body: "Locate author citations, formulas, definitions, and specific index terms without tedious scrolling.",
+        desc: "Locate author citations, formulas, definitions, and specific index terms without tedious manual scrolling.",
     },
     {
-        icon: IconHighlight,
+        icon: IconFileDescription,
         title: "Technical Manuals & Specs",
-        body: "Find part numbers, error codes, and troubleshooting instructions inside huge technical product manuals.",
+        desc: "Find part numbers, error codes, and troubleshooting instructions inside massive technical product manuals.",
     },
     {
-        icon: IconDeviceLaptop,
+        icon: IconReceipt,
         title: "Financial Filings & Reports",
-        body: "Track quarterly earnings disclosures, EBITDA figures, and balance sheet line items in corporate 10-K filings.",
+        desc: "Track quarterly earnings disclosures, EBITDA figures, and balance sheet line items in corporate 10-K filings.",
     },
 ];
 
@@ -150,35 +159,35 @@ const FAQS = [
         a: "If your PDF is a flat image scan without selectable text, use our OCR PDF tool first to add a searchable text layer, then search it.",
     },
     {
-        q: "Can I jump directly to each search result?",
-        a: "Yes! Use the next and previous navigation arrows or press Enter to smoothly auto-scroll straight to each highlighted match.",
+        q: "Can I search case-insensitively or with whole words?",
+        a: "Yes. The search bar supports case-insensitive searches and exact phrase matches across all document pages.",
     },
     {
-        q: "Is there a limit on PDF page count or file size?",
-        a: "PDF Maya can comfortably process and index documents up to 100MB and hundreds of pages in modern web browsers.",
+        q: "Are my confidential files secure during search?",
+        a: "Yes. All processing is strictly client-side within your browser sandbox. No file data or search queries ever leave your machine.",
     },
     {
-        q: "Is any software installation required?",
-        a: "No. Everything works directly in your web browser without installing Adobe Acrobat or browser extensions.",
+        q: "Is there a limit on how large a PDF can be searched?",
+        a: "No. You can search documents containing hundreds of pages swiftly with instant client-side rendering.",
     },
 ];
 
 const RELATED_TOOLS = [
-    { label: "OCR PDF", href: "/ocr-pdf", desc: "Make scanned PDFs selectable and searchable.", icon: IconFileDescription },
+    { label: "OCR PDF", href: "/ocr-pdf", desc: "Make scanned PDFs searchable with optical recognition.", icon: IconSettings },
     { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
-    { label: "PDF to Text", href: "/pdf-to-txt", desc: "Extract raw plain text from PDF documents.", icon: IconFileDescription },
-    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
-    { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
+    { label: "PDF to Text", href: "/pdf-to-txt", desc: "Extract clean plain text from PDF documents.", icon: IconFileDescription },
     { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
+    { label: "Compare PDF", href: "/compare-pdf", desc: "Spot text differences between two PDF versions.", icon: IconArrowsSort },
+    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
 ];
 
 export default function SearchPdfPage() {
     const jsonLdSoftware = {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        name: "Search PDF Tool - PDF Maya",
+        name: "PDF Search Tool - PDF Maya",
         url: "https://pdfmaya.com/search-pdf",
-        description: "Search words and phrases inside PDF documents online for free with instant highlights.",
+        description: "Search words and phrases inside PDF documents online for free with instant highlighting.",
         applicationCategory: "UtilityApplication",
         operatingSystem: "All",
         offers: {
@@ -191,8 +200,8 @@ export default function SearchPdfPage() {
     const jsonLdHowTo = {
         "@context": "https://schema.org",
         "@type": "HowTo",
-        name: "How to Search Words in a PDF Online",
-        description: "Step-by-step guide to finding and highlighting keywords in PDF files with PDF Maya.",
+        name: "How to Search Words in a PDF Document Online",
+        description: "Step-by-step guide to finding text and keywords in PDF files with PDF Maya.",
         step: HOW_TO_STEPS.map((s, index) => ({
             "@type": "HowToStep",
             position: index + 1,
@@ -233,13 +242,14 @@ export default function SearchPdfPage() {
 
             {/* ═══════════════════════════════════════════════
                 HERO AREA: Header & Full-Width Upload Section
+                (Preserved intact)
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
                     {/* Format Badge */}
                     <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#0369a1]">
-                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e0f2fe]">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#185ABD]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e0ecfc]">
                                 <IconSearch size={13} stroke={2.5} />
                             </span>
                             <span>Document Search</span>
@@ -248,12 +258,12 @@ export default function SearchPdfPage() {
 
                     {/* H1 Heading */}
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
-                        Search PDF Online
+                        Search PDF Online Free
                     </h1>
 
                     {/* Subtitle */}
                     <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Instantly search words and phrases across all pages with live multi-page highlights and fast keyword navigation.
+                        Find keywords, sentences, and phrases inside multi-page PDF documents with instant visual highlighting and match counters. 100% private.
                     </p>
 
                     {/* Full-Width File Upload Card */}
@@ -264,42 +274,64 @@ export default function SearchPdfPage() {
             </header>
 
             {/* ═══════════════════════════════════════════════
-                WRITTEN CONTENT BELOW HERO UPLOADER
+                REFINED CONTENT SECTIONS (Clean, Modern, Open UI)
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: How to Convert (Centered 1, 2, 3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                How to Search Words in a PDF Online
+                                How to Search a PDF Document
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Three simple steps to search and highlight any keyword inside your document.
+                            <p className="text-base text-neutral-600">
+                                Find any phrase or keyword across pages in 3 simple steps.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {HOW_TO_STEPS.map((s) => {
-                                const StepIcon = s.icon;
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                            {HOW_TO_STEPS.map((item) => (
+                                <div key={item.step} className="flex flex-col items-center text-center space-y-4">
+                                    <span className="w-12 h-12 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center font-extrabold text-brand-dark text-lg shadow-2xs">
+                                        {item.step}
+                                    </span>
+                                    <h3 className="text-lg font-bold text-brand-dark">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-600 leading-relaxed max-w-xs">
+                                        {item.body}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Feature Matrix (Refined 6-Item Grid, Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                The Best Online PDF Search Tool
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                Client-side multi-page text rendering, live hit counters, instant visual yellow highlights, and quick keyboard navigation.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            {FEATURES.map((feature, idx) => {
+                                const FeatureIcon = feature.icon;
                                 return (
-                                    <div
-                                        key={s.step}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <div className="relative">
-                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
-                                                <StepIcon size={26} stroke={1.8} />
-                                            </span>
-                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
-                                                {s.step}
-                                            </span>
+                                    <div key={idx} className="flex flex-col items-center text-center space-y-3.5">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${feature.color}`}>
+                                            <FeatureIcon size={26} stroke={2} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {s.title}
+                                        <h3 className="text-lg font-bold text-brand-dark">
+                                            {feature.title}
                                         </h3>
                                         <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {s.body}
+                                            {feature.body}
                                         </p>
                                     </div>
                                 );
@@ -308,70 +340,105 @@ export default function SearchPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
-                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                Why Search PDFs with PDF Maya?
-                            </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Blazing-fast client-side search engine with real-time text matching and navigation.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {FEATURES.map((f) => {
-                                const FeatureIcon = f.icon;
-                                return (
-                                    <div
-                                        key={f.title}
-                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
-                                            <FeatureIcon size={22} stroke={1.8} />
-                                        </span>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {f.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {f.body}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                When to Use the PDF Search Tool
+                                Client-Side Parsing &amp; Vector Text Indexing
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Essential for reading contracts, research papers, financial reports, and product guides.
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                PDF Maya tokenizes text layers locally in your browser memory for immediate search query results.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {USE_CASES.map((uc) => {
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Instant Client-Side Text Indexing
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Text streams are tokenized in real time directly within your web browser sandbox for immediate zero-lag search filtering.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Coordinate-Mapped Visual Highlighting
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Every matching keyword is highlighted with high-contrast yellow overlay boxes matching exact vector character bounding boxes.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Zero Data Upload Exposure
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Documents are parsed exclusively in client memory; your search queries and PDF data never touch an external server.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Jump-to-Match Auto Scrolling
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Navigate between matches across hundreds of pages seamlessly with smooth viewport scrolling and active match indicators.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Practical PDF Search Use Cases
+                            </h2>
+                            <p className="text-base text-neutral-600">
+                                Find crucial information rapidly in lengthy legal, financial, and educational documents.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div
-                                        key={uc.title}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
-                                    >
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
-                                            <UcIcon size={20} stroke={2} />
-                                        </span>
-                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
-                                            {uc.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {uc.body}
+                                    <div key={idx} className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={20} stroke={2} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-brand-dark">
+                                                {uc.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-13">
+                                            {uc.desc}
                                         </p>
                                     </div>
                                 );
@@ -380,7 +447,64 @@ export default function SearchPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 5: Privacy & Security Trust Strip (Refined & Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Your Documents Stay Private &amp; Secure
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                We prioritize document confidentiality and data privacy across all search operations.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ea] text-[#107C41] border border-[#bfe4cd] flex items-center justify-center shadow-2xs">
+                                    <IconShieldLock size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">100% Client-Side</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Files are processed in your browser memory and never sent to a server.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] flex items-center justify-center shadow-2xs">
+                                    <IconTrash size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Instant File Deletion</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Memory buffers are purged immediately upon closing or refreshing the tab.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5] flex items-center justify-center shadow-2xs">
+                                    <IconUserCheck size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">No Account Needed</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Search unlimited files without registration, emails, or paywalls.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#c0daf8] flex items-center justify-center shadow-2xs">
+                                    <IconDeviceLaptop size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Universal Support</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Works seamlessly in any browser on macOS, Windows, iOS, and Android.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 6: Frequently Asked Questions ──
+                    (Preserved intact as requested) */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -413,7 +537,7 @@ export default function SearchPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">

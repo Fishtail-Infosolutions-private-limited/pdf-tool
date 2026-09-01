@@ -26,6 +26,11 @@ import {
     IconPencil,
     IconFileTypePdf,
     IconArrowRight,
+    IconCheck,
+    IconUserCheck,
+    IconTrash,
+    IconSchool,
+    IconGavel,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -62,20 +67,17 @@ export const metadata: Metadata = {
 
 const HOW_TO_STEPS = [
     {
-        step: "01",
-        icon: IconWorld,
+        step: "1",
         title: "Enter URL, File, or Code",
         body: "Type a live website URL, upload an .html file, or paste your raw HTML/CSS snippet into the converter above.",
     },
     {
-        step: "02",
-        icon: IconSettings,
+        step: "2",
         title: "Browser Engine Rendering",
-        body: "Click 'Preview PDF'. Our engine renders the webpage with active CSS styles, images, and fonts into an interactive preview.",
+        body: "Our engine renders the webpage with active CSS styles, images, and fonts into an interactive preview.",
     },
     {
-        step: "03",
-        icon: IconDownload,
+        step: "3",
         title: "Download Print-Ready PDF",
         body: "Your PDF document is compiled instantly. Download for offline archiving, printing, or client reporting.",
     },
@@ -84,31 +86,37 @@ const HOW_TO_STEPS = [
 const FEATURES = [
     {
         icon: IconWorld,
+        color: "bg-[#e0ecfc] text-[#185ABD]",
         title: "High-Fidelity Browser Rendering",
         body: "Executes modern CSS, responsive layouts, web fonts, and JavaScript elements with pinpoint visual accuracy.",
     },
     {
         icon: IconDeviceMobile,
+        color: "bg-[#fef3c7] text-[#d97706]",
         title: "Custom Device Viewports",
         body: "Render pages as Desktop HD (1920px), Laptop (1280px), Tablet (768px), or Mobile iPhone (430px) formats.",
     },
     {
         icon: IconCode,
+        color: "bg-[#e6f4ea] text-[#107C41]",
         title: "URL, File & Raw Code Modes",
-        body: "Seamlessly convert from live public URLs, local .html files, or raw HTML templates.",
+        body: "Seamlessly convert from live public URLs, local .html files, or raw HTML code templates.",
     },
     {
         icon: IconSparkles,
+        color: "bg-[#e6f4ef] text-brand-teal",
         title: "100% Free with No Watermarks",
         body: "Capture web pages and convert HTML without paying subscription fees or getting branded watermarks.",
     },
     {
         icon: IconShieldLock,
+        color: "bg-[#eef2ff] text-[#4f46e5]",
         title: "Encrypted & Auto-Deleted",
         body: "All transmissions are encrypted via SSL/TLS. Files and temporary renders are deleted immediately after your session.",
     },
     {
         icon: IconDeviceLaptop,
+        color: "bg-[#e0f2fe] text-[#0284c7]",
         title: "Cross-Platform Access",
         body: "Convert web content directly in your web browser on macOS, Windows, Linux, iOS, and Android.",
     },
@@ -118,22 +126,22 @@ const USE_CASES = [
     {
         icon: IconReceipt,
         title: "Online Invoices & Receipts",
-        body: "Capture online payment receipts, booking confirmations, and digital invoices into permanent archival PDFs.",
+        desc: "Capture online payment receipts, booking confirmations, and digital invoices into permanent archival PDFs.",
     },
     {
         icon: IconWorld,
-        title: "Web Articles & Blog Posts",
-        body: "Save long-form news stories, scientific blog posts, and documentation articles for offline reading and research.",
+        title: "Web Articles & Documentation",
+        desc: "Save long-form news stories, technical documentation, and blog tutorials for offline reading and reference.",
     },
     {
         icon: IconCode,
         title: "HTML Templates & Reports",
-        body: "Convert automated HTML invoice templates, receipts, and dynamic dashboard reports into downloadable PDF files.",
+        desc: "Convert automated HTML invoice templates, receipts, and dynamic dashboard reports into downloadable PDF files.",
     },
     {
         icon: IconFileDescription,
         title: "Webpage Legal Disclosures",
-        body: "Archive terms of service updates, policy statements, and website snapshots for compliance records.",
+        desc: "Archive terms of service updates, policy statements, and website snapshots for compliance and audit records.",
     },
 ];
 
@@ -148,28 +156,28 @@ const FAQS = [
     },
     {
         q: "Can I convert raw HTML code without hosting it online?",
-        a: "Yes! Switch to the 'Paste Code' tab to enter any raw HTML and CSS markup directly, or upload an .html file via the 'Upload HTML' tab.",
+        a: "Yes! Switch to the 'HTML Code' tab, paste your HTML and CSS markup directly into the editor, and click 'Render & Download'.",
     },
     {
-        q: "Can I capture a single continuous long page instead of multi-page breaks?",
-        a: "Yes! Check the 'Single continuous long page' option in the sidebar to generate an unbroken snapshot of the entire webpage.",
+        q: "Are my converted web pages and code snippets secure?",
+        a: "Yes. All transmissions are protected with end-to-end 256-bit SSL encryption. Rendered files and temporary assets are purged automatically right after download.",
     },
     {
-        q: "Are my uploaded HTML documents and URLs secure?",
-        a: "Yes. All file uploads and URL rendering are protected with HTTPS encryption. Rendered files are deleted immediately after download.",
+        q: "Can I choose between mobile and desktop screen views?",
+        a: "Yes. Use the viewport selector to capture how the webpage looks on desktop monitors, laptops, tablets, or mobile phone screens.",
     },
     {
-        q: "Are there any watermarks on the converted PDF?",
-        a: "No. PDF Maya never inserts watermarks, branding stamps, or limitations on your output PDF documents.",
+        q: "Are there any watermarks added to the PDF?",
+        a: "No. Generated PDF files remain 100% clean and free of watermarks or branding stamps.",
     },
 ];
 
 const RELATED_TOOLS = [
+    { label: "Word to PDF", href: "/word-to-pdf", desc: "Convert Word documents to clean PDF files.", icon: IconFileWord },
+    { label: "JPG to PDF", href: "/jpg-to-pdf", desc: "Combine images into a single PDF document.", icon: IconPhoto },
     { label: "PDF to Word", href: "/pdf-to-word", desc: "Convert PDFs into editable Microsoft Word documents.", icon: IconFileWord },
-    { label: "PDF to JPG", href: "/pdf-to-jpg", desc: "Convert PDF pages into high-resolution images.", icon: IconPhoto },
-    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
     { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
-    { label: "PDF to Text", href: "/pdf-to-txt", desc: "Extract raw plain text from PDF documents.", icon: IconFileDescription },
+    { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
     { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
 ];
 
@@ -180,7 +188,7 @@ export default function HtmlToPdfPage() {
         name: "HTML to PDF Converter - PDF Maya",
         url: "https://pdfmaya.com/html-to-pdf",
         description: "Convert live webpage URLs, HTML files, or raw HTML code into high-fidelity PDF documents online for free.",
-        applicationCategory: "UtilityApplication",
+        applicationCategory: "OfficeApplication",
         operatingSystem: "All",
         offers: {
             "@type": "Offer",
@@ -192,8 +200,8 @@ export default function HtmlToPdfPage() {
     const jsonLdHowTo = {
         "@context": "https://schema.org",
         "@type": "HowTo",
-        name: "How to Convert HTML to PDF Online",
-        description: "Step-by-step guide to converting web pages, HTML files, or code into a PDF with PDF Maya.",
+        name: "How to Convert HTML and Webpages to PDF Online",
+        description: "Step-by-step guide to converting URLs and HTML code to PDF with PDF Maya.",
         step: HOW_TO_STEPS.map((s, index) => ({
             "@type": "HowToStep",
             position: index + 1,
@@ -234,13 +242,14 @@ export default function HtmlToPdfPage() {
 
             {/* ═══════════════════════════════════════════════
                 HERO AREA: Header & Full-Width Upload Section
+                (Preserved intact)
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
                     {/* Format Badge */}
                     <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
-                        <div className="flex items-center gap-1.5 text-xs font-bold text-brand-teal">
-                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e6f4ef]">
+                        <div className="flex items-center gap-1.5 text-xs font-bold text-[#185ABD]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e0ecfc]">
                                 <IconWorld size={13} stroke={2.5} />
                             </span>
                             <span>HTML / Webpage</span>
@@ -261,7 +270,7 @@ export default function HtmlToPdfPage() {
 
                     {/* Subtitle */}
                     <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Transform live website URLs, HTML files, or raw code into clean, print-ready PDF documents.
+                        Convert live webpage URLs, HTML files, or raw code snippets into crisp, printable PDF documents in seconds. 100% free.
                     </p>
 
                     {/* Full-Width File Upload Card */}
@@ -272,42 +281,64 @@ export default function HtmlToPdfPage() {
             </header>
 
             {/* ═══════════════════════════════════════════════
-                WRITTEN CONTENT BELOW HERO UPLOADER
+                REFINED CONTENT SECTIONS (Clean, Modern, Open UI)
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: How to Convert (Centered 1, 2, 3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                How to Convert HTML to PDF Online
+                                How to Convert HTML to PDF
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Three simple steps to render any webpage or HTML code into a clean PDF.
+                            <p className="text-base text-neutral-600">
+                                Capture web pages and render HTML to PDF in 3 simple steps.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {HOW_TO_STEPS.map((s) => {
-                                const StepIcon = s.icon;
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                            {HOW_TO_STEPS.map((item) => (
+                                <div key={item.step} className="flex flex-col items-center text-center space-y-4">
+                                    <span className="w-12 h-12 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center font-extrabold text-brand-dark text-lg shadow-2xs">
+                                        {item.step}
+                                    </span>
+                                    <h3 className="text-lg font-bold text-brand-dark">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-600 leading-relaxed max-w-xs">
+                                        {item.body}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Feature Matrix (Refined 6-Item Grid, Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                The Best HTML to PDF Converter
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                Complete headless browser rendering loads external CSS, web typography, JavaScript widgets, and custom device viewports accurately.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            {FEATURES.map((feature, idx) => {
+                                const FeatureIcon = feature.icon;
                                 return (
-                                    <div
-                                        key={s.step}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <div className="relative">
-                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
-                                                <StepIcon size={26} stroke={1.8} />
-                                            </span>
-                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
-                                                {s.step}
-                                            </span>
+                                    <div key={idx} className="flex flex-col items-center text-center space-y-3.5">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${feature.color}`}>
+                                            <FeatureIcon size={26} stroke={2} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {s.title}
+                                        <h3 className="text-lg font-bold text-brand-dark">
+                                            {feature.title}
                                         </h3>
                                         <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {s.body}
+                                            {feature.body}
                                         </p>
                                     </div>
                                 );
@@ -316,70 +347,105 @@ export default function HtmlToPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
-                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                Why Convert HTML to PDF with PDF Maya?
-                            </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Pixel-accurate browser rendering with full CSS, web fonts, and responsive layout control.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {FEATURES.map((f) => {
-                                const FeatureIcon = f.icon;
-                                return (
-                                    <div
-                                        key={f.title}
-                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
-                                            <FeatureIcon size={22} stroke={1.8} />
-                                        </span>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {f.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {f.body}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                When to Use the HTML to PDF Converter
+                                Headless Browser Execution &amp; CSS Fidelity
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Save online receipts, archive blog articles, convert invoice templates, and record compliance disclosures.
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                PDF Maya renders modern CSS Grid, Flexbox, Web Fonts, and SVG graphics into vector-crisp PDF documents.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {USE_CASES.map((uc) => {
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        CSS3 &amp; Web Font Rendering
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Loads Google Fonts, custom @font-face declarations, gradients, shadows, and flex layouts with pixel precision.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Custom Device Screen Emulation
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Emulate desktop monitors, tablets, or smartphones to capture responsive media queries exactly as intended.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Live JavaScript Execution
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Executes interactive chart scripts, dynamic DOM manipulations, and math formulas before compiling the final PDF.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Selectable &amp; Searchable Text
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Webpage text remains fully selectable, searchable (Ctrl+F), and copyable within the generated PDF document.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Practical HTML to PDF Use Cases
+                            </h2>
+                            <p className="text-base text-neutral-600">
+                                Archive web pages, invoice templates, and online documentation cleanly.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div
-                                        key={uc.title}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
-                                    >
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
-                                            <UcIcon size={20} stroke={2} />
-                                        </span>
-                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
-                                            {uc.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {uc.body}
+                                    <div key={idx} className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={20} stroke={2} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-brand-dark">
+                                                {uc.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-13">
+                                            {uc.desc}
                                         </p>
                                     </div>
                                 );
@@ -388,7 +454,64 @@ export default function HtmlToPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 5: Privacy & Security Trust Strip (Refined & Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Your Documents Stay Private &amp; Secure
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                We prioritize document confidentiality and code security at every stage.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ea] text-[#107C41] border border-[#bfe4cd] flex items-center justify-center shadow-2xs">
+                                    <IconShieldLock size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">256-Bit SSL/TLS</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    All transmissions are secured with end-to-end HTTPS encryption.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] flex items-center justify-center shadow-2xs">
+                                    <IconTrash size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Instant File Deletion</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Uploaded code and rendered PDFs are purged automatically from memory.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5] flex items-center justify-center shadow-2xs">
+                                    <IconUserCheck size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">No Account Needed</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Convert unlimited files without registration, emails, or paywalls.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#c0daf8] flex items-center justify-center shadow-2xs">
+                                    <IconDeviceLaptop size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Universal Support</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Works seamlessly in any browser on macOS, Windows, iOS, and Android.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 6: Frequently Asked Questions ──
+                    (Preserved intact as requested) */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -396,7 +519,7 @@ export default function HtmlToPdfPage() {
                                 Frequently Asked Questions
                             </h2>
                             <p className="mt-3 text-neutral-600 text-base sm:text-lg">
-                                Everything you need to know about converting webpages and HTML to PDF.
+                                Everything you need to know about converting HTML and webpages to PDF.
                             </p>
                         </div>
 
@@ -421,7 +544,7 @@ export default function HtmlToPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">

@@ -26,6 +26,11 @@ import {
     IconFileTypePdf,
     IconArrowRight,
     IconPrinter,
+    IconCheck,
+    IconUserCheck,
+    IconTrash,
+    IconSchool,
+    IconGavel,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -63,55 +68,58 @@ export const metadata: Metadata = {
 
 const HOW_TO_STEPS = [
     {
-        step: "01",
-        icon: IconUpload,
+        step: "1",
         title: "Upload Your Excel Workbook",
-        body: "Drag and drop your spreadsheet (.xlsx, .xls, or .csv) into the converter area above or click to select from your device.",
+        body: "Drag and drop your spreadsheet (.xlsx, .xls, or .csv) into the converter box above or click to browse files.",
     },
     {
-        step: "02",
-        icon: IconSettings,
+        step: "2",
         title: "Table Layout Optimization",
-        body: "Click 'Convert to PDF'. Our engine scales sheets, preserves gridlines, aligns cell data, and optimizes tables for standard page sizes.",
+        body: "Our engine scales sheets, preserves gridlines, aligns cell data, and optimizes tables for standard page sizes.",
     },
     {
-        step: "03",
-        icon: IconDownload,
+        step: "3",
         title: "Download Print-Ready PDF",
-        body: "Your PDF document is ready immediately. Download your fixed-layout file that opens reliably without cell shifting on any screen.",
+        body: "Your PDF document is ready immediately. Download your fixed-layout file that opens reliably on any screen.",
     },
 ];
 
 const FEATURES = [
     {
         icon: IconTable,
+        color: "bg-[#e6f4ea] text-[#107C41]",
         title: "Fixed Table & Column Alignment",
-        body: "Lock column widths, row heights, font sizes, and custom cell formatting so tables don't wrap unexpectedly on different computers.",
+        body: "Lock column widths, row heights, font sizes, and custom cell formatting so tables don't wrap unexpectedly.",
     },
     {
         icon: IconPrinter,
+        color: "bg-[#e0ecfc] text-[#185ABD]",
         title: "Print-Ready Page Scaling",
         body: "Automatically fits wide data tables and reports to standard Letter and A4 page dimensions for crisp printing.",
     },
     {
         icon: IconChartBar,
+        color: "bg-[#fef3c7] text-[#d97706]",
         title: "Chart & Graph Rendering",
         body: "Renders financial charts, bar graphs, trendlines, and pivot visuals in full vector resolution within the PDF.",
     },
     {
         icon: IconSparkles,
+        color: "bg-[#e6f4ef] text-brand-teal",
         title: "100% Free with No Watermarks",
-        body: "Convert your spreadsheets without subscription charges, registration walls, watermarks, or credit card requirements.",
+        body: "Convert your spreadsheets without subscription charges, registration walls, watermarks, or credit cards.",
     },
     {
         icon: IconShieldLock,
+        color: "bg-[#eef2ff] text-[#4f46e5]",
         title: "Encrypted & Secure Processing",
-        body: "All transmissions are encrypted via SSL/TLS. Your proprietary financial spreadsheets are deleted immediately after conversion.",
+        body: "All transmissions are encrypted via SSL/TLS. Your proprietary financial spreadsheets are deleted immediately.",
     },
     {
         icon: IconDeviceLaptop,
+        color: "bg-[#e0f2fe] text-[#0284c7]",
         title: "Universal Cross-Device Viewing",
-        body: "Recipients don't need Microsoft Excel installed to review your reports; the output PDF opens seamlessly on any smartphone, tablet, or PC.",
+        body: "Recipients don't need Microsoft Excel installed to review your reports; the output PDF opens seamlessly on any device.",
     },
 ];
 
@@ -119,22 +127,22 @@ const USE_CASES = [
     {
         icon: IconReceipt,
         title: "Invoices, Price Lists & Quotes",
-        body: "Convert calculated pricing sheets and itemized invoices into unalterable, professional PDF estimates for clients.",
+        desc: "Convert calculated pricing sheets and itemized invoices into unalterable, professional PDF estimates for clients.",
     },
     {
         icon: IconChartBar,
         title: "Executive Reports & KPI Dashboards",
-        body: "Share quarterly sales statistics, business KPIs, and budget reviews with leadership in an easily readable format.",
+        desc: "Share quarterly sales statistics, business KPIs, and budget reviews with leadership in an easily readable format.",
     },
     {
         icon: IconFileSpreadsheet,
         title: "Schedules, Rosters & Attendance Logs",
-        body: "Distribute employee shift schedules, project timelines, and event rosters that look clean and easy to print.",
+        desc: "Distribute employee shift schedules, project timelines, and event rosters that look clean and easy to print.",
     },
     {
         icon: IconTable,
         title: "Auditing & Financial Archives",
-        body: "Archive year-end balance sheets, tax logs, and audit trails in the immutable PDF standard.",
+        desc: "Archive year-end balance sheets, tax logs, and audit trails in the immutable, non-editable PDF standard.",
     },
 ];
 
@@ -148,30 +156,30 @@ const FAQS = [
         a: "No. Our conversion engine uses intelligent page scaling to ensure that wide data tables and spreadsheet columns fit neatly onto standard printable pages.",
     },
     {
-        q: "Are my confidential numbers and data safe?",
-        a: "Yes. All file uploads and downloads are encrypted via HTTPS (SSL/TLS). Files are processed strictly on isolated servers and automatically deleted once the conversion finishes.",
+        q: "Can I convert multi-tab Excel workbooks?",
+        a: "Yes. Worksheets in your Excel workbook are rendered into sequential PDF pages with consistent headers and column alignments.",
     },
     {
-        q: "Does this tool support multiple sheets in an Excel workbook?",
-        a: "Yes. The converter processes all active worksheets within your Excel workbook and combines them into sequential pages within the final PDF.",
+        q: "Are my confidential financial figures secure?",
+        a: "Yes. All transmissions are protected with end-to-end 256-bit SSL encryption. Uploaded spreadsheets and converted PDFs are deleted automatically right after processing.",
     },
     {
-        q: "Can I convert Excel to PDF on Mac or mobile devices?",
-        a: "Yes. PDF Maya runs in any modern browser on macOS, Windows, Linux, iOS, and Android without needing Microsoft Office installed.",
+        q: "Do I need Microsoft Excel installed on my device?",
+        a: "No. PDF Maya converts spreadsheets completely in the cloud without requiring Microsoft Excel or Office 365 desktop software.",
     },
     {
-        q: "Are there any watermarks or page limits?",
-        a: "No. PDF Maya never adds watermarks, advertisements, or stamps to your converted PDF documents.",
+        q: "Are there any watermarks added to the PDF?",
+        a: "No. Output PDF documents remain 100% clean and free of watermarks or branding stamps.",
     },
 ];
 
 const RELATED_TOOLS = [
-    { label: "PDF to Excel", href: "/pdf-to-excel", desc: "Extract PDF tables into editable Excel sheets.", icon: IconTable },
+    { label: "PDF to Excel", href: "/pdf-to-excel", desc: "Extract PDF tables into editable Excel sheets.", icon: IconFileSpreadsheet },
     { label: "Word to PDF", href: "/word-to-pdf", desc: "Convert Word documents to clean PDF files.", icon: IconFileWord },
-    { label: "JPG to PDF", href: "/jpg-to-pdf", desc: "Convert images to PDF documents.", icon: IconPhoto },
+    { label: "PPT to PDF", href: "/pptx-to-pdf", desc: "Convert PowerPoint slides to PDF presentations.", icon: IconPhoto },
     { label: "Merge PDF", href: "/merge-pdf", desc: "Combine multiple PDFs into a single file.", icon: IconArrowsJoin2 },
     { label: "Compress PDF", href: "/compress-pdf", desc: "Reduce PDF file size without quality loss.", icon: IconLayersSubtract },
-    { label: "Edit PDF", href: "/edit-pdf", desc: "Add text, annotations, and shapes directly to PDFs.", icon: IconPencil },
+    { label: "Protect PDF", href: "/protect-pdf", desc: "Encrypt PDF files with AES passwords.", icon: IconShieldLock },
 ];
 
 export default function ExcelToPdfPage() {
@@ -180,7 +188,7 @@ export default function ExcelToPdfPage() {
         "@type": "WebApplication",
         name: "Excel to PDF Converter - PDF Maya",
         url: "https://pdfmaya.com/excel-to-pdf",
-        description: "Convert Microsoft Excel spreadsheets (XLSX, XLS) into standardized PDF documents online for free.",
+        description: "Convert Microsoft Excel spreadsheets (XLSX, XLS, CSV) into standardized PDF documents online for free.",
         applicationCategory: "OfficeApplication",
         operatingSystem: "All",
         offers: {
@@ -194,7 +202,7 @@ export default function ExcelToPdfPage() {
         "@context": "https://schema.org",
         "@type": "HowTo",
         name: "How to Convert Excel to PDF Online",
-        description: "Step-by-step guide to converting an Excel spreadsheet into a PDF document with PDF Maya.",
+        description: "Step-by-step guide to converting Microsoft Excel workbooks to PDF with PDF Maya.",
         step: HOW_TO_STEPS.map((s, index) => ({
             "@type": "HowToStep",
             position: index + 1,
@@ -235,16 +243,17 @@ export default function ExcelToPdfPage() {
 
             {/* ═══════════════════════════════════════════════
                 HERO AREA: Header & Full-Width Upload Section
+                (Preserved intact)
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
                     {/* Format Badge */}
                     <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E0DED9] shadow-2xs mb-4">
                         <div className="flex items-center gap-1.5 text-xs font-bold text-[#107C41]">
-                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e6f7ef]">
+                            <span className="w-5 h-5 rounded flex items-center justify-center bg-[#e6f4ea]">
                                 <IconFileTypeXls size={13} stroke={2.5} />
                             </span>
-                            <span>Excel</span>
+                            <span>Excel (.xlsx)</span>
                         </div>
                         <IconArrowRight size={13} className="text-neutral-400" />
                         <div className="flex items-center gap-1.5 text-xs font-bold text-[#dc2626]">
@@ -262,7 +271,7 @@ export default function ExcelToPdfPage() {
 
                     {/* Subtitle */}
                     <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Transform Microsoft Excel (.xlsx, .xls, .csv) spreadsheets into fixed-layout, print-ready PDF documents. Fast, accurate, and completely free.
+                        Transform Microsoft Excel workbooks (.xlsx, .xls, .csv) into clean, printable PDF documents in seconds. 100% free.
                     </p>
 
                     {/* Full-Width File Upload Card */}
@@ -273,42 +282,64 @@ export default function ExcelToPdfPage() {
             </header>
 
             {/* ═══════════════════════════════════════════════
-                WRITTEN CONTENT BELOW HERO UPLOADER
+                REFINED CONTENT SECTIONS (Clean, Modern, Open UI)
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: How to Convert (Centered 1, 2, 3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                How to Convert Excel to PDF Online
+                                How to Convert Excel to PDF
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Three simple steps to turn spreadsheets into professional, non-editable PDF files.
+                            <p className="text-base text-neutral-600">
+                                Fit tables and generate clean PDF files in 3 simple steps.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {HOW_TO_STEPS.map((s) => {
-                                const StepIcon = s.icon;
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                            {HOW_TO_STEPS.map((item) => (
+                                <div key={item.step} className="flex flex-col items-center text-center space-y-4">
+                                    <span className="w-12 h-12 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center font-extrabold text-brand-dark text-lg shadow-2xs">
+                                        {item.step}
+                                    </span>
+                                    <h3 className="text-lg font-bold text-brand-dark">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-600 leading-relaxed max-w-xs">
+                                        {item.body}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Feature Matrix (Refined 6-Item Grid, Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                The Best Excel to PDF Converter
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                Fit wide spreadsheets to printable pages automatically, preserve chart colors, and lock cells into read-only PDF reports.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            {FEATURES.map((feature, idx) => {
+                                const FeatureIcon = feature.icon;
                                 return (
-                                    <div
-                                        key={s.step}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <div className="relative">
-                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
-                                                <StepIcon size={26} stroke={1.8} />
-                                            </span>
-                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
-                                                {s.step}
-                                            </span>
+                                    <div key={idx} className="flex flex-col items-center text-center space-y-3.5">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${feature.color}`}>
+                                            <FeatureIcon size={26} stroke={2} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {s.title}
+                                        <h3 className="text-lg font-bold text-brand-dark">
+                                            {feature.title}
                                         </h3>
                                         <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {s.body}
+                                            {feature.body}
                                         </p>
                                     </div>
                                 );
@@ -317,70 +348,105 @@ export default function ExcelToPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
-                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                Why Convert Excel to PDF with PDF Maya?
-                            </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Ensure your financial data, reports, and calculations are shared securely and displayed cleanly.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {FEATURES.map((f) => {
-                                const FeatureIcon = f.icon;
-                                return (
-                                    <div
-                                        key={f.title}
-                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
-                                            <FeatureIcon size={22} stroke={1.8} />
-                                        </span>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {f.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {f.body}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                When to Use the Excel to PDF Converter
+                                Print Scaling &amp; Data Grid Preservation
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Perfect for accounting, management reporting, inventory management, and invoice distribution.
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                PDF Maya eliminates truncated columns and broken data grids during spreadsheet PDF rendering.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {USE_CASES.map((uc) => {
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Intelligent Sheet-to-Page Scaling
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Wide balance sheets and sprawling data tables are scaled intelligently to fit portrait or landscape Letter/A4 layouts.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Cell Styling &amp; Border Fidelity
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Background fills, currency symbols, custom date formats, and gridlines retain crisp contrast and styling.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Vector Charts &amp; Visual Assets
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Embedded bar graphs, pie charts, and sparklines are exported as razor-sharp vector graphics ready for print.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Multi-Sheet Sequential Export
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Multi-tab workbooks are converted into a single unified PDF document with sequentially numbered pages.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Practical Excel to PDF Use Cases
+                            </h2>
+                            <p className="text-base text-neutral-600">
+                                Lock and distribute financial models, price quotes, and operational schedules.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div
-                                        key={uc.title}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
-                                    >
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
-                                            <UcIcon size={20} stroke={2} />
-                                        </span>
-                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
-                                            {uc.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {uc.body}
+                                    <div key={idx} className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={20} stroke={2} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-brand-dark">
+                                                {uc.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-13">
+                                            {uc.desc}
                                         </p>
                                     </div>
                                 );
@@ -389,7 +455,64 @@ export default function ExcelToPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 5: Privacy & Security Trust Strip (Refined & Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Your Documents Stay Private &amp; Secure
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                We prioritize financial data confidentiality and document security at every stage.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ea] text-[#107C41] border border-[#bfe4cd] flex items-center justify-center shadow-2xs">
+                                    <IconShieldLock size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">256-Bit SSL/TLS</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    All transmissions are secured with end-to-end HTTPS encryption.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] flex items-center justify-center shadow-2xs">
+                                    <IconTrash size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Instant File Deletion</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Uploaded spreadsheets and converted PDFs are purged automatically from memory.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5] flex items-center justify-center shadow-2xs">
+                                    <IconUserCheck size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">No Account Needed</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Convert unlimited files without registration, emails, or paywalls.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#c0daf8] flex items-center justify-center shadow-2xs">
+                                    <IconDeviceLaptop size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Universal Support</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Works seamlessly in any browser on macOS, Windows, iOS, and Android.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 6: Frequently Asked Questions ──
+                    (Preserved intact as requested) */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -397,7 +520,7 @@ export default function ExcelToPdfPage() {
                                 Frequently Asked Questions
                             </h2>
                             <p className="mt-3 text-neutral-600 text-base sm:text-lg">
-                                Everything you need to know about converting spreadsheets to PDF format.
+                                Everything you need to know about converting Excel spreadsheets to PDF.
                             </p>
                         </div>
 
@@ -422,7 +545,7 @@ export default function ExcelToPdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
