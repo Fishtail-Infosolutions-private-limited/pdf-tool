@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -266,7 +266,9 @@ export default function SplitPdfPage() {
 
                     {/* Full-Width File Upload Card */}
                     <div className="mt-10">
-                        <SplitPdfClient />
+                        <Suspense fallback={<div className="w-full h-48 bg-white rounded-3xl border border-[#E0DED9] animate-pulse" />}>
+                            <SplitPdfClient />
+                        </Suspense>
                     </div>
                 </div>
             </header>
