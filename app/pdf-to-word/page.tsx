@@ -14,19 +14,21 @@ import {
     IconShieldLock,
     IconDeviceLaptop,
     IconSparkles,
-    IconFileDescription,
-    IconGavel,
-    IconSchool,
-    IconReceipt,
-    IconArrowUpRight,
     IconPlus,
+    IconFileWord,
+    IconFileTypePdf,
+    IconArrowRight,
+    IconArrowUpRight,
     IconFileArrowRight,
     IconArrowsJoin2,
     IconLayersSubtract,
     IconPencil,
-    IconFileTypePdf,
-    IconFileWord,
-    IconArrowRight,
+    IconCheck,
+    IconFileDescription,
+    IconGavel,
+    IconSchool,
+    IconReceipt,
+    IconCircleCheck,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -64,78 +66,81 @@ export const metadata: Metadata = {
 
 const HOW_TO_STEPS = [
     {
-        step: "01",
-        icon: IconUpload,
+        step: "1",
         title: "Upload Your PDF",
-        body: "Drag and drop your PDF into the converter area above or click to select a file from your computer or phone.",
+        body: "Select the PDF file you want to convert from your computer or phone, or drag and drop it into the box above.",
     },
     {
-        step: "02",
-        icon: IconSettings,
-        title: "Instant Conversion",
-        body: "Click 'Convert to Word'. Our intelligent engine parses text, fonts, images, and tables directly into native Word format.",
+        step: "2",
+        title: "Automatic Processing",
+        body: "Our high-precision layout engine parses paragraphs, fonts, data tables, and embedded images into native Word format.",
     },
     {
-        step: "03",
-        icon: IconDownload,
-        title: "Download Editable DOCX",
-        body: "Your new Microsoft Word (.docx) document is ready instantly. Download and edit freely in Word, Google Docs, or Pages.",
+        step: "3",
+        title: "Download Word DOCX",
+        body: "A perfectly formatted Microsoft Word document is generated in seconds, ready for instant download and editing.",
     },
 ];
 
 const FEATURES = [
     {
         icon: IconLayout,
-        title: "Accurate Layout & Formatting",
-        body: "Preserve original fonts, paragraph styles, margins, headings, and column structures without misalignments.",
+        color: "bg-[#e0ecfc] text-[#185ABD]",
+        title: "Accurate Layout & Typography",
+        body: "Preserves custom fonts, bold weights, paragraph alignments, line heights, and margins so your Word document mirrors the original PDF.",
     },
     {
         icon: IconTable,
+        color: "bg-[#e6f4ea] text-[#107C41]",
         title: "Table & Data Grid Preservation",
-        body: "Convert structured financial grids, spreadsheets, and data tables into fully editable Word tables with cell borders.",
+        body: "Converts financial ledgers, balance sheets, and invoices into authentic Microsoft Word tables with editable cell grids.",
     },
     {
         icon: IconPhoto,
-        title: "Embedded Image Extraction",
-        body: "Retain high-resolution photos, graphics, diagrams, and illustrations positioned exactly where they belong.",
+        color: "bg-[#fef3c7] text-[#d97706]",
+        title: "High-Resolution Image Extraction",
+        body: "Extracts embedded photos, corporate logos, diagrams, and vector illustrations at their crisp native resolution.",
     },
     {
         icon: IconSparkles,
-        title: "100% Free & No Watermarks",
-        body: "Convert as many files as you need without hidden fees, subscriptions, credit cards, or unwanted branding stamps.",
+        color: "bg-[#e6f4ef] text-brand-teal",
+        title: "100% Free with No Watermarks",
+        body: "Convert your PDF files to Word without registration, credit cards, subscription gates, or branding watermarks.",
     },
     {
         icon: IconShieldLock,
-        title: "Private & Automatic Deletion",
-        body: "All transmissions are SSL-encrypted. Your documents are never viewed, shared, or permanently stored.",
+        color: "bg-[#eef2ff] text-[#4f46e5]",
+        title: "256-Bit SSL & Auto-Deletion",
+        body: "All transmissions are encrypted via SSL/TLS. Uploaded files are processed in memory and deleted immediately after download.",
     },
     {
         icon: IconDeviceLaptop,
+        color: "bg-[#e0f2fe] text-[#0284c7]",
         title: "Universal Cross-Platform Access",
-        body: "Access directly from your browser on macOS, Windows, Linux, iPadOS, iOS, and Android without installing apps.",
+        body: "Works directly in your browser on Mac, Windows, Linux, iOS, iPadOS, and Android without installing any software.",
     },
 ];
 
 const USE_CASES = [
     {
         icon: IconFileDescription,
-        title: "Update Resumes & CVs",
-        body: "Need to update a resume saved as a PDF? Convert it back to Word to add recent roles, skills, or adjust the layout in minutes.",
+        title: "Resumes & CV Updates",
+        desc: "Convert older PDF resumes back to Word to update work experience, add newly acquired skills, or customize typography before applying for jobs.",
     },
     {
         icon: IconGavel,
-        title: "Revise Contracts & Agreements",
-        body: "Make modifications to contract terms, clauses, dates, and party details directly in Microsoft Word before final approval.",
+        title: "Contracts & Legal Agreements",
+        desc: "Make modifications to contract terms, payment clauses, and execution dates directly in Microsoft Word with Track Changes and margin comments.",
     },
     {
         icon: IconSchool,
-        title: "Repurpose Academic Papers & Notes",
-        body: "Extract research citations, study materials, and literature excerpts to incorporate directly into your essays and thesis drafts.",
+        title: "Academic Research & Theses",
+        desc: "Extract literature citations, research study tables, and bibliographies straight into your essay and dissertation drafts without retyping.",
     },
     {
         icon: IconReceipt,
-        title: "Edit Invoices & Business Reports",
-        body: "Reclaim editable financial data, invoices, and quarterly summaries without re-typing numbers manually.",
+        title: "Invoices & Financial Reports",
+        desc: "Reclaim editable financial records, monthly invoices, and audit summaries to paste tabular numbers directly into accounting spreadsheets.",
     },
 ];
 
@@ -210,40 +215,40 @@ export default function PdfToWordPage() {
     const jsonLdSoftware = {
         "@context": "https://schema.org",
         "@type": "WebApplication",
-        "name": "PDF to Word Converter - PDF Maya",
-        "url": "https://pdfmaya.com/pdf-to-word",
-        "description": "Convert PDF documents to editable Microsoft Word (DOCX) files online for free.",
-        "applicationCategory": "OfficeApplication",
-        "operatingSystem": "All",
-        "offers": {
+        name: "PDF to Word Converter - PDF Maya",
+        url: "https://pdfmaya.com/pdf-to-word",
+        description: "Convert PDF documents to editable Microsoft Word (DOCX) files online for free.",
+        applicationCategory: "OfficeApplication",
+        operatingSystem: "All",
+        offers: {
             "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD",
+            price: "0",
+            priceCurrency: "USD",
         },
     };
 
     const jsonLdHowTo = {
         "@context": "https://schema.org",
         "@type": "HowTo",
-        "name": "How to Convert PDF to Word Online",
-        "description": "Step-by-step guide to converting a PDF into an editable Word document with PDF Maya.",
-        "step": HOW_TO_STEPS.map((s, index) => ({
+        name: "How to Convert PDF to Word Online",
+        description: "Step-by-step guide to converting a PDF into an editable Word document with PDF Maya.",
+        step: HOW_TO_STEPS.map((s, index) => ({
             "@type": "HowToStep",
-            "position": index + 1,
-            "name": s.title,
-            "text": s.body,
+            position: index + 1,
+            name: s.title,
+            text: s.body,
         })),
     };
 
     const jsonLdFaq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
-        "mainEntity": FAQS.map((faq) => ({
+        mainEntity: FAQS.map((faq) => ({
             "@type": "Question",
-            "name": faq.q,
-            "acceptedAnswer": {
+            name: faq.q,
+            acceptedAnswer: {
                 "@type": "Answer",
-                "text": faq.a,
+                text: faq.a,
             },
         })),
     };
@@ -268,6 +273,7 @@ export default function PdfToWordPage() {
 
             {/* ═══════════════════════════════════════════════
                 HERO AREA: Header & Full-Width Upload Section
+                (Preserved intact as requested)
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
@@ -306,42 +312,64 @@ export default function PdfToWordPage() {
             </header>
 
             {/* ═══════════════════════════════════════════════
-                WRITTEN CONTENT BELOW HERO UPLOADER
+                REFINED CONTENT SECTIONS (Clean, Modern, Centered Steps)
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: How to Convert (Centered 1, 2, 3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                How to Convert PDF to Word Online
+                                How to Convert PDF to Word
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Three simple steps to transform uneditable PDFs into editable Word documents.
+                            <p className="text-base text-neutral-600">
+                                Follow three simple steps to convert any PDF into an editable Word document online.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {HOW_TO_STEPS.map((s) => {
-                                const StepIcon = s.icon;
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                            {HOW_TO_STEPS.map((item) => (
+                                <div key={item.step} className="flex flex-col items-center text-center space-y-4">
+                                    <span className="w-12 h-12 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center font-extrabold text-brand-dark text-lg shadow-2xs">
+                                        {item.step}
+                                    </span>
+                                    <h3 className="text-lg font-bold text-brand-dark">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-600 leading-relaxed max-w-xs">
+                                        {item.body}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Feature Matrix (Refined 6-Item Grid, Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                The Best PDF to Word Converter
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                Convert documents with precision. Our engine reconstructs tables, typography, paragraphs, and high-resolution images seamlessly.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            {FEATURES.map((feature, idx) => {
+                                const FeatureIcon = feature.icon;
                                 return (
-                                    <div
-                                        key={s.step}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <div className="relative">
-                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
-                                                <StepIcon size={26} stroke={1.8} />
-                                            </span>
-                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
-                                                {s.step}
-                                            </span>
+                                    <div key={idx} className="flex flex-col items-center text-center space-y-3.5">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${feature.color}`}>
+                                            <FeatureIcon size={26} stroke={2} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {s.title}
+                                        <h3 className="text-lg font-bold text-brand-dark">
+                                            {feature.title}
                                         </h3>
                                         <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {s.body}
+                                            {feature.body}
                                         </p>
                                     </div>
                                 );
@@ -350,70 +378,101 @@ export default function PdfToWordPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
-                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                Why Convert PDF to Word with PDF Maya?
-                            </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Designed for professionals, students, and teams who require accurate, hassle-free document conversion.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {FEATURES.map((f) => {
-                                const FeatureIcon = f.icon;
-                                return (
-                                    <div
-                                        key={f.title}
-                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
-                                            <FeatureIcon size={22} stroke={1.8} />
-                                        </span>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {f.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {f.body}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                When to Use the PDF to Word Converter
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="max-w-3xl space-y-4">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight leading-snug">
+                                Complete Layout &amp; Formatting Integrity
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Overcome the frustration of uneditable PDF documents across your daily workflow.
+                            <p className="text-base text-neutral-700 leading-relaxed">
+                                Many free converters output disjointed text boxes that break formatting when edited. PDF Maya deconstructs PDF geometry into natural Microsoft Word document elements:
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {USE_CASES.map((uc) => {
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 pt-4 border-t border-[#E0DED9]">
+                            {/* Feature Point 1 */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
+                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={14} stroke={3} />
+                                    </span>
+                                    <span>Native Table Grid Reconstruction</span>
+                                </h3>
+                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    Financial balance sheets, invoice grids, and product catalogs are converted into authentic Word tables with editable cells, customizable borders, and formula-ready numbers.
+                                </p>
+                            </div>
+
+                            {/* Feature Point 2 */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
+                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={14} stroke={3} />
+                                    </span>
+                                    <span>Fluid Paragraph Flow &amp; Font Matching</span>
+                                </h3>
+                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    Sentences wrap automatically across margins. Font families, weights (bold, italic), line spacing, and paragraph indents are preserved so you can rewrite copy naturally.
+                                </p>
+                            </div>
+
+                            {/* Feature Point 3 */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
+                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={14} stroke={3} />
+                                    </span>
+                                    <span>Lossless Image &amp; Graphic Extraction</span>
+                                </h3>
+                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    Embedded photography, corporate branding logos, charts, and vector diagrams maintain their native DPI resolution without fuzzy compression.
+                                </p>
+                            </div>
+
+                            {/* Feature Point 4 */}
+                            <div className="space-y-3">
+                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
+                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={14} stroke={3} />
+                                    </span>
+                                    <span>Multi-Column Document Structuring</span>
+                                </h3>
+                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    Magazine layouts, academic research articles, and corporate newsletters flow sequentially through columns without overlapping headers or misplaced images.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="max-w-2xl mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Practical PDF to Word Use Cases
+                            </h2>
+                            <p className="text-base text-neutral-600">
+                                Accelerate document turnaround across business, legal, academic, and personal workflows.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div
-                                        key={uc.title}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
-                                    >
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
-                                            <UcIcon size={20} stroke={2} />
-                                        </span>
-                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
-                                            {uc.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {uc.body}
+                                    <div key={idx} className="space-y-2.5">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-lg bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={18} stroke={2} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-brand-dark">
+                                                {uc.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-12">
+                                            {uc.desc}
                                         </p>
                                     </div>
                                 );
@@ -422,7 +481,64 @@ export default function PdfToWordPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 5: Privacy & Security Trust Strip ── */}
+                <section className="py-16 md:py-20 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="max-w-2xl mb-12 space-y-2">
+                            <h2 className="text-2xl sm:text-3xl font-bold text-brand-dark tracking-tight">
+                                Your Documents Stay Private &amp; Secure
+                            </h2>
+                            <p className="text-sm sm:text-base text-neutral-600">
+                                We prioritize document security and user confidentiality across all conversion operations.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-8 border-t border-[#E0DED9]">
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
+                                    <IconCircleCheck size={18} stroke={2.5} />
+                                    <span className="text-brand-dark">256-Bit SSL/TLS</span>
+                                </div>
+                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                    All transmissions are secured with end-to-end HTTPS encryption.
+                                </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
+                                    <IconCircleCheck size={18} stroke={2.5} />
+                                    <span className="text-brand-dark">Instant File Deletion</span>
+                                </div>
+                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                    Uploaded PDFs and converted DOCX files are purged automatically.
+                                </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
+                                    <IconCircleCheck size={18} stroke={2.5} />
+                                    <span className="text-brand-dark">No Account Needed</span>
+                                </div>
+                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                    Convert unlimited files without registration, emails, or paywalls.
+                                </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
+                                    <IconCircleCheck size={18} stroke={2.5} />
+                                    <span className="text-brand-dark">Universal Support</span>
+                                </div>
+                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                    Works seamlessly in any browser on macOS, Windows, iOS, and Android.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 6: Frequently Asked Questions ──
+                    (Preserved intact as requested) */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -455,7 +571,7 @@ export default function PdfToWordPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
