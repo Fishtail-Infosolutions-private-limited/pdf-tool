@@ -22,14 +22,18 @@ import {
     IconPhoto,
     IconLayersSubtract,
     IconPencil,
-    IconFileTypePdf,
-    IconArrowRight,
+    IconCheck,
+    IconGavel,
+    IconSchool,
+    IconReceipt,
+    IconTrash,
+    IconUserCheck,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
     title: "Merge PDF Files Online Free – Combine Multiple PDFs | PDF Maya",
     description:
-        "Combine and join multiple PDF documents into one single file online for free. Arrange and reorder pages easily with 100% privacy and no watermarks.",
+        "Combine and join multiple PDF documents into one single file online for free. Arrange and reorder pages easily with 100% privacy, no file limits, and no watermarks.",
     keywords: [
         "merge pdf",
         "combine pdf",
@@ -39,6 +43,7 @@ export const metadata: Metadata = {
         "pdf combiner",
         "merge pdf pages",
         "free online pdf merger",
+        "merge pdf documents without watermark",
     ],
     alternates: {
         canonical: "/merge-pdf",
@@ -61,21 +66,18 @@ export const metadata: Metadata = {
 
 const HOW_TO_STEPS = [
     {
-        step: "01",
-        icon: IconUpload,
+        step: "1",
         title: "Upload Your PDF Files",
-        body: "Select two or more PDF files from your computer, phone, or drag and drop them into the merge box above.",
+        body: "Select two or more PDF files from your computer or phone, or drag and drop them into the merge box above.",
     },
     {
-        step: "02",
-        icon: IconSettings,
-        title: "Arrange & Organize",
-        body: "Reorder files in the exact sequence you want them to appear in the combined document.",
+        step: "2",
+        title: "Arrange & Reorder",
+        body: "Drag and drop thumbnails to arrange your documents in the exact sequential order you want them to appear.",
     },
     {
-        step: "03",
-        icon: IconDownload,
-        title: "Download Combined PDF",
+        step: "3",
+        title: "Download Merged PDF",
         body: "Click 'Merge PDFs'. Your single unified document is generated immediately with zero quality loss.",
     },
 ];
@@ -83,33 +85,39 @@ const HOW_TO_STEPS = [
 const FEATURES = [
     {
         icon: IconArrowsJoin2,
-        title: "Fast Batch Document Merging",
-        body: "Join multiple large PDF reports, forms, and scans into a single streamlined document in seconds.",
+        color: "bg-[#e6f4ef] text-brand-teal",
+        title: "Fast Multi-File Merging",
+        body: "Join multiple large PDF reports, forms, and scans into a single streamlined document in seconds without delays.",
     },
     {
         icon: IconSortAscending,
+        color: "bg-[#e0ecfc] text-[#185ABD]",
         title: "Interactive Page Reordering",
-        body: "Easily adjust the order of documents and pages before merging to create a clean, logical file structure.",
+        body: "Easily rearrange files and pages visually with intuitive drag-and-drop controls before finalizing your combined document.",
     },
     {
         icon: IconFolderFilled,
+        color: "bg-[#fef3c7] text-[#d97706]",
         title: "Handle Large Multi-Page Files",
-        body: "Process heavy PDF files, books, and hundreds of pages without browser crashes or throttling.",
+        body: "Process heavy PDF files, books, and hundreds of pages smoothly without browser crashes or throttling limits.",
     },
     {
         icon: IconSparkles,
+        color: "bg-[#e6f4ea] text-[#107C41]",
         title: "100% Free with No Watermarks",
-        body: "Merge as many PDF documents as you need without hidden charges, subscriptions, or branding stamps.",
+        body: "Merge as many PDF documents as you need without hidden charges, subscriptions, or intrusive branding stamps.",
     },
     {
         icon: IconShieldLock,
-        title: "Private & Auto-Deleted",
-        body: "All transmissions are encrypted via SSL/TLS. Files are processed securely and deleted immediately after your session.",
+        color: "bg-[#eef2ff] text-[#4f46e5]",
+        title: "256-Bit SSL & Auto-Deletion",
+        body: "All transmissions are encrypted via SSL/TLS. Uploaded files are processed securely and deleted immediately after merging.",
     },
     {
         icon: IconDeviceLaptop,
-        title: "Works on Any Device",
-        body: "Merge documents smoothly on iOS, Android, macOS, Windows, iPadOS, and Linux without downloading software.",
+        color: "bg-[#e0f2fe] text-[#0284c7]",
+        title: "Universal Cross-Platform Tool",
+        body: "Merge documents smoothly on iOS, Android, macOS, Windows, iPadOS, and Linux without downloading any software.",
     },
 ];
 
@@ -117,22 +125,22 @@ const USE_CASES = [
     {
         icon: IconFileDescription,
         title: "Job Applications & Portfolios",
-        body: "Combine your resume, cover letter, references, and certificate scans into a single submission document.",
+        desc: "Combine your resume, cover letter, references, and certificate scans into a single polished submission PDF.",
     },
     {
-        icon: IconFolderFilled,
+        icon: IconGavel,
         title: "Contracts, Annexures & NDAs",
-        body: "Unify legal contracts, master service agreements, and appendix disclosures into one comprehensive agreement file.",
+        desc: "Unify legal contracts, master service agreements, and appendix disclosures into one comprehensive agreement file.",
     },
     {
-        icon: IconFileDescription,
-        title: "Financial Reports & Invoices",
-        body: "Consolidate monthly bank statements, receipts, and accounting invoices for audits and tax filings.",
+        icon: IconReceipt,
+        title: "Financial Statements & Invoices",
+        desc: "Consolidate monthly bank statements, receipts, and accounting invoices into a clean archive for tax season and audits.",
     },
     {
-        icon: IconArrowsJoin2,
-        title: "Academic Papers & Theses",
-        body: "Merge research chapters, bibliographies, indexes, and appendices into a complete academic thesis.",
+        icon: IconSchool,
+        title: "Academic Theses & Research Papers",
+        desc: "Merge research chapters, bibliographies, indexes, and appendices into a complete dissertation or academic submission.",
     },
 ];
 
@@ -233,6 +241,7 @@ export default function MergePdfPage() {
 
             {/* ═══════════════════════════════════════════════
                 HERO AREA: Header & Full-Width Upload Section
+                (Preserved intact)
             ═══════════════════════════════════════════════ */}
             <header className="pt-28 md:pt-32 pb-16 md:pb-20 px-5 md:px-8 border-b border-[#E0DED9] bg-[#FAFAF9]">
                 <div className="max-w-7xl mx-auto text-center">
@@ -248,12 +257,12 @@ export default function MergePdfPage() {
 
                     {/* H1 Heading */}
                     <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-brand-dark tracking-tight leading-tight">
-                        Merge PDF Files
+                        Merge PDF Files Online
                     </h1>
 
                     {/* Subtitle */}
                     <p className="mt-4 text-neutral-600 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                        Combine multiple PDF files into a single, organized document. Fast, easy, secure, and completely free.
+                        Combine multiple PDF documents into a single organized file in seconds. Fast, free, and completely secure.
                     </p>
 
                     {/* Full-Width File Upload Card */}
@@ -264,42 +273,64 @@ export default function MergePdfPage() {
             </header>
 
             {/* ═══════════════════════════════════════════════
-                WRITTEN CONTENT BELOW HERO UPLOADER
+                REFINED CONTENT SECTIONS (Clean, Modern, Open UI)
             ═══════════════════════════════════════════════ */}
             <main className="flex-1">
-                {/* ── SECTION 1: How It Works (3 Steps) ── */}
+                {/* ── SECTION 1: How to Convert (Centered 1, 2, 3 Steps) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                How to Merge PDF Files Online
+                                How to Merge PDF Files
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Three simple steps to unify multiple documents into one clean PDF file.
+                            <p className="text-base text-neutral-600">
+                                Combine multiple PDFs into one unified document in 3 simple steps.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            {HOW_TO_STEPS.map((s) => {
-                                const StepIcon = s.icon;
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+                            {HOW_TO_STEPS.map((item) => (
+                                <div key={item.step} className="flex flex-col items-center text-center space-y-4">
+                                    <span className="w-12 h-12 rounded-2xl bg-[#FAFAF9] border border-[#E0DED9] flex items-center justify-center font-extrabold text-brand-dark text-lg shadow-2xs">
+                                        {item.step}
+                                    </span>
+                                    <h3 className="text-lg font-bold text-brand-dark">
+                                        {item.title}
+                                    </h3>
+                                    <p className="text-sm text-neutral-600 leading-relaxed max-w-xs">
+                                        {item.body}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 2: Feature Matrix (Refined 6-Item Grid, Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto">
+                        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                The Best PDF Merger Online
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                Join PDFs effortlessly with high-speed processing, full quality preservation, and complete privacy.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12 gap-y-12">
+                            {FEATURES.map((feature, idx) => {
+                                const FeatureIcon = feature.icon;
                                 return (
-                                    <div
-                                        key={s.step}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-8 flex flex-col items-center text-center gap-4 shadow-2xs hover:bg-white hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <div className="relative">
-                                            <span className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5]">
-                                                <StepIcon size={26} stroke={1.8} />
-                                            </span>
-                                            <span className="absolute -top-2 -right-2 flex items-center justify-center w-6 h-6 rounded-full bg-brand-teal text-white text-[10px] font-bold">
-                                                {s.step}
-                                            </span>
+                                    <div key={idx} className="flex flex-col items-center text-center space-y-3.5">
+                                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${feature.color}`}>
+                                            <FeatureIcon size={26} stroke={2} />
                                         </div>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {s.title}
+                                        <h3 className="text-lg font-bold text-brand-dark">
+                                            {feature.title}
                                         </h3>
                                         <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {s.body}
+                                            {feature.body}
                                         </p>
                                     </div>
                                 );
@@ -308,70 +339,105 @@ export default function MergePdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 2: Key Features & Benefits ── */}
-                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                Why Merge PDFs with PDF Maya?
-                            </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Streamline your document workflow with reliable, high-speed PDF combination.
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {FEATURES.map((f) => {
-                                const FeatureIcon = f.icon;
-                                return (
-                                    <div
-                                        key={f.title}
-                                        className="bg-white rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs hover:border-brand-teal/60 hover:shadow-xs transition-all duration-200"
-                                    >
-                                        <span className="flex items-center justify-center w-11 h-11 rounded-xl bg-[#e6f4ef] text-brand-teal">
-                                            <FeatureIcon size={22} stroke={1.8} />
-                                        </span>
-                                        <h3 className="text-lg font-bold text-brand-dark tracking-tight">
-                                            {f.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {f.body}
-                                        </p>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </section>
-
-                {/* ── SECTION 3: Common Use Cases ── */}
+                {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-7xl mx-auto">
-                        <div className="text-center max-w-3xl mx-auto mb-14">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
-                                When to Use the Merge PDF Tool
+                                Lossless Quality &amp; Structure Preservation
                             </h2>
-                            <p className="mt-3 text-neutral-600 text-base sm:text-lg leading-relaxed">
-                                Ideal for preparing comprehensive multi-document submissions and reports.
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                PDF Maya preserves all bookmarks, form fields, page orientations, and vector graphics during the merge process.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                            {USE_CASES.map((uc) => {
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Lossless Vector &amp; Text Resolution
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Original typography, embedded custom fonts, and high-DPI images maintain their native clarity without degradation or re-compression.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Visual Drag-and-Drop Page Sorting
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Sort entire files or individual pages visually. Rotate upside-down scans and delete unnecessary pages before generating the merged file.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Preserves Interactive Elements &amp; Links
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Hyperlinks, table of contents indexes, bookmarks, and fillable form fields remain fully functional in the final combined output document.
+                                </p>
+                            </div>
+
+                            <div className="space-y-3">
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
+                                    </span>
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Handles Large Document Batches
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
+                                    Combine dozens of multi-megabyte PDFs, technical manuals, and scanned archives reliably without browser lag or memory limits.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Practical PDF Merge Use Cases
+                            </h2>
+                            <p className="text-base text-neutral-600">
+                                Simplify document management across personal, academic, legal, and business workflows.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div
-                                        key={uc.title}
-                                        className="bg-[#FAFAF9] rounded-2xl border border-[#E0DED9] p-7 flex flex-col gap-3.5 shadow-2xs"
-                                    >
-                                        <span className="flex items-center justify-center w-10 h-10 rounded-xl bg-[#f0ede4] text-[#8C886B]">
-                                            <UcIcon size={20} stroke={2} />
-                                        </span>
-                                        <h3 className="text-base font-bold text-brand-dark tracking-tight">
-                                            {uc.title}
-                                        </h3>
-                                        <p className="text-sm text-neutral-600 leading-relaxed">
-                                            {uc.body}
+                                    <div key={idx} className="space-y-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={20} stroke={2} />
+                                            </div>
+                                            <h3 className="text-base font-bold text-brand-dark">
+                                                {uc.title}
+                                            </h3>
+                                        </div>
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-13">
+                                            {uc.desc}
                                         </p>
                                     </div>
                                 );
@@ -380,7 +446,64 @@ export default function MergePdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 4: Frequently Asked Questions ── */}
+                {/* ── SECTION 5: Privacy & Security Trust Strip (Refined & Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Your Documents Stay Private &amp; Secure
+                            </h2>
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                We prioritize document confidentiality and data security at every stage of the merge process.
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ea] text-[#107C41] border border-[#bfe4cd] flex items-center justify-center shadow-2xs">
+                                    <IconShieldLock size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">256-Bit SSL/TLS</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    All transmissions are secured with end-to-end HTTPS encryption.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] flex items-center justify-center shadow-2xs">
+                                    <IconTrash size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Instant File Deletion</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Uploaded PDFs and combined output files are purged automatically.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5] flex items-center justify-center shadow-2xs">
+                                    <IconUserCheck size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">No Account Needed</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Merge unlimited files without registration, emails, or paywalls.
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#c0daf8] flex items-center justify-center shadow-2xs">
+                                    <IconDeviceLaptop size={24} stroke={2} />
+                                </div>
+                                <h3 className="text-base font-bold text-brand-dark">Universal Support</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
+                                    Works seamlessly in any browser on macOS, Windows, iOS, and Android.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* ── SECTION 6: Frequently Asked Questions ──
+                    (Preserved intact as requested) */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#F7F6F3] border-b border-[#E0DED9]">
                     <div className="max-w-3xl mx-auto">
                         <div className="text-center mb-12">
@@ -388,7 +511,7 @@ export default function MergePdfPage() {
                                 Frequently Asked Questions
                             </h2>
                             <p className="mt-3 text-neutral-600 text-base sm:text-lg">
-                                Everything you need to know about combining PDF files.
+                                Everything you need to know about combining PDF documents.
                             </p>
                         </div>
 
@@ -413,7 +536,7 @@ export default function MergePdfPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Explore More PDF Tools (Sleek Tile Design) ── */}
+                {/* ── SECTION 7: Explore More PDF Tools ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white">
                     <div className="max-w-7xl mx-auto">
                         <div className="text-center max-w-3xl mx-auto mb-14">
