@@ -28,7 +28,8 @@ import {
     IconGavel,
     IconSchool,
     IconReceipt,
-    IconCircleCheck,
+    IconTrash,
+    IconUserCheck,
 } from "@tabler/icons-react";
 
 export const metadata: Metadata = {
@@ -381,64 +382,72 @@ export default function PdfToWordPage() {
                 {/* ── SECTION 3: Deep-Dive Technical Fidelity (Visual Breakdown) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
                     <div className="max-w-5xl mx-auto space-y-16">
-                        <div className="max-w-3xl space-y-4">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight leading-snug">
-                                Complete Layout &amp; Formatting Integrity
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
+                                Formatting &amp; Geometry Integrity
                             </h2>
-                            <p className="text-base text-neutral-700 leading-relaxed">
-                                Many free converters output disjointed text boxes that break formatting when edited. PDF Maya deconstructs PDF geometry into natural Microsoft Word document elements:
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                PDF Maya deconstructs PDF geometry into authentic Microsoft Word elements rather than floating text frames.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-16 pt-4 border-t border-[#E0DED9]">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
                             {/* Feature Point 1 */}
                             <div className="space-y-3">
-                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
-                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
-                                        <IconCheck size={14} stroke={3} />
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
                                     </span>
-                                    <span>Native Table Grid Reconstruction</span>
-                                </h3>
-                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Native Table Grid Reconstruction
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
                                     Financial balance sheets, invoice grids, and product catalogs are converted into authentic Word tables with editable cells, customizable borders, and formula-ready numbers.
                                 </p>
                             </div>
 
                             {/* Feature Point 2 */}
                             <div className="space-y-3">
-                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
-                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
-                                        <IconCheck size={14} stroke={3} />
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
                                     </span>
-                                    <span>Fluid Paragraph Flow &amp; Font Matching</span>
-                                </h3>
-                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Fluid Paragraph Flow &amp; Font Matching
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
                                     Sentences wrap automatically across margins. Font families, weights (bold, italic), line spacing, and paragraph indents are preserved so you can rewrite copy naturally.
                                 </p>
                             </div>
 
                             {/* Feature Point 3 */}
                             <div className="space-y-3">
-                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
-                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
-                                        <IconCheck size={14} stroke={3} />
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
                                     </span>
-                                    <span>Lossless Image &amp; Graphic Extraction</span>
-                                </h3>
-                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Lossless Image &amp; Graphic Extraction
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
                                     Embedded photography, corporate branding logos, charts, and vector diagrams maintain their native DPI resolution without fuzzy compression.
                                 </p>
                             </div>
 
                             {/* Feature Point 4 */}
                             <div className="space-y-3">
-                                <h3 className="text-lg font-bold text-brand-dark flex items-center gap-2.5">
-                                    <span className="w-6 h-6 rounded-full bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
-                                        <IconCheck size={14} stroke={3} />
+                                <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-lg bg-[#e6f4ea] text-[#107C41] flex items-center justify-center shrink-0">
+                                        <IconCheck size={16} stroke={3} />
                                     </span>
-                                    <span>Multi-Column Document Structuring</span>
-                                </h3>
-                                <p className="text-sm text-neutral-600 pl-8.5 leading-relaxed">
+                                    <h3 className="text-base font-bold text-brand-dark">
+                                        Multi-Column Document Structuring
+                                    </h3>
+                                </div>
+                                <p className="text-sm text-neutral-600 leading-relaxed pl-11">
                                     Magazine layouts, academic research articles, and corporate newsletters flow sequentially through columns without overlapping headers or misplaced images.
                                 </p>
                             </div>
@@ -448,8 +457,8 @@ export default function PdfToWordPage() {
 
                 {/* ── SECTION 4: Everyday Use Cases (Clean 4-Column Open Flow) ── */}
                 <section className="py-20 md:py-24 px-5 md:px-8 bg-[#FAFAF9] border-b border-[#E0DED9]">
-                    <div className="max-w-5xl mx-auto">
-                        <div className="max-w-2xl mb-16 space-y-3">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
                             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
                                 Practical PDF to Word Use Cases
                             </h2>
@@ -462,16 +471,16 @@ export default function PdfToWordPage() {
                             {USE_CASES.map((uc, idx) => {
                                 const UcIcon = uc.icon;
                                 return (
-                                    <div key={idx} className="space-y-2.5">
+                                    <div key={idx} className="space-y-3">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-9 h-9 rounded-lg bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
-                                                <UcIcon size={18} stroke={2} />
+                                            <div className="w-10 h-10 rounded-xl bg-white border border-[#E0DED9] flex items-center justify-center text-brand-dark shrink-0 shadow-2xs">
+                                                <UcIcon size={20} stroke={2} />
                                             </div>
                                             <h3 className="text-base font-bold text-brand-dark">
                                                 {uc.title}
                                             </h3>
                                         </div>
-                                        <p className="text-sm text-neutral-600 leading-relaxed pl-12">
+                                        <p className="text-sm text-neutral-600 leading-relaxed pl-13">
                                             {uc.desc}
                                         </p>
                                     </div>
@@ -481,55 +490,55 @@ export default function PdfToWordPage() {
                     </div>
                 </section>
 
-                {/* ── SECTION 5: Privacy & Security Trust Strip ── */}
-                <section className="py-16 md:py-20 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
-                    <div className="max-w-5xl mx-auto">
-                        <div className="max-w-2xl mb-12 space-y-2">
-                            <h2 className="text-2xl sm:text-3xl font-bold text-brand-dark tracking-tight">
+                {/* ── SECTION 5: Privacy & Security Trust Strip (Refined & Centered) ── */}
+                <section className="py-20 md:py-24 px-5 md:px-8 bg-white border-b border-[#E0DED9]">
+                    <div className="max-w-5xl mx-auto space-y-16">
+                        <div className="text-center max-w-2xl mx-auto space-y-3">
+                            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-brand-dark tracking-tight">
                                 Your Documents Stay Private &amp; Secure
                             </h2>
-                            <p className="text-sm sm:text-base text-neutral-600">
-                                We prioritize document security and user confidentiality across all conversion operations.
+                            <p className="text-base text-neutral-600 leading-relaxed">
+                                We prioritize document confidentiality and data security at every stage of the conversion process.
                             </p>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pt-8 border-t border-[#E0DED9]">
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
-                                    <IconCircleCheck size={18} stroke={2.5} />
-                                    <span className="text-brand-dark">256-Bit SSL/TLS</span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ea] text-[#107C41] border border-[#bfe4cd] flex items-center justify-center shadow-2xs">
+                                    <IconShieldLock size={24} stroke={2} />
                                 </div>
-                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                <h3 className="text-base font-bold text-brand-dark">256-Bit SSL/TLS</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
                                     All transmissions are secured with end-to-end HTTPS encryption.
                                 </p>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
-                                    <IconCircleCheck size={18} stroke={2.5} />
-                                    <span className="text-brand-dark">Instant File Deletion</span>
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#fee2e2] text-[#dc2626] border border-[#fecaca] flex items-center justify-center shadow-2xs">
+                                    <IconTrash size={24} stroke={2} />
                                 </div>
-                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                <h3 className="text-base font-bold text-brand-dark">Instant File Deletion</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
                                     Uploaded PDFs and converted DOCX files are purged automatically.
                                 </p>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
-                                    <IconCircleCheck size={18} stroke={2.5} />
-                                    <span className="text-brand-dark">No Account Needed</span>
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e6f4ef] text-brand-teal border border-[#bce0d5] flex items-center justify-center shadow-2xs">
+                                    <IconUserCheck size={24} stroke={2} />
                                 </div>
-                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                <h3 className="text-base font-bold text-brand-dark">No Account Needed</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
                                     Convert unlimited files without registration, emails, or paywalls.
                                 </p>
                             </div>
 
-                            <div className="space-y-1.5">
-                                <div className="flex items-center gap-2 text-brand-teal font-bold text-sm">
-                                    <IconCircleCheck size={18} stroke={2.5} />
-                                    <span className="text-brand-dark">Universal Support</span>
+                            <div className="flex flex-col items-center text-center space-y-3.5">
+                                <div className="w-13 h-13 rounded-2xl bg-[#e0ecfc] text-[#185ABD] border border-[#c0daf8] flex items-center justify-center shadow-2xs">
+                                    <IconDeviceLaptop size={24} stroke={2} />
                                 </div>
-                                <p className="text-xs text-neutral-500 leading-relaxed">
+                                <h3 className="text-base font-bold text-brand-dark">Universal Support</h3>
+                                <p className="text-xs text-neutral-600 leading-relaxed max-w-[220px]">
                                     Works seamlessly in any browser on macOS, Windows, iOS, and Android.
                                 </p>
                             </div>
