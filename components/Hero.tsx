@@ -39,16 +39,16 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative flex items-center overflow-hidden pt-18 border-b border-[#E0DED9] bg-[#FAFAF9]"
+      className="relative flex items-center overflow-hidden pt-16 md:pt-18 border-b border-[#E0DED9] bg-[#FAFAF9]"
     >
-      <div className="relative max-w-7xl mx-auto px-5 md:px-8 w-full pt-24 md:pt-18 pb-20 md:pb-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* ── LEFT COLUMN ── */}
+      <div className="relative max-w-7xl mx-auto px-5 md:px-8 w-full pt-6 sm:pt-10 md:pt-16 pb-14 sm:pb-18 md:pb-24">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          {/* ── LEFT COLUMN (Headline & Content) ── */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col gap-6"
+            className="order-2 lg:order-1 flex flex-col gap-5 sm:gap-6"
           >
             {/* Headline */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold leading-[1.15] tracking-tight text-brand-dark">
@@ -107,7 +107,7 @@ export default function Hero() {
               delay: 0.1,
             }}
             id="upload"
-            className="relative"
+            className="order-1 lg:order-2 relative"
           >
             {/* Card wrapper */}
             <div className="relative rounded-2xl border border-[#E0DED9] bg-white shadow-sm overflow-hidden">
