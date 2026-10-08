@@ -27,6 +27,7 @@ async def extract_images_from_pdf(file: UploadFile):
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
+    doc = None
     try:
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         base_name = os.path.splitext(file.filename)[0]
@@ -77,12 +78,23 @@ async def extract_images_from_pdf(file: UploadFile):
                     logger.warning(f"Could not extract image xref={xref}: {e}")
                     continue
 
-        doc.close()
         return images_found
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Image extraction failed: {e}")
         raise HTTPException(status_code=500, detail=f"Extraction failed: {str(e)}")
+    finally:
+        if doc is not None:
+            try:
+                doc.close()
+            except Exception:
+                pass
+        try:
+            await file.close()
+        except Exception:
+            pass
 
 
 async def extract_images_as_zip(file: UploadFile):

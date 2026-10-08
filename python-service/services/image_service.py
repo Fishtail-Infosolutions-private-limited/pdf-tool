@@ -25,6 +25,7 @@ async def convert_pdf_to_images(file: UploadFile, format: str = "jpg"):
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
+    doc = None
     try:
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         total_pages = len(doc)
@@ -40,7 +41,6 @@ async def convert_pdf_to_images(file: UploadFile, format: str = "jpg"):
             page = doc.load_page(0)
             pix = page.get_pixmap(matrix=fitz.Matrix(300/72, 300/72))
             img_data = pix.tobytes(ext)
-            doc.close()
             return img_data, f"{base_name}.{ext}", mime
         else:
             # Multi-page: create a ZIP in memory
@@ -53,9 +53,21 @@ async def convert_pdf_to_images(file: UploadFile, format: str = "jpg"):
                     img_name = f"{base_name}-page-{i+1}.{ext}"
                     zip_file.writestr(img_name, img_data)
             
-            doc.close()
             return zip_buffer.getvalue(), f"{base_name}-images.zip", "application/zip"
 
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Image conversion failed: {e}")
         raise HTTPException(status_code=500, detail=f"Conversion failed: {str(e)}")
+    finally:
+        if doc is not None:
+            try:
+                doc.close()
+            except Exception:
+                pass
+        try:
+            await file.close()
+        except Exception:
+            pass
+
