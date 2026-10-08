@@ -33,19 +33,23 @@ async def compress_pdf(file: UploadFile, quality: str = "medium") -> tuple[bytes
         (compressed_bytes, output_filename, original_size_bytes, compressed_size_bytes)
     """
     gs_preset = PRESETS.get(quality, "/ebook")
-    original_bytes = await file.read()
+    try:
+        original_bytes = await file.read()
+    finally:
+        await file.close()
     original_size = len(original_bytes)
 
-    # Use TemporaryFile for processing
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as input_temp, \
-         tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as output_temp:
-        
-        input_temp_path = input_temp.name
-        output_temp_path = output_temp.name
-        
-        # Write original bytes
+    # Use TemporaryFile for processing - ensure file descriptors are closed before invoking GS
+    input_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    output_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    input_temp_path = input_temp.name
+    output_temp_path = output_temp.name
+    try:
         input_temp.write(original_bytes)
         input_temp.flush()
+    finally:
+        input_temp.close()
+        output_temp.close()
         
     try:
         # Construct Ghostscript command
