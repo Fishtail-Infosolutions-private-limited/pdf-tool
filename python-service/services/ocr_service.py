@@ -26,16 +26,21 @@ def _has_selectable_text(pdf_bytes: bytes) -> bool:
     contains at least one character of extractable text.
     Returns True if the doc already has real text on at least one page.
     """
+    doc = None
     try:
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         for page in doc:
             text = page.get_text("text").strip()
             if text:
-                doc.close()
                 return True
-        doc.close()
     except Exception:
         pass
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
     return False
 
 
@@ -62,7 +67,10 @@ async def ocr_pdf(file, language: str = "eng", force: bool = False) -> tuple[byt
         if os.path.exists(tess_path) and tess_path.lower() not in os.environ["PATH"].lower():
             os.environ["PATH"] += os.pathsep + tess_path
 
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
 
     if not pdf_bytes:
         raise ValueError("Uploaded file is empty.")
@@ -77,10 +85,14 @@ async def ocr_pdf(file, language: str = "eng", force: bool = False) -> tuple[byt
         # Return the original file with a note via a special header we'll set in main.py
         return pdf_bytes, output_filename, True  # type: ignore[return-value]
 
-    # Write input to a temp file (ocrmypdf works with file paths)
-    with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_in:
+    # Write input to a temp file and close the handle so it's not locked
+    tmp_in = tempfile.NamedTemporaryFile(suffix=".pdf", delete=False)
+    tmp_in_path = tmp_in.name
+    try:
         tmp_in.write(pdf_bytes)
-        tmp_in_path = tmp_in.name
+        tmp_in.flush()
+    finally:
+        tmp_in.close()
 
     tmp_out_path = tmp_in_path.replace(".pdf", "-ocr.pdf")
 

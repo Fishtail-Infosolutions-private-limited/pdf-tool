@@ -41,64 +41,74 @@ async def add_page_numbers(
     Stamp page numbers (or any text containing {n}/{total}) onto a PDF.
     Returns (pdf_bytes, output_filename).
     """
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
 
-    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-    total_pages = len(doc)
+    doc = None
+    try:
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        total_pages = len(doc)
 
-    # Clamp page range (convert to 0-indexed)
-    fp = max(1, from_page) - 1
-    tp = (min(total_pages, to_page) - 1) if to_page > 0 else total_pages - 1
+        # Clamp page range (convert to 0-indexed)
+        fp = max(1, from_page) - 1
+        tp = (min(total_pages, to_page) - 1) if to_page > 0 else total_pages - 1
 
-    # Parse hex color → (r, g, b) floats 0‒1
-    color = _hex_to_rgb(text_color)
+        # Parse hex color → (r, g, b) floats 0‒1
+        color = _hex_to_rgb(text_color)
 
-    # Choose font
-    base_font = FONT_MAP.get(font_name, "helv")
-    use_bold = bold or (font_name in FORCE_BOLD)
+        # Choose font
+        base_font = FONT_MAP.get(font_name, "helv")
+        use_bold = bold or (font_name in FORCE_BOLD)
 
-    # Determine the actual font key fitz uses for bold/italic combos
-    fitz_font = _resolve_font(base_font, use_bold, italic)
+        # Determine the actual font key fitz uses for bold/italic combos
+        fitz_font = _resolve_font(base_font, use_bold, italic)
 
-    # Resolve template
-    template = custom_text if custom_text.strip() else text_template
+        # Resolve template
+        template = custom_text if custom_text.strip() else text_template
 
-    for i, page in enumerate(doc):
-        if i < fp or i > tp:
-            continue
+        for i, page in enumerate(doc):
+            if i < fp or i > tp:
+                continue
 
-        page_number = first_number + (i - fp)
-        label = template.replace("{n}", str(page_number)).replace("{total}", str(total_pages))
+            page_number = first_number + (i - fp)
+            label = template.replace("{n}", str(page_number)).replace("{total}", str(total_pages))
 
-        rect = page.rect  # page bounding box in points
-        x, y = _compute_position(rect, position, margin, font_size)
+            rect = page.rect  # page bounding box in points
+            x, y = _compute_position(rect, position, margin, font_size)
 
-        # Measure text width to centre/right-align
-        text_width = fitz.get_text_length(label, fontname=fitz_font, fontsize=font_size)
+            # Measure text width to centre/right-align
+            text_width = fitz.get_text_length(label, fontname=fitz_font, fontsize=font_size)
 
-        # Adjust x for centre/right alignment
-        if position[1] == "C":       # ?C → horizontally centred
-            x = x - text_width / 2
-        elif position[1] == "R":     # ?R → right aligned
-            x = x - text_width
+            # Adjust x for centre/right alignment
+            if position[1] == "C":       # ?C → horizontally centred
+                x = x - text_width / 2
+            elif position[1] == "R":     # ?R → right aligned
+                x = x - text_width
 
-        page.insert_text(
-            (x, y),
-            label,
-            fontname=fitz_font,
-            fontsize=font_size,
-            color=color,
-        )
+            page.insert_text(
+                (x, y),
+                label,
+                fontname=fitz_font,
+                fontsize=font_size,
+                color=color,
+            )
 
-        if underline:
-            _draw_underline(page, x, y, text_width, font_size, color)
+            if underline:
+                _draw_underline(page, x, y, text_width, font_size, color)
 
-    out_bytes = doc.tobytes(garbage=4, deflate=True)
-    doc.close()
+        out_bytes = doc.tobytes(garbage=4, deflate=True)
 
-    base = (file.filename or "document").rsplit(".", 1)[0]
-    output_filename = f"{base}_numbered.pdf"
-    return out_bytes, output_filename
+        base = (file.filename or "document").rsplit(".", 1)[0]
+        output_filename = f"{base}_numbered.pdf"
+        return out_bytes, output_filename
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────
