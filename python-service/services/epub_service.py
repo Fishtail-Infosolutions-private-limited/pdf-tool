@@ -25,13 +25,16 @@ async def convert_pdf_to_epub(file: UploadFile):
         )
 
     logger.info(f"Converting via DOCX pipeline: {file.filename}")
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
     
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
     try:
-        with tempfile.TemporaryDirectory() as tmpdir:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmpdir:
             pdf_path = os.path.join(tmpdir, "input.pdf")
             docx_path = os.path.join(tmpdir, "intermediate.docx")
 
@@ -42,9 +45,16 @@ async def convert_pdf_to_epub(file: UploadFile):
             # 2. Convert PDF to DOCX
             # pdf2docx is the best library for recovering structure/tables
             logger.info("Step 1: PDF to DOCX...")
-            cv = Converter(pdf_path)
-            cv.convert(docx_path, start=0, end=None)
-            cv.close()
+            cv = None
+            try:
+                cv = Converter(pdf_path)
+                cv.convert(docx_path, start=0, end=None)
+            finally:
+                if cv:
+                    try:
+                        cv.close()
+                    except Exception:
+                        pass
 
             # 3. Convert DOCX to HTML
             logger.info("Step 2: DOCX to HTML...")
