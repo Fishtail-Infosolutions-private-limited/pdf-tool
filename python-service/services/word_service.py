@@ -20,14 +20,16 @@ async def convert_pdf_to_word(file: UploadFile):
 
     logger.info(f"Converting file: {file.filename}")
 
-    # Read uploaded PDF bytes
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
 
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
     # Use temp files because pdf2docx works with file paths, not byte streams
-    with tempfile.TemporaryDirectory() as tmpdir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmpdir:
         pdf_path = os.path.join(tmpdir, "input.pdf")
         docx_path = os.path.join(tmpdir, "output.docx")
 
@@ -35,17 +37,23 @@ async def convert_pdf_to_word(file: UploadFile):
         with open(pdf_path, "wb") as f:
             f.write(pdf_bytes)
 
+        cv = None
         try:
             # Convert using pdf2docx – this is the magic that preserves layout
             cv = Converter(pdf_path)
             cv.convert(docx_path, start=0, end=None)
-            cv.close()
         except Exception as e:
             logger.error(f"Conversion failed: {e}")
             raise HTTPException(
                 status_code=500,
                 detail=f"Conversion failed: {str(e)}",
             )
+        finally:
+            if cv:
+                try:
+                    cv.close()
+                except Exception:
+                    pass
 
         # Read the resulting DOCX into memory
         with open(docx_path, "rb") as f:
