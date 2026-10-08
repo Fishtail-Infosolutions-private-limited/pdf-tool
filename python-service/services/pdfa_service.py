@@ -41,7 +41,11 @@ async def convert_pdf_to_pdfa(
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
+
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
@@ -64,7 +68,7 @@ async def convert_pdf_to_pdfa(
             ),
         )
 
-    with tempfile.TemporaryDirectory() as tmp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp_dir:
         input_path = os.path.join(tmp_dir, "input.pdf")
         output_path = os.path.join(tmp_dir, "output.pdf")
 
