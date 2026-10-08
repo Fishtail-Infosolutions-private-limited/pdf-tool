@@ -26,22 +26,25 @@ def _is_skippable(text: str) -> bool:
         return True
     return False
 
+import concurrent.futures
+
+# Reusable executor to prevent leaking thread workers/handles on every translated text segment
+_translation_executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
+
 def _safe_translate(translator: GoogleTranslator, text: str, timeout: int = 15) -> str | None:
     """
     Translate a single string with a hard timeout to prevent hangs.
     Returns the translated string or None if it fails/times out.
     """
-    import concurrent.futures
-    with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
-        future = executor.submit(translator.translate, text)
-        try:
-            return future.result(timeout=timeout)
-        except concurrent.futures.TimeoutError:
-            logger.warning(f"Translation timed out for text: {text[:50]}...")
-            return None
-        except Exception as e:
-            logger.warning(f"Translation error: {e}")
-            return None
+    future = _translation_executor.submit(translator.translate, text)
+    try:
+        return future.result(timeout=timeout)
+    except concurrent.futures.TimeoutError:
+        logger.warning(f"Translation timed out for text: {text[:50]}...")
+        return None
+    except Exception as e:
+        logger.warning(f"Translation error: {e}")
+        return None
 
 async def translate_pdf(file: UploadFile, target_lang: str):
     """
@@ -55,8 +58,11 @@ async def translate_pdf(file: UploadFile, target_lang: str):
 
     logger.info(f"Translating PDF to {target_lang}: {file.filename}")
 
-    # Read uploaded PDF bytes
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
+
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
@@ -67,7 +73,7 @@ async def translate_pdf(file: UploadFile, target_lang: str):
         logger.error(str(e))
         raise HTTPException(status_code=503, detail=str(e))
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         input_pdf_path = os.path.join(temp_dir, "input.pdf")
         temp_docx_path = os.path.join(temp_dir, "temp_layout.docx")
         translated_docx_path = os.path.join(temp_dir, "translated.docx")
@@ -78,14 +84,10 @@ async def translate_pdf(file: UploadFile, target_lang: str):
             f.write(pdf_bytes)
 
         # 2. Convert PDF to DOCX
+        cv = None
         try:
             logger.info("Converting PDF to DOCX (Step 1/3)...")
             cv = Converter(input_pdf_path)
-            # Layout settings that improve fidelity:
-            # - connected_border_tolerance: merges nearby borders so table cells stay together
-            # - line_overlap_threshold: reduces false multi-line splits
-            # - line_break_width_ratio: helps with line spacing accuracy
-            # - lines_left_aligned_threshold: avoids falsely splitting columns
             cv.convert(
                 temp_docx_path,
                 start=0,
@@ -95,7 +97,6 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                 line_break_width_ratio=0.5,
                 lines_left_aligned_threshold=0.1,
             )
-            cv.close()
         except Exception as e:
             logger.error(f"PDF to DOCX conversion failed: {e}")
             raise HTTPException(
@@ -103,6 +104,12 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                 detail=f"Layout Extraction Failed: We couldn't parse the PDF structure. " 
                        f"This usually happens with very complex or scanned PDFs. Error: {str(e)}"
             )
+        finally:
+            if cv:
+                try:
+                    cv.close()
+                except Exception:
+                    pass
 
         # 3. Translate the DOCX
         def do_translate():
