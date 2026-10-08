@@ -10,7 +10,12 @@ async def repair_pdf(file):
     """
     try:
         file_bytes = await file.read()
-        
+    finally:
+        await file.close()
+
+    doc = None
+    out_stream = None
+    try:
         # fitz.open will attempt to repair corrupted xref tables automatically
         doc = fitz.open(stream=file_bytes, filetype="pdf")
         
@@ -23,7 +28,6 @@ async def repair_pdf(file):
             deflate=True,
             garbage=4
         )
-        doc.close()
         
         output_filename = f"repaired_{file.filename}"
         if not output_filename.endswith(".pdf"):
@@ -33,3 +37,14 @@ async def repair_pdf(file):
     except Exception as e:
         logger.error(f"Failed to repair PDF: {e}")
         raise
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
+        if out_stream:
+            try:
+                out_stream.close()
+            except Exception:
+                pass
