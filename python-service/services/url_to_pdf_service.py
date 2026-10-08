@@ -73,101 +73,88 @@ async def _async_convert_url_to_pdf(
 
     async with async_playwright() as p:
         browser = await p.chromium.launch(headless=True, args=['--no-sandbox', '--disable-setuid-sandbox'])
-        context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            viewport={"width": viewport_width, "height": 900}
-        )
-        page = await context.new_page()
-        
-        # Force "screen" media so the PDF renders the full desktop layout
-        # instead of the website's narrow @media print styles.
-        await page.emulate_media(media="screen")
-        
         try:
-            if url:
-                await page.goto(url, wait_until="networkidle", timeout=30000)
-            else:
-                await page.set_content(html, wait_until="networkidle", timeout=30000)
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                viewport={"width": viewport_width, "height": 900}
+            )
+            page = await context.new_page()
+            
+            # Force "screen" media so the PDF renders the full desktop layout
+            # instead of the website's narrow @media print styles.
+            await page.emulate_media(media="screen")
+            
+            try:
+                if url:
+                    await page.goto(url, wait_until="networkidle", timeout=30000)
+                else:
+                    await page.set_content(html, wait_until="networkidle", timeout=30000)
+                    
+                if hide_cookie:
+                    # Attempt to inject CSS to hide common cookie banners
+                    await page.add_style_tag(content="""
+                        [id*="cookie" i], [class*="cookie" i], 
+                        [id*="consent" i], [class*="consent" i],
+                        .cookie-banner, #cookie-notice, #cc-main, .cc-window {
+                            display: none !important;
+                            opacity: 0 !important;
+                            visibility: hidden !important;
+                        }
+                    """)
+            except Exception as e:
+                logger.error(f"Error loading page in Playwright: {e}")
+                raise ValueError(f"Failed to load page: {e}")
                 
-            if hide_cookie:
-                # Attempt to inject CSS to hide common cookie banners
-                await page.add_style_tag(content="""
-                    [id*="cookie" i], [class*="cookie" i], 
-                    [id*="consent" i], [class*="consent" i],
-                    .cookie-banner, #cookie-notice, #cc-main, .cc-window {
-                        display: none !important;
-                        opacity: 0 !important;
-                        visibility: hidden !important;
-                    }
-                """)
-        except Exception as e:
-            logger.error(f"Error loading page in Playwright: {e}")
-            await browser.close()
-            raise ValueError(f"Failed to load page: {e}")
-            
-        try:
-            pdf_options: dict = {
-                "print_background": True,
-                "landscape": landscape,
-                "margin": margin_dict,
-            }
-            
-            if one_long_page:
-                # Full-scroll single page: width = viewport, height = total scroll height
-                dims = await page.evaluate("""() => {
-                    return {
-                        width: Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
-                        height: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
-                    }
-                }""")
-                pdf_options["width"] = f"{dims['width']}px"
-                pdf_options["height"] = f"{min(dims['height'], 14000)}px"
-                pdf_options["margin"] = {"top": "0in", "bottom": "0in", "left": "0in", "right": "0in"}
-            else:
-                # Set PDF width = viewport_width so mobile/desktop layout is preserved exactly.
-                # We use width+height instead of format= because format auto-scales to paper width,
-                # which defeats the purpose of setting a specific screen size viewport.
-                paper_dims = {
-                    "a4": ("8.27in", "11.69in"),
-                    "a3": ("11.69in", "16.54in"),
-                    "a5": ("5.83in", "8.27in"),
-                    "letter": ("8.5in", "11in"),
-                    "legal": ("8.5in", "14in"),
-                    "ledger": ("11in", "17in"),
-                    "fit": (None, None),
+            try:
+                pdf_options: dict = {
+                    "print_background": True,
+                    "landscape": landscape,
+                    "margin": margin_dict,
                 }
                 
-                # Get standard paper dims for the selected format
-                std_w, std_h = paper_dims.get(page_size.lower(), ("8.27in", "11.69in"))
-                
-                # We force the PDF width to be exactly viewport_width pixels.
-                # This is the "magic" that makes any screen size work on any paper.
-                pdf_options["width"] = f"{viewport_width}px"
-                
-                # For height, we use the "long" side of the paper if portrait, 
-                # or the "short" side if landscape.
-                if landscape:
-                    pdf_options["height"] = std_w if std_w else "8.27in"
+                if one_long_page:
+                    # Full-scroll single page: width = viewport, height = total scroll height
+                    dims = await page.evaluate("""() => {
+                        return {
+                            width: Math.max(document.body.scrollWidth, document.documentElement.scrollWidth),
+                            height: Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)
+                        }
+                    }""")
+                    pdf_options["width"] = f"{dims['width']}px"
+                    pdf_options["height"] = f"{min(dims['height'], 14000)}px"
+                    pdf_options["margin"] = {"top": "0in", "bottom": "0in", "left": "0in", "right": "0in"}
                 else:
-                    pdf_options["height"] = std_h if std_h else "11.69in"
-                
-                # If page_size is "fit", we omit height to let it auto-break or be single page
-                if page_size.lower() == "fit":
-                    pdf_options.pop("height", None)
+                    paper_dims = {
+                        "a4": ("8.27in", "11.69in"),
+                        "a3": ("11.69in", "16.54in"),
+                        "a5": ("5.83in", "8.27in"),
+                        "letter": ("8.5in", "11in"),
+                        "legal": ("8.5in", "14in"),
+                        "ledger": ("11in", "17in"),
+                        "fit": (None, None),
+                    }
+                    
+                    std_w, std_h = paper_dims.get(page_size.lower(), ("8.27in", "11.69in"))
+                    pdf_options["width"] = f"{viewport_width}px"
+                    
+                    if landscape:
+                        pdf_options["height"] = std_w if std_w else "8.27in"
+                    else:
+                        pdf_options["height"] = std_h if std_h else "11.69in"
+                    
+                    if page_size.lower() == "fit":
+                        pdf_options.pop("height", None)
 
-                # Ensure landscape flag is False because we are manually setting 
-                # width and height to the final desired orientation.
-                pdf_options["landscape"] = False
+                    pdf_options["landscape"] = False
+                    
+                pdf_bytes = await page.pdf(**pdf_options)
                 
-            pdf_bytes = await page.pdf(**pdf_options)
-            
-        except Exception as e:
-            logger.error(f"Error generating PDF in Playwright: {e}")
+            except Exception as e:
+                logger.error(f"Error generating PDF in Playwright: {e}")
+                raise ValueError(f"Failed to generate PDF: {e}")
+        finally:
             await browser.close()
-            raise ValueError(f"Failed to generate PDF: {e}")
             
-        await browser.close()
-        
     return pdf_bytes, output_filename
 
 async def convert_url_to_pdf(

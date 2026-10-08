@@ -111,70 +111,81 @@ async def add_watermark(
     Stamp a text or image watermark onto a PDF.
     Returns (pdf_bytes, output_filename).
     """
-    pdf_bytes = await file.read()
-    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
-    total = len(doc)
-    pages_to_watermark = _parse_page_range(page_range, total)
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
 
-    # Multiple positions support
-    pos_list = [p.strip() for p in position.split(",")]
+    doc = None
+    try:
+        doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+        total = len(doc)
+        pages_to_watermark = _parse_page_range(page_range, total)
 
-    # Process image exactly ONCE before looping
-    pre_img_bytes = None
-    pre_img_w = 0
-    pre_img_h = 0
-    pre_unrotated_w = 0
+        # Multiple positions support
+        pos_list = [p.strip() for p in position.split(",")]
 
-    if watermark_type == "image" and image_data:
-        try:
-            raw_bytes = base64.b64decode(image_data)
-            with Image.open(io.BytesIO(raw_bytes)) as img:
-                img = img.convert("RGBA")
-                if opacity < 1.0:
-                    alpha = img.getchannel('A')
-                    new_alpha = alpha.point(lambda i: int(i * opacity))
-                    img.putalpha(new_alpha)
-                
-                pre_unrotated_w, _ = img.size
+        # Process image exactly ONCE before looping
+        pre_img_bytes = None
+        pre_img_w = 0
+        pre_img_h = 0
+        pre_unrotated_w = 0
 
-                if int(rotation) % 360 != 0:
-                    img = img.rotate(-rotation, expand=True, resample=Image.BICUBIC)
-                
-                out_io = io.BytesIO()
-                img.save(out_io, format="PNG")
-                pre_img_bytes = out_io.getvalue()
-                pre_img_w, pre_img_h = img.size
-        except Exception as e:
-            print(f"Failed to pre-process watermark image: {e}")
+        if watermark_type == "image" and image_data:
+            try:
+                raw_bytes = base64.b64decode(image_data)
+                with Image.open(io.BytesIO(raw_bytes)) as img:
+                    img = img.convert("RGBA")
+                    if opacity < 1.0:
+                        alpha = img.getchannel('A')
+                        new_alpha = alpha.point(lambda i: int(i * opacity))
+                        img.putalpha(new_alpha)
+                    
+                    pre_unrotated_w, _ = img.size
 
-    for page_idx in pages_to_watermark:
-        page = doc[page_idx]
-        rect = page.rect
-        pw, ph = rect.width, rect.height
+                    if int(rotation) % 360 != 0:
+                        img = img.rotate(-rotation, expand=True, resample=Image.BICUBIC)
+                    
+                    with io.BytesIO() as out_io:
+                        img.save(out_io, format="PNG")
+                        pre_img_bytes = out_io.getvalue()
+                    pre_img_w, pre_img_h = img.size
+            except Exception as e:
+                print(f"Failed to pre-process watermark image: {e}")
 
-        for pos in pos_list:
-            pos_fractions = POSITION_GRID.get(pos, (0.5, 0.5))
-            # Anchor point in page coordinates
-            anchor_x = rect.x0 + pos_fractions[0] * pw
-            anchor_y = rect.y0 + pos_fractions[1] * ph
+        for page_idx in pages_to_watermark:
+            page = doc[page_idx]
+            rect = page.rect
+            pw, ph = rect.width, rect.height
 
-            if watermark_type == "image" and pre_img_bytes:
-                _stamp_image(
-                    page, pre_img_bytes, pre_img_w, pre_img_h, pre_unrotated_w,
-                    anchor_x, anchor_y, pw, image_width_pct, layer, pos_fractions
-                )
-            elif watermark_type == "text":
-                _stamp_text(
-                    page, text, font_name, font_size, bold, italic, underline,
-                    text_color, anchor_x, anchor_y, pw, ph,
-                    opacity, rotation, layer, pos_fractions
-                )
+            for pos in pos_list:
+                pos_fractions = POSITION_GRID.get(pos, (0.5, 0.5))
+                # Anchor point in page coordinates
+                anchor_x = rect.x0 + pos_fractions[0] * pw
+                anchor_y = rect.y0 + pos_fractions[1] * ph
 
-    out_bytes = doc.tobytes(garbage=4, deflate=True)
-    doc.close()
+                if watermark_type == "image" and pre_img_bytes:
+                    _stamp_image(
+                        page, pre_img_bytes, pre_img_w, pre_img_h, pre_unrotated_w,
+                        anchor_x, anchor_y, pw, image_width_pct, layer, pos_fractions
+                    )
+                elif watermark_type == "text":
+                    _stamp_text(
+                        page, text, font_name, font_size, bold, italic, underline,
+                        text_color, anchor_x, anchor_y, pw, ph,
+                        opacity, rotation, layer, pos_fractions
+                    )
 
-    base = (file.filename or "document").rsplit(".", 1)[0]
-    return out_bytes, f"{base}_watermarked.pdf"
+        out_bytes = doc.tobytes(garbage=4, deflate=True)
+
+        base = (file.filename or "document").rsplit(".", 1)[0]
+        return out_bytes, f"{base}_watermarked.pdf"
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 def _stamp_text(page, text, font_name, font_size, bold, italic, underline,
