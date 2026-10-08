@@ -67,7 +67,11 @@ async def convert_excel_to_pdf(file: UploadFile) -> tuple[bytes, str]:
     base_name = os.path.splitext(filename)[0]
     output_filename = f"{base_name}.pdf"
 
-    content = await file.read()
+    try:
+        content = await file.read()
+    finally:
+        await file.close()
+
     if not content:
         raise HTTPException(status_code=400, detail="Empty file uploaded.")
 
@@ -77,7 +81,7 @@ async def convert_excel_to_pdf(file: UploadFile) -> tuple[bytes, str]:
         logger.error(str(e))
         raise HTTPException(status_code=503, detail=str(e))
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp_dir:
         input_path = os.path.join(temp_dir, filename)
         expected_pdf = os.path.join(temp_dir, f"{base_name}.pdf")
 
