@@ -6,11 +6,24 @@ import { User, IUser } from "@/lib/models/User";
 import bcrypt from "bcryptjs";
 import { isStudentEmail } from "@/lib/edu-domains";
 
+const useSecureCookies = process.env.NODE_ENV === "production" && (process.env.NEXTAUTH_URL?.startsWith("https://") ?? false);
+const cookiePrefix = useSecureCookies ? "__Secure-" : "";
+const hostPrefix = useSecureCookies ? "__Host-" : "";
+
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_ID || "",
       clientSecret: process.env.GOOGLE_SECRET || "",
+      authorization: {
+        params: {
+          prompt: "consent",
+          access_type: "offline",
+          response_type: "code",
+        },
+      },
+      // Use PKCE for code verification, preventing fragile state cookie drops
+      checks: ["pkce"],
     }),
     CredentialsProvider({
       name: "Credentials",
@@ -50,6 +63,59 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  useSecureCookies,
+  cookies: {
+    sessionToken: {
+      name: `${cookiePrefix}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+    callbackUrl: {
+      name: `${cookiePrefix}next-auth.callback-url`,
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+    csrfToken: {
+      name: `${hostPrefix}next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+      },
+    },
+    pkceCodeVerifier: {
+      name: `${cookiePrefix}next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+        maxAge: 900,
+      },
+    },
+    state: {
+      name: `${cookiePrefix}next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+        maxAge: 900,
+      },
+    },
+  },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
