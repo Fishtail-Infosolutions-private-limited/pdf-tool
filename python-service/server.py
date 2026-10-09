@@ -10,8 +10,11 @@ background-thread loop — use ProactorEventLoop and support subprocesses.
 import sys
 import asyncio
 
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+if sys.platform == "win32" and sys.version_info < (3, 8):
+    try:
+        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+    except Exception:
+        pass
 
 import uvicorn
 import os
