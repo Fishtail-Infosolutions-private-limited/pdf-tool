@@ -12,6 +12,10 @@ services:
       timeout: 10s
       retries: 3
     restart: always
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
 
   nextjs-app:
     build:
@@ -20,11 +24,20 @@ services:
     container_name: pdf-nextjs-app
     ports:
       - "${HOST_APP_PORT:-3010}:3008"
+    env_file:
+      - .env
     environment:
       - PYTHON_SERVICE_URL=http://python-service:8001
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
     depends_on:
       python-service:
         condition: service_started
     volumes:
       - ./storage:/app/storage
     restart: always
+

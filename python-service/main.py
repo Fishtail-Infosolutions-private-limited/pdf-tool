@@ -18,9 +18,27 @@ import io
 import json
 import base64
 import logging
+import starlette.formparsers
+from starlette.requests import Request
 from fastapi import FastAPI, File, Form, UploadFile, Query, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
+
+# Allow uploads up to 100MB without triggering Starlette default 1MB part size limit
+starlette.formparsers.MultiPartParser.max_part_size = 100 * 1024 * 1024
+starlette.formparsers.MultiPartParser.spool_max_size = 10 * 1024 * 1024
+
+# Increase Linux container file descriptor limit if running under Linux/Docker
+if sys.platform != "win32":
+    try:
+        import resource
+        soft, hard = resource.getrlimit(resource.RLIMIT_NOFILE)
+        target = min(hard, 65536) if hard > 0 else 65536
+        if soft < target:
+            resource.setrlimit(resource.RLIMIT_NOFILE, (target, hard))
+            logging.info(f"Increased RLIMIT_NOFILE soft limit from {soft} to {target} (hard: {hard})")
+    except Exception as e:
+        logging.warning(f"Could not adjust RLIMIT_NOFILE: {e}")
 
 # Import our separate services
 from services.word_service import convert_pdf_to_word
@@ -67,6 +85,27 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def cleanup_upload_files(request: Request, call_next):
+    """
+    Ensures any open SpooledTemporaryFile / UploadFile file descriptors 
+    are immediately closed when request processing ends, preventing [Errno 24] leaks.
+    """
+    try:
+        return await call_next(request)
+    finally:
+        try:
+            form = getattr(request, "_form", None)
+            if form is not None:
+                for _, value in form.multi_items():
+                    if hasattr(value, "close") and callable(value.close):
+                        if asyncio.iscoroutinefunction(value.close):
+                            await value.close()
+                        else:
+                            value.close()
+        except Exception:
+            pass
 
 @app.get("/health")
 async def health_check():
@@ -245,10 +284,15 @@ async def pdf_pages_to_jpg(
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
-    pdf_bytes = await file.read()
+    try:
+        pdf_bytes = await file.read()
+    finally:
+        await file.close()
+
     if len(pdf_bytes) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty.")
 
+    doc = None
     try:
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         base_name = os.path.splitext(file.filename)[0]
@@ -268,13 +312,18 @@ async def pdf_pages_to_jpg(
                 "name": f"{base_name}-page-{i+1}.jpg",
             })
 
-        doc.close()
         logger.info(f"Rendered {len(pages)} pages from '{file.filename}'")
         return JSONResponse(content={"pages": pages, "total": len(pages)})
 
     except Exception as e:
         logger.error(f"Page rendering failed: {e}")
         raise HTTPException(status_code=500, detail=f"Rendering failed: {str(e)}")
+    finally:
+        if doc:
+            try:
+                doc.close()
+            except Exception:
+                pass
 
 
 @app.post("/convert/pdf-extract-images")
@@ -755,6 +804,12 @@ async def images_to_pdf_endpoint(
     except Exception as e:
         logger.error(f"Unexpected error in IMAGES-to-PDF: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to generate PDF: {str(e)}")
+    finally:
+        for f in files:
+            try:
+                await f.close()
+            except Exception:
+                pass
 
 
 @app.post("/edit/extract-content")
@@ -785,8 +840,11 @@ async def apply_edits_endpoint(
     """
     try:
         if edits_file:
-            edits_bytes = await edits_file.read()
-            edits = edits_bytes.decode('utf-8')
+            try:
+                edits_bytes = await edits_file.read()
+                edits = edits_bytes.decode('utf-8')
+            finally:
+                await edits_file.close()
         elif not edits:
             raise ValueError("Missing edits payload")
 
