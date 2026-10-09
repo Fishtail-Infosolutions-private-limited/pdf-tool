@@ -11,8 +11,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
+        const fileBuffer = await file.arrayBuffer();
+        const blob = new Blob([fileBuffer], { type: file.type || "application/pdf" });
         const forwardForm = new FormData();
-        forwardForm.append("file", file, file.name);
+        forwardForm.append("file", blob, file.name || "document.pdf");
 
         let pythonResponse: Response;
         try {

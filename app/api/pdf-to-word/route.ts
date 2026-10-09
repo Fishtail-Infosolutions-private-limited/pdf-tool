@@ -12,8 +12,10 @@ export async function POST(req: NextRequest) {
         }
 
         // Forward the file to the Python microservice
+        const fileBuffer = await file.arrayBuffer();
+        const blob = new Blob([fileBuffer], { type: file.type || "application/pdf" });
         const forwardForm = new FormData();
-        forwardForm.append("file", file, file.name);
+        forwardForm.append("file", blob, file.name || "document.pdf");
 
         let pythonResponse: Response;
         try {

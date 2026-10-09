@@ -11,8 +11,10 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
         }
 
+        const fileBuffer = await file.arrayBuffer();
+        const inputBlob = new Blob([fileBuffer], { type: file.type || "application/pdf" });
         const pythonFormData = new FormData();
-        pythonFormData.append("file", file);
+        pythonFormData.append("file", inputBlob, file.name || "document.pdf");
 
         const response = await fetch(`${PYTHON_SERVICE_URL}/convert/pdf-to-txt`, {
             method: "POST",

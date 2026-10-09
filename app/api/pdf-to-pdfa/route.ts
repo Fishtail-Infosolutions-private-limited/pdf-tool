@@ -14,8 +14,10 @@ export async function POST(req: NextRequest) {
 
         const microserviceUrl = `${PYTHON_SERVICE_URL}/convert/pdf-to-pdfa`;
 
+        const fileBuffer = await file.arrayBuffer();
+        const blob = new Blob([fileBuffer], { type: file.type || "application/pdf" });
         const proxyFormData = new FormData();
-        proxyFormData.append("file", file);
+        proxyFormData.append("file", blob, file.name || "document.pdf");
         proxyFormData.append("conformance_level", conformanceLevel);
 
         const response = await fetch(microserviceUrl, {
