@@ -23,22 +23,54 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 const COOKIE_NAME = "pdfmaya_did";
 
 export async function GET(req: NextRequest) {
-  const deviceId = req.cookies.get(COOKIE_NAME)?.value;
+  try {
+    const deviceId = req.cookies.get(COOKIE_NAME)?.value;
 
-  const session = await getServerSession(authOptions);
-  let tier: UserTier = "anonymous";
-  let key = `fp:${deviceId}`;
+    let session = null;
+    try {
+      session = await getServerSession(authOptions);
+    } catch {
+      // Ignore session lookup errors
+    }
 
-  if (session?.user) {
-    const user = session.user as any;
-    tier = user.isStudent ? "premium" : "registered";
-    key = `uid:${user.id || user.email}`;
-  }
+    let tier: UserTier = "anonymous";
+    let key = `fp:${deviceId}`;
 
-  // If there is no cookie yet and no session, the user hasn't been fingerprinted.
-  // Return a "full tank" response — the session will be initialised
-  // when FingerprintProvider runs on the client.
-  if (!deviceId && tier === "anonymous") {
+    if (session?.user) {
+      const user = session.user as any;
+      tier = user.isStudent ? "premium" : "registered";
+      key = `uid:${user.id || user.email}`;
+    }
+
+    // If there is no cookie yet and no session, the user hasn't been fingerprinted.
+    // Return a "full tank" response — the session will be initialised
+    // when FingerprintProvider runs on the client.
+    if (!deviceId && tier === "anonymous") {
+      return NextResponse.json({
+        allowed: true,
+        remaining: LIMITS.anonymous.max,
+        limit: LIMITS.anonymous.max,
+        resetAt: Date.now() + LIMITS.anonymous.windowMs,
+        resetInSeconds: LIMITS.anonymous.windowMs / 1000,
+      });
+    }
+
+    const result = await getRemainingUsage(key, tier);
+
+    const resetInSeconds = Math.max(
+      0,
+      Math.ceil((result.resetAt - Date.now()) / 1000)
+    );
+
+    return NextResponse.json({
+      allowed: result.allowed,
+      remaining: result.remaining,
+      limit: result.limit,
+      resetAt: result.resetAt,
+      resetInSeconds,
+    });
+  } catch (error) {
+    console.error("check-limit error:", error);
     return NextResponse.json({
       allowed: true,
       remaining: LIMITS.anonymous.max,
@@ -47,19 +79,4 @@ export async function GET(req: NextRequest) {
       resetInSeconds: LIMITS.anonymous.windowMs / 1000,
     });
   }
-
-  const result = await getRemainingUsage(key, tier);
-
-  const resetInSeconds = Math.max(
-    0,
-    Math.ceil((result.resetAt - Date.now()) / 1000)
-  );
-
-  return NextResponse.json({
-    allowed: result.allowed,
-    remaining: result.remaining,
-    limit: result.limit,
-    resetAt: result.resetAt,
-    resetInSeconds,
-  });
 }

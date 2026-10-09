@@ -55,8 +55,12 @@ export async function POST(req: Request) {
        message: autoStudent ? "Verification code sent." : "User created successfully.",
        isStudent: autoStudent 
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("register error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const isDbError = error?.name === "MongooseServerSelectionError" || error?.message?.includes("ECONNREFUSED") || error?.message?.includes("MongoDB");
+    return NextResponse.json(
+      { error: isDbError ? "Database is currently unavailable. Please try again shortly." : "Internal Server Error" },
+      { status: 500 }
+    );
   }
 }
