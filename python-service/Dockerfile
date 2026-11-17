@@ -10,6 +10,23 @@ ENV PIP_BREAK_SYSTEM_PACKAGES 1
 RUN apt-get update && apt-get install -y --no-install-recommends \
     tesseract-ocr \
     tesseract-ocr-eng \
+    tesseract-ocr-fra \
+    tesseract-ocr-deu \
+    tesseract-ocr-spa \
+    tesseract-ocr-por \
+    tesseract-ocr-ita \
+    tesseract-ocr-nld \
+    tesseract-ocr-rus \
+    tesseract-ocr-chi-sim \
+    tesseract-ocr-chi-tra \
+    tesseract-ocr-jpn \
+    tesseract-ocr-kor \
+    tesseract-ocr-ara \
+    tesseract-ocr-hin \
+    fonts-noto-core \
+    fonts-noto-cjk \
+    fonts-lohit-deva \
+    fonts-lohit-mar \
     ghostscript \
     unpaper \
     pngquant \

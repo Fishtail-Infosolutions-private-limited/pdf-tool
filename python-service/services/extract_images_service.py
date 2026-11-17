@@ -32,6 +32,7 @@ async def extract_images_from_pdf(file: UploadFile):
         doc = fitz.open(stream=pdf_bytes, filetype="pdf")
         base_name = os.path.splitext(file.filename)[0]
         images_found = []
+        seen_xrefs = set()
 
         for page_index in range(len(doc)):
             page = doc.load_page(page_index)
@@ -39,6 +40,9 @@ async def extract_images_from_pdf(file: UploadFile):
 
             for img_index, img_info in enumerate(image_list):
                 xref = img_info[0]
+                if xref in seen_xrefs:
+                    continue
+                seen_xrefs.add(xref)
                 try:
                     base_image = doc.extract_image(xref)
                     image_bytes = base_image["image"]

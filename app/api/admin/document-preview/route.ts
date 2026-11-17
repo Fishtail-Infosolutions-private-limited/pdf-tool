@@ -18,9 +18,9 @@ const MIME_MAP: Record<string, string> = {
 export async function GET(req: NextRequest) {
   try {
     const adminToken = req.cookies.get("admin_token")?.value;
-    const expectedToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
+    const expectedToken = process.env.NEXTAUTH_SECRET;
 
-    if (!adminToken || adminToken !== expectedToken) {
+    if (!expectedToken || !adminToken || adminToken !== expectedToken) {
       return new NextResponse("Forbidden", { status: 403 });
     }
 

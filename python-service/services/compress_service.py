@@ -111,6 +111,13 @@ async def compress_pdf(file: UploadFile, quality: str = "medium") -> tuple[bytes
         # Read compressed output
         with open(output_temp_path, "rb") as f_out:
             compressed_bytes = f_out.read()
+
+        # Guard against Ghostscript inflation: If the compressed output is larger
+        # than the original (common on small PDFs or vector-heavy files where font subsetting adds overhead),
+        # return the original bytes.
+        if len(compressed_bytes) >= original_size and original_size > 0:
+            logger.info(f"Compression produced larger file ({len(compressed_bytes)} >= {original_size}). Keeping original.")
+            compressed_bytes = original_bytes
             
     finally:
         # Cleanup temp files

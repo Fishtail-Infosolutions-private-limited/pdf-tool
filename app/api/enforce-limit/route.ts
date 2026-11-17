@@ -45,8 +45,14 @@ export async function POST(req: NextRequest) {
   }
 
   // --- 2. Determine the user tier ---------------------------------
-  const session = await getServerSession(authOptions);
-  
+  // Bound the session lookup with a fast timeout so an unresponsive
+  // database (e.g. MongoDB unreachable in Docker) cannot stall the
+  // request for 20-30s. (ISSUE-12)
+  const session = await Promise.race([
+    getServerSession(authOptions),
+    new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000)),
+  ]);
+
   let tier: UserTier = "anonymous";
   let key = `fp:${deviceId}`;
 

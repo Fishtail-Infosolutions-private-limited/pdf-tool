@@ -11,6 +11,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
         }
 
+        const MAX_FILE_SIZE_BYTES = 30 * 1024 * 1024; // 30 MB
+        if (file.size > MAX_FILE_SIZE_BYTES) {
+            return NextResponse.json(
+                { error: "The uploaded file exceeds the 30MB limit. Please upload a smaller document." },
+                { status: 413 }
+            );
+        }
+
         const fileBuffer = await file.arrayBuffer();
         const inputBlob = new Blob([fileBuffer], { type: file.type || "application/pdf" });
         const pythonFormData = new FormData();
@@ -22,10 +30,16 @@ export async function POST(request: NextRequest) {
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
+            let errorText = await response.text();
             console.error("Python microservice error:", errorText);
+            try {
+                const parsed = JSON.parse(errorText);
+                if (parsed.detail) errorText = parsed.detail;
+            } catch {
+                // Keep raw text
+            }
             return NextResponse.json(
-                { error: `Python service error: ${errorText}` },
+                { error: `Text extraction failed: ${errorText}` },
                 { status: response.status }
             );
         }
