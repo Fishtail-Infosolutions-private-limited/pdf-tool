@@ -189,6 +189,9 @@ export default function PdfToPptxClient() {
                                         </>
                                     )}
                                 </button>
+                                <p className="text-xs text-neutral-400 text-center leading-relaxed">
+                                    Note: Slides preserve layout, figures, and styling with pixel-perfect visual fidelity. To extract editable flowing text paragraphs, use PDF to Word.
+                                </p>
                             </div>
                         )}
                     </div>

@@ -56,13 +56,13 @@ async def convert_pdf_to_epub(file: UploadFile):
                     except Exception:
                         pass
 
-            # 3. Convert DOCX to HTML
+            # 3. Convert DOCX to HTML with embedded images preserved as base64 data URIs
             logger.info("Step 2: DOCX to HTML...")
-            # We'll need a place to store images temporarily if mammoth extracts them, 
-            # though by default mammoth often ignores them unless we provide an image handler.
-            # For now, let's just get the HTML.
             with open(docx_path, "rb") as docx_file:
-                result = mammoth.convert_to_html(docx_file)
+                result = mammoth.convert_to_html(
+                    docx_file,
+                    convert_image=mammoth.images.img_element(mammoth.images.data_uri)
+                )
                 html_content = result.value
 
             # 4. Package as EPUB with Multiple Chapters

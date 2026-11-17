@@ -143,8 +143,10 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                                     valid_runs.append(run)
 
             if not valid_runs:
-                doc.save(translated_docx_path)
-                return
+                raise HTTPException(
+                    status_code=400,
+                    detail="No machine-readable text was found in this document. If this is a scanned document, please run OCR PDF first."
+                )
 
             delimiter = "\n\n"
             max_chars = 4500
@@ -169,13 +171,14 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                 chunks.append(current_chunk)
 
             logger.info(f"Translating {len(valid_runs)} runs in {len(chunks)} chunks...")
+            translated_count = 0
 
             for item_chunk in chunks:
                 combined_text = delimiter.join([item[2] for item in item_chunk])
                 try:
                     translated_combined = translator.translate(combined_text)
                     if not translated_combined:
-                        continue
+                        raise ValueError("Translation provider returned empty response.")
                     
                     # Normalize translated newlines occasionally warped by the translation service
                     normalized_translation = translated_combined.replace('\r\n', '\n').replace('\n \n', '\n\n')
@@ -193,6 +196,7 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                                 if original_text.startswith('  '): out = ' ' + out
                                 if original_text.endswith(' '): out = out + ' '
                                 run.text = out
+                                translated_count += 1
                     else:
                         # Success, assign mapped values
                         for i, (run, original_text, stripped) in enumerate(item_chunk):
@@ -203,6 +207,7 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                                 if original_text.startswith('  '): out = ' ' + out
                                 if original_text.endswith(' '): out = out + ' '
                                 run.text = out
+                                translated_count += 1
 
                 except Exception as e:
                     logger.warning(f"Translation failed for a chunk: {e}. Fallback to sequential.")
@@ -215,6 +220,13 @@ async def translate_pdf(file: UploadFile, target_lang: str):
                             if original_text.startswith('  '): out = ' ' + out
                             if original_text.endswith(' '): out = out + ' '
                             run.text = out
+                            translated_count += 1
+
+            if translated_count == 0:
+                raise HTTPException(
+                    status_code=502,
+                    detail="The translation service is currently being rate-limited (429 Too Many Requests). Please try again in a few minutes."
+                )
 
             # Let's save the file
             doc.save(translated_docx_path)

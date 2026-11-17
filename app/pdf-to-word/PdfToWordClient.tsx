@@ -194,6 +194,9 @@ export default function PdfToWordClient() {
                                         </>
                                     )}
                                 </button>
+                                <p className="text-xs text-neutral-400 text-center leading-relaxed">
+                                    Tip: Text and tables convert to fully editable Word content. Complex multi-layered vector charts may be embedded as images to preserve visual accuracy.
+                                </p>
                             </div>
                         )}
                     </div>

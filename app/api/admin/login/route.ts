@@ -16,7 +16,11 @@ export async function POST(req: NextRequest) {
     
     // Simple secure cookie - hardcoded hash just to mark the session securely on the client
     // In production, you'd use a real JWT or crypto hash here tied to an env secret
-    const adminToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
+    const adminToken = process.env.NEXTAUTH_SECRET;
+    if (!adminToken) {
+      console.error("[Admin Login] NEXTAUTH_SECRET is not configured on the server.");
+      return NextResponse.json({ error: "Server authentication is improperly configured." }, { status: 500 });
+    }
     
     response.cookies.set("admin_token", adminToken, {
       httpOnly: true,

@@ -43,8 +43,19 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, message: "Password updated successfully!" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Reset password error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const isDbError =
+      error?.name === "MongooseServerSelectionError" ||
+      error?.message?.includes("ECONNREFUSED") ||
+      error?.message?.includes("MongoDB");
+    return NextResponse.json(
+      {
+        error: isDbError
+          ? "Database is currently unavailable. Please try again shortly."
+          : "Internal Server Error",
+      },
+      { status: 500 }
+    );
   }
 }

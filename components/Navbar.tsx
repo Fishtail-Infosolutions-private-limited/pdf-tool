@@ -39,6 +39,7 @@ import {
     IconFileMinus,
 } from "@tabler/icons-react";
 import { UserDropdown } from "@/components/UserDropdown";
+import { UsageBadge } from "@/components/UsageBadge";
 
 // Pastel colour palette per category
 const CAT_COLORS: Record<string, { bg: string; iconColor: string }> = {
@@ -394,8 +395,11 @@ export default function Navbar() {
                     ))}
                 </ul>
 
-                {/* Right side: auth buttons + mobile burger — always grouped together */}
+                {/* Right side: usage badge + auth buttons + mobile burger */}
                 <div className="flex items-center gap-2">
+                    <div className="hidden sm:flex items-center">
+                        <UsageBadge />
+                    </div>
                     <UserDropdown />
 
                     {/* Mobile burger */}

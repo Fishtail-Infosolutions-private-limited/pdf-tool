@@ -1,4 +1,5 @@
 import io
+import os
 import fitz  # PyMuPDF
 from fastapi import UploadFile
 
@@ -59,11 +60,29 @@ async def add_page_numbers(
         color = _hex_to_rgb(text_color)
 
         # Choose font
+        is_devanagari = font_name in ("Lohit Marathi", "Lohit Devanagari") or any('\u0900' <= char <= '\u097F' for char in template)
+        custom_font_file = None
+        if is_devanagari:
+            # Check for bundled or system Devanagari fonts
+            candidates = [
+                os.path.join(os.path.dirname(__file__), "..", "fonts", "Devanagari.ttc"),
+                "/usr/share/fonts/truetype/lohit-devanagari/Lohit-Devanagari.ttf",
+                "/usr/share/fonts/truetype/lohit-marathi/Lohit-Marathi.ttf",
+                "/usr/share/fonts/truetype/noto/NotoSansDevanagari-Regular.ttf",
+                "/System/Library/Fonts/Supplemental/ITFDevanagari.ttc",
+            ]
+            for cand in candidates:
+                if os.path.isfile(cand):
+                    custom_font_file = cand
+                    break
+
         base_font = FONT_MAP.get(font_name, "helv")
         use_bold = bold or (font_name in FORCE_BOLD)
 
         # Determine the actual font key fitz uses for bold/italic combos
         fitz_font = _resolve_font(base_font, use_bold, italic)
+        if custom_font_file:
+            fitz_font = "custom_devanagari"
 
         # Resolve template
         template = custom_text if custom_text.strip() else text_template
@@ -72,6 +91,12 @@ async def add_page_numbers(
             if i < fp or i > tp:
                 continue
 
+            if custom_font_file:
+                try:
+                    page.insert_font(fontname="custom_devanagari", fontfile=custom_font_file)
+                except Exception:
+                    pass
+
             page_number = first_number + (i - fp)
             label = template.replace("{n}", str(page_number)).replace("{total}", str(total_pages))
 
@@ -79,7 +104,14 @@ async def add_page_numbers(
             x, y = _compute_position(rect, position, margin, font_size)
 
             # Measure text width to centre/right-align
-            text_width = fitz.get_text_length(label, fontname=fitz_font, fontsize=font_size)
+            if custom_font_file:
+                try:
+                    f_obj = fitz.Font(fontfile=custom_font_file)
+                    text_width = f_obj.text_length(label, fontsize=font_size)
+                except Exception:
+                    text_width = len(label) * font_size * 0.6
+            else:
+                text_width = fitz.get_text_length(label, fontname=fitz_font, fontsize=font_size)
 
             # Adjust x for centre/right alignment
             if position[1] == "C":       # ?C → horizontally centred

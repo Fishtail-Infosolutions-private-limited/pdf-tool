@@ -38,8 +38,19 @@ export async function POST(req: Request) {
     await sendPasswordResetEmail(email.toLowerCase(), otp);
 
     return NextResponse.json({ success: true, message: "Code sent to your inbox!" });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Forgot password request error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const isDbError =
+      error?.name === "MongooseServerSelectionError" ||
+      error?.message?.includes("ECONNREFUSED") ||
+      error?.message?.includes("MongoDB");
+    return NextResponse.json(
+      {
+        error: isDbError
+          ? "Database is currently unavailable. Please try again shortly."
+          : "Internal Server Error",
+      },
+      { status: 500 }
+    );
   }
 }

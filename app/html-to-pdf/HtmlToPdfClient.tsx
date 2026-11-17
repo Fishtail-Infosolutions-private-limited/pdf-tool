@@ -229,8 +229,23 @@ export default function HtmlToPdfClient() {
         setSettingsChanged(false);
     };
 
+    const normalizeUrl = (raw: string) => {
+        const trimmed = raw.trim();
+        if (!trimmed) return "";
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        return `https://${trimmed}`;
+    };
+
+    const isValidUrl = (value: string) =>
+        /^https?:\/\/[^\s/$.?#].[^\s]*$/i.test(value);
+
     const handleFetchUrl = async () => {
         if (!urlInput.trim()) return;
+        const normalizedUrl = normalizeUrl(urlInput);
+        if (!isValidUrl(normalizedUrl)) {
+            setError("Please enter a valid website address (e.g. https://example.com)");
+            return;
+        }
         setIsFetchingUrl(true);
         setIsGeneratingPreview(true);
         setError(null);
@@ -238,7 +253,7 @@ export default function HtmlToPdfClient() {
         setPreviewPdfUrl(null);
         try {
             const pdfBlob = await urlToPdf({
-                url: urlInput.trim(),
+                url: normalizedUrl,
                 pageSize,
                 orientation,
                 margin,
@@ -248,7 +263,7 @@ export default function HtmlToPdfClient() {
             });
             const blobUrl = URL.createObjectURL(pdfBlob);
             setPreviewPdfUrl(blobUrl);
-            setPreviewTitle(urlInput.trim().replace(/^https?:\/\//, "").split("/")[0]);
+            setPreviewTitle(normalizedUrl.replace(/^https?:\/\//, "").split("/")[0]);
             setStage("preview");
             setSettingsChanged(false);
         } catch (err: any) {
@@ -333,7 +348,7 @@ export default function HtmlToPdfClient() {
                 pdfBlob = await response.blob();
             } else {
                 pdfBlob = await urlToPdf({
-                    url: activeTab === "url" ? urlInput.trim() : undefined,
+                    url: activeTab === "url" ? normalizeUrl(urlInput) : undefined,
                     html: activeTab !== "url" ? previewHtml : undefined,
                     pageSize,
                     orientation,
@@ -452,11 +467,10 @@ export default function HtmlToPdfClient() {
                             {!htmlFile ? (
                                 <div
                                     {...getRootProps()}
-                                    className={`group flex flex-col items-center justify-center py-8 sm:py-10 px-6 sm:px-12 rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer text-center w-full ${
-                                        isDragActive
+                                    className={`group flex flex-col items-center justify-center py-8 sm:py-10 px-6 sm:px-12 rounded-2xl border-2 border-dashed transition-all duration-200 cursor-pointer text-center w-full ${isDragActive
                                             ? "border-brand-teal bg-[#e6f4ef]/60 scale-[1.003]"
                                             : "border-[#E0DED9] bg-[#FAFAF9] hover:border-brand-teal/70 hover:bg-[#FAF9F7]"
-                                    }`}
+                                        }`}
                                 >
                                     <input {...getInputProps()} id="html-file-input" />
 
@@ -515,9 +529,8 @@ export default function HtmlToPdfClient() {
                                         type="button"
                                         onClick={() => handleFileRead(htmlFile)}
                                         disabled={isGeneratingPreview}
-                                        className={`w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-brand-teal hover:bg-[#036649] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-[0.99] ${
-                                            isGeneratingPreview ? "opacity-60 cursor-wait" : ""
-                                        }`}
+                                        className={`w-full py-4 px-6 rounded-xl font-bold text-base text-white bg-brand-teal hover:bg-[#036649] transition-all flex items-center justify-center gap-2 shadow-sm cursor-pointer active:scale-[0.99] ${isGeneratingPreview ? "opacity-60 cursor-wait" : ""
+                                            }`}
                                     >
                                         {isGeneratingPreview ? (
                                             <IconLoader2 size={20} className="animate-spin" />

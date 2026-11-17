@@ -177,10 +177,12 @@ async function embedSignaturesIntoPdf(
         const page = pages[placed.pageIndex];
         if (!page) continue;
 
-        // Convert base64 PNG to bytes
+        // Convert base64 data URL to bytes
         const base64 = placed.dataUrl.split(",")[1];
         const imgBytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
-        const img = await pdfDoc.embedPng(imgBytes);
+        // Support both PNG and JPEG signature images (previously PNG-only)
+        const isJpeg = placed.dataUrl.startsWith("data:image/jpeg") || placed.dataUrl.startsWith("data:image/jpg");
+        const img = isJpeg ? await pdfDoc.embedJpg(imgBytes) : await pdfDoc.embedPng(imgBytes);
 
         const pdfPageWidth = page.getWidth();
         const pdfPageHeight = page.getHeight();
@@ -1579,19 +1581,19 @@ export default function SignPdfSignPage() {
 
             </div>
 
-            {/* Modal */ }
-    {
-        showModal && (
-            <SignatureModal
-                onClose={() => {
-                    setShowModal(false);
-                    setEditingSignature(null);
-                }}
-                onSave={handleSaveSignature}
-                initialData={editingSignature ?? undefined}
-            />
-        )
-    }
+            {/* Modal */}
+            {
+                showModal && (
+                    <SignatureModal
+                        onClose={() => {
+                            setShowModal(false);
+                            setEditingSignature(null);
+                        }}
+                        onSave={handleSaveSignature}
+                        initialData={editingSignature ?? undefined}
+                    />
+                )
+            }
         </div >
     );
 }

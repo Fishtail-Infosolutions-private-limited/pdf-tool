@@ -6,9 +6,9 @@ export async function POST(req: Request) {
   // Check auth
   const cookieStore = await cookies();
   const adminToken = cookieStore.get("admin_token")?.value;
-  const expectedToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
+  const expectedToken = process.env.NEXTAUTH_SECRET;
 
-  if (!adminToken || adminToken !== expectedToken) {
+  if (!expectedToken || !adminToken || adminToken !== expectedToken) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

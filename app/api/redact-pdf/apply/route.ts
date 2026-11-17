@@ -5,7 +5,8 @@ export async function POST(request: Request) {
         const formData = await request.formData();
 
         // Proxy the raw FormData to the Python microservice
-        const res = await fetch("http://127.0.0.1:8000/redact/apply", {
+        const PYTHON_SERVICE_URL = process.env.PYTHON_SERVICE_URL || "http://localhost:8001";
+        const res = await fetch(`${PYTHON_SERVICE_URL}/redact/apply`, {
             method: "POST",
             body: formData,
         });

@@ -117,9 +117,26 @@ async def compare_pdfs(file_a: UploadFile, file_b: UploadFile) -> dict:
                         additions.append(normalise(raw_words_b[i], page_b_width, page_b_height))
                         total_added += 1
 
-                has_changes = bool(deletions or additions)
-                if has_changes:
-                    changed_pages.append(page_idx + 1)
+            # --- Check visual / image differences (ISSUE-07) -----------------------
+            images_a = page_a.get_images() if page_a_exists else []
+            images_b = page_b.get_images() if page_b_exists else []
+            if len(images_a) != len(images_b):
+                if len(images_b) > len(images_a):
+                    additions.append({
+                        "x": 0.05, "y": 0.05, "w": 0.9, "h": 0.9,
+                        "text": f"[{len(images_b) - len(images_a)} new image/graphic(s) detected]"
+                    })
+                    total_added += 1
+                else:
+                    deletions.append({
+                        "x": 0.05, "y": 0.05, "w": 0.9, "h": 0.9,
+                        "text": f"[{len(images_a) - len(images_b)} image/graphic(s) removed]"
+                    })
+                    total_deleted += 1
+
+            has_changes = bool(deletions or additions)
+            if has_changes:
+                changed_pages.append(page_idx + 1)
 
             pages_result.append({
                 "page_num": page_idx + 1,

@@ -119,26 +119,30 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async signIn({ user, account, profile }) {
       if (account?.provider === "google") {
-        await connectToDatabase();
+        try {
+          await connectToDatabase();
 
-        let dbUser = await User.findOne({ email: user.email?.toLowerCase() });
+          let dbUser = await User.findOne({ email: user.email?.toLowerCase() });
 
-        // Auto-register first-time Google sign-ins
-        if (!dbUser && user.email) {
-          // If their google account happens to be a .edu domain, instantly mark them!
-          const autoStudent = isStudentEmail(user.email);
+          // Auto-register first-time Google sign-ins
+          if (!dbUser && user.email) {
+            // If their google account happens to be a .edu domain, instantly mark them!
+            const autoStudent = isStudentEmail(user.email);
 
-          dbUser = await User.create({
-            email: user.email.toLowerCase(),
-            name: user.name,
-            image: user.image,
-            isStudent: autoStudent,
-            studentEmail: autoStudent ? user.email.toLowerCase() : undefined,
-          });
-        } else if (dbUser && user.image && dbUser.image !== user.image) {
-          // Update missing/changed image on subsequent sign-ins
-          dbUser.image = user.image;
-          await dbUser.save();
+            dbUser = await User.create({
+              email: user.email.toLowerCase(),
+              name: user.name,
+              image: user.image,
+              isStudent: autoStudent,
+              studentEmail: autoStudent ? user.email.toLowerCase() : undefined,
+            });
+          } else if (dbUser && user.image && dbUser.image !== user.image) {
+            // Update missing/changed image on subsequent sign-ins
+            dbUser.image = user.image;
+            await dbUser.save();
+          }
+        } catch (dbErr) {
+          console.warn("[NextAuth signIn] Database unavailable during Google sign-in. Proceeding with OAuth session:", dbErr);
         }
       }
       return true;

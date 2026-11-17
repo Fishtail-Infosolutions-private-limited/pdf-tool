@@ -12,9 +12,9 @@ import { unlink } from "fs/promises";
 export async function GET(req: NextRequest) {
   try {
     const adminToken = req.cookies.get("admin_token")?.value;
-    const expectedToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
+    const expectedToken = process.env.NEXTAUTH_SECRET;
 
-    if (!adminToken || adminToken !== expectedToken) {
+    if (!expectedToken || !adminToken || adminToken !== expectedToken) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -43,9 +43,9 @@ export async function GET(req: NextRequest) {
 export async function PATCH(req: NextRequest) {
   try {
     const adminToken = req.cookies.get("admin_token")?.value;
-    const expectedToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
+    const expectedToken = process.env.NEXTAUTH_SECRET;
 
-    if (!adminToken || adminToken !== expectedToken) {
+    if (!expectedToken || !adminToken || adminToken !== expectedToken) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
@@ -105,9 +105,9 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   try {
     const adminToken = req.cookies.get("admin_token")?.value;
-    const expectedToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
+    const expectedToken = process.env.NEXTAUTH_SECRET;
 
-    if (!adminToken || adminToken !== expectedToken) {
+    if (!expectedToken || !adminToken || adminToken !== expectedToken) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 

@@ -33,6 +33,9 @@ async def _async_convert_url_to_pdf(
 
     # Decide filename
     if url:
+        url = url.strip()
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = f"https://{url}"
         # Improved safe domain extraction
         try:
             from urllib.parse import urlparse
@@ -103,7 +106,12 @@ async def _async_convert_url_to_pdf(
                     """)
             except Exception as e:
                 logger.error(f"Error loading page in Playwright: {e}")
-                raise ValueError(f"Failed to load page: {e}")
+                error_str = str(e)
+                if "Protocol error" in error_str or "Cannot navigate to invalid URL" in error_str:
+                    raise ValueError("Please provide a valid website address with a reachable domain (e.g. https://example.com).")
+                elif "Timeout" in error_str:
+                    raise ValueError("The website took too long to respond. Please check the URL and try again.")
+                raise ValueError(f"Failed to load page: {error_str.splitlines()[0] if error_str else 'Unknown error'}")
                 
             try:
                 pdf_options: dict = {

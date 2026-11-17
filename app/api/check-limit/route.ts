@@ -28,7 +28,10 @@ export async function GET(req: NextRequest) {
 
     let session = null;
     try {
-      session = await getServerSession(authOptions);
+      session = await Promise.race([
+        getServerSession(authOptions),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000)),
+      ]);
     } catch {
       // Ignore session lookup errors
     }

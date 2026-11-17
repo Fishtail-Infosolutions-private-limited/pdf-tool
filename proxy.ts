@@ -15,8 +15,8 @@ export default async function proxy(req: NextRequest) {
   // 1. ADMIN PORTAL PROTECTION
   if (pathname.startsWith("/admin")) {
     const adminToken = req.cookies.get("admin_token")?.value;
-    const expectedToken = process.env.NEXTAUTH_SECRET || "fallback_secret_for_admin_token_123";
-    const isAuthenticated = adminToken && adminToken === expectedToken;
+    const expectedToken = process.env.NEXTAUTH_SECRET;
+    const isAuthenticated = !!expectedToken && !!adminToken && adminToken === expectedToken;
 
     if (pathname === "/admin/login" && isAuthenticated) {
       return NextResponse.redirect(new URL("/admin/verifications", req.url));
